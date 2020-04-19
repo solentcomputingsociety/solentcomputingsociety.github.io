@@ -1,0 +1,34 @@
+{
+  "short_name": "Computing Society",
+  "name": "Solent Computing Society",
+  "description": "Solent Computing Society offical web app.",
+  "dir": "ltr",
+  "lang": "en",
+  "orientation": "portrait-primary",
+  "crossorigin": "use-credentials",
+  "icons": [
+    {
+      "src": "/app/img/icons/android-chrome-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/app/img/icons/android-chrome-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "serviceworker": {
+    "src": "/sw.js",
+    "scope": "/",
+    "type": "",
+    "update_via_cache": "none"
+  },
+  "start_url": "/login",
+  "background_color": "#e81717",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#e81717"
+}

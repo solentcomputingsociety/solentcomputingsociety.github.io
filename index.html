@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, user-scalable=no">
+	<title>Solent Computing Society</title>
+	<link rel="shortcut icon" href="/favicon.ico" />
+	<link rel="icon" href="/img/favicon_16x16.png" type="image/png" sizes="16x16" />
+	<link rel="icon" href="/img/favicon_36x36.png" type="image/png" sizes="36x36" />
+	<link rel="icon" href="/img/favicon_96x96.png" type="image/png" sizes="96x96" />
+	<link rel="apple-touch-icon" href="/img/apple/touch_icon.png" />
+	<meta name="apple-mobile-web-app-title" content="Computing Society">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="description" content="The offical website for the Solent Computing Society">
+	<link rel="manifest" href="/app/manifest.webmanifest">
+	<script type="text/javascript">"serviceWorker"in navigator&&navigator.serviceWorker.register("/sw.js"),(void 0===window.navigator.standalone||!window.navigator.standalone)&&!window.matchMedia("(display-mode: standalone)").matches||location.assign("login.html");</script>
+	<style type="text/css">
+html, body {
+	margin: 0;
+	font-family: arial;
+}
+p {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 80vw;
+}
+div#header_navigation {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 80px;
+	width: 100vw;
+	background-color: #e81717;
+	z-index: 999;
+}
+a#user_link{
+	display: block;
+	text-decoration: none;
+	float: right;
+	border: 3px solid #ffffff;
+	color: #ffffff;
+	padding: 10px 20px;
+	border-radius: 56px;
+	font-size: large;
+	font-weight: 300;
+	height: 20px;
+	margin: 17px 35px 17px 0;
+	cursor: pointer;
+}
+a#user_link:hover {
+	background: #ffffff !important;
+	color: #e81717 !important;
+}
+div#logo {
+	padding: 5px 15px 5px 0;
+	width: 125px;
+	height: 70px;
+	margin: 0 10px 0 30px;
+	display: inline-block;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-image: url("/logo_flat.png");
+	background-size: 125px 70px;
+}
+div#content {
+	padding-top: 80px;
+	text-align: center;
+}
+div#header_navigation > * {
+	font-family: arial;
+	-webkit-transition: all 300ms ease-out;
+	-moz-transition: all 300ms ease-out;
+	-o-transition: all 300ms ease-out;
+	transition: all 300ms ease-out;
+}
+@media screen and (max-width: 680px){
+	div#header_navigation {
+		-webkit-box-shadow: 0px 6px 10px 0px rgba(232, 23, 23, 0.8);
+		box-shadow: 0px 6px 10px 0px rgba(232, 23, 23, 0.8);
+	}
+	div#logo {
+		margin-left:10px !important;
+	}
+	a#user_link {
+		margin-right: 20px !important;
+		background: #ffffff !important;
+		border-color: #ffffff;
+		color: #e81717 !important;
+	}
+	#content {
+		margin-top: 0 !important;
+		min-height: calc(95vh - 80px);
+	}
+	#image_render > #device {
+		background-image: url("img/iphone_f.png") !important;
+		width: 100vw !important;
+	}
+	#image_render > #display {
+		height: 100% !important;
+	}
+	#image_render > #display > div {
+		transform: skew(150deg, 16deg);
+		padding-top: 50px;
+		height: 100%;
+	}
+}
+#content {
+	margin: 1em auto 3em;
+	min-height: calc(95vh - 80px - 1em);
+}
+#footer {
+	vertical-align: bottom;
+	text-align: center;
+	height: 5vh;
+	font-size: small;
+}
+#footer > p {
+	text-align: center;
+}
+#image_render {
+	overflow: hidden;
+	height: 400px;
+}
+#image_render > #device {
+	background-image: url("img/laptop_f.png"); 
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	height: 400px;
+	width: 649px;
+	margin: auto;
+	position: absolute;
+	left: 0;
+	right: 0;
+	z-index: 1;
+}
+#image_render > #display {
+	margin: 20px auto;
+	height: 320px;
+	width: 550px;
+}
+#image_render > #display > div{
+	height: 100%;
+	width: 100%;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+#img_1 {
+	background-image: url("img/local/scs_1.jpg");
+}
+.no_slide_image {
+	width: 0 !important;
+}
+p.ul {
+	margin-bottom: 0;
+	font-weight: bold;
+	font-size: large;
+	line-height: 2em;
+}
+p.ul:after {
+	content: ":";
+}
+p.li {
+	margin: 0 auto;
+}
+a {
+	text-decoration: none;
+}
+</style>
+</head>
+<body>
+	<div id="header_navigation">
+		<div id="logo"></div>
+		<a href="/login" id="user_link">Login</a>
+	</div>
+	<div id="content">
+		<div id="image_render">
+			<div id="device"></div>
+			<div id="display">
+				<div id="img_1"></div>
+				<script type="text/javascript">
+					for(var img=["img/local/scs_2.jpg","img/local/scs_3.jpg","img/local/scs_4.jpg","img/local/scs_5.jpg","img/local/scs_6.jpg","img/local/scs_7.jpg","img/local/scs_8.jpg","img/local/scs_9.jpg"],i=0;i<img.length;i++)div=document.createElement("div"),div.id="img_"+(i+2),div.style="background-image: url('"+img[i]+"')",document.getElementById("display").appendChild(div),img[i]=document.getElementById(div.id);var current=0;img.unshift(document.getElementById("img_1")),setInterval(function(){for(var i=0;i<img.length;i++)img[i].style.display="none";current=current!=img.length-1?current+1:0,img[current].style.display="block"},3e3);
+				</script>
+			</div>
+		</div>
+		<h1>Welcome to the Solent Computing Society</h1>
+		<div>
+			<p>This is the offical website for the Solent Computing Society.</p>
+			<p>The Computing Society are a bunch of friendly people from all studies who like to get together and have fun.</p>
+			<p class="ul">So what do we do as a society</p>
+			<p class="li">We meet every Wednesday between 17:00 and 19:00 in JM312 to socialise and meet new faces,</p class="li">
+			<p class="li">We attend events (e.g. hackathons, meetups, and workshops),</p class="li">
+			<p class="li">Play games,</p class="li">
+			<p class="li">Try out new things whenever we can.</p class="li">
+			<p>Not sure if you want to join us in the room? Come join us for drinks after!</p>
+			<p class="ul">You can reach us on</p>
+			<p class="li"><a href="mailto:computing@solentsu.co.uk" target="_blank" title="Email">Email</a></p class="li">
+			<p class="li"><a href="http://www.facebook.com/SolentCS/" target="_blank" title="Facebook">Facebook</a></p class="li">
+			<p class="li"><a href="https://twitter.com/SolentCS" target="_blank" title="Twitter">Twitter</a></p class="li">
+			<p class="li"><a href="https://discord.gg/MabpHdk" target="_blank" title="Discord">Discord</a></p class="li">
+		</div>
+	</div>
+	<div id="footer">
+		<p>&copy; Solent Computing Society</p>
+	</div>
+</body>
+</html>

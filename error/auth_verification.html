@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="/s/tyle/main.css">
+	<title>Verify email address | Solent Computing Society</title>
+	<script>const page_ref = "770cd2f0fc573368510bcf08355f9fbc";</script>
+	<script type="text/javascript" src="/s/cript/app.js"></script>
+	<link rel="manifest" href="/app/manifest.webmanifest">
+	<script type="text/javascript">if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}</script>
+</head>
+<body>
+	<div id="welcome_page">
+		<div class="content">
+			<div id="b_banner"></div>
+			<div>
+				<form method="post">
+					<div id="login_panel" class="hide">
+						<div id="login_panel_submit" class="input_container">
+							<div id="login_panel_error">
+								<div>Your email address (<span id="email_address">email@solent.ac.uk</span>) needs to be verified!</div>
+								<div id="login_panel_error_content"></div>
+							</div>
+							<input type="submit" value="Send verification code" id="login_submit">
+						</div>
+					</div>
+					<div id="load_spinner" class="margin_top"></div>
+				</form>
+			</div>
+		</div>
+		<div class="footer">
+			<p class="white_text center_text no_margin" id="cancel_verification">Cancel</p>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /app/
+Disallow: /error/
+Disallow: /img/
+Disallow: /s/
+Allow: /
