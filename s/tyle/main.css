@@ -466,7 +466,7 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 
 @media screen and (max-width: 450px){
 	div.input_container > input {
-		padding: 2vw 20px;
+		padding: 2vw 20px !important;
 	}
 	div#login_panel_error {
 		max-width: 100vw;
