@@ -581,6 +581,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										add.callback[i]();
 									}
 								} catch(e){}
+								try {
+									document.getElementById("redundant_padding").style.minHeight = (document.getElementById("banner_contents").offsetHeight + 20 - (16 * 4)) + "px";
+								} catch(e){};
 							}
 							var load = ["/app/img/map_loading.gif"].forEach(function(img){
 								img_blob(img);
