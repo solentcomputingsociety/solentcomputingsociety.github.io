@@ -304,7 +304,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							});
 							sub_pages.forEach(function(nav_id){
 								var sub_page_link_ref = sub_pages[sub_page_link_generation];
-								document.getElementById(nav_id).addEventListener("click",function(){
+								document.getElementById(nav_id).addEventListener("click",function(e){
+									if (e.target.classList.contains("disabled")){
+										return;
+									}
 									for (var type_key in contents) {
 										if ([[],null].indexOf(contents[type_key]) >= 0){
 											return;
