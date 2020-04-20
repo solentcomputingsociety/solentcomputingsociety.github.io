@@ -517,6 +517,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 													post_contents = post_contents[0].split("\\n");
 												}
 												for (var iii = 0; iii < post_contents.length; iii++) {
+													post_contents[iii] = post_contents[iii].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 													post_contents[iii] = (post_contents[iii] || "").replace(/([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
 														function(match, space, url){
 															var hyperlink = url;
