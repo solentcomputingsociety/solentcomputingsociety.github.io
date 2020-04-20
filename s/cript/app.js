@@ -108,6 +108,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		switch (page) {
 			case "d56b699830e77ba53855679cb1d252da":
 				if (preload){
+					document.title = "Loading... | Solent Computing Society";
 					document.addEventListener("DOMContentLoaded", function(event){
 						document.getElementById("login_panel").classList.add("hide");
 						document.getElementById("load_spinner").classList.remove("hide");
@@ -124,6 +125,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							}
 							return;
 						} else {
+							document.title = "Login | Solent Computing Society";
 							document.getElementById("login_panel").classList.remove("hide");
 							document.getElementById("load_spinner").classList.add("hide");
 							document.getElementById("footer_content").classList.remove("hide");
@@ -189,29 +191,30 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								e.preventDefault();
 								var credentials = [];
 								try {
-									var login_email = document.getElementById("login_email");
-									var login_password = document.getElementById("login_password");
+									var signup_email = document.getElementById("signup_email");
+									var signup_password = document.getElementById("signup_password");
 									var error_panel = document.getElementById("login_panel_error");
-									if (!/@solent.ac.uk\s*$/.test(login_email.value)){
+									if (!/@solent.ac.uk\s*$/.test(signup_email.value)){
 										error_panel.innerHTML = "Please use your university email address!";
 										error_panel.classList.remove("hide");
 										return;
 									} else {
 										document.getElementById("login_panel_submit").classList.add("hide");
 										document.getElementById("load_spinner").classList.remove("hide");
-										login_email.disabled = true;
-										login_password.disabled = true;
-										credentials.push(login_email.value);
-										credentials.push(login_password.value);
+										signup_email.disabled = true;
+										signup_password.disabled = true;
+										credentials.push(signup_email.value);
+										credentials.push(signup_password.value);
 										document.getElementById("footer_content").classList.add("hide");
+										overide_redirect = true;
 										await firebase.auth().createUserWithEmailAndPassword(credentials[0], credentials[1]).catch(function(error) {
 											error_panel.innerHTML = error.message;
 											error_panel.classList.remove("hide");
 											document.getElementById("login_panel_submit").classList.remove("hide");
 											document.getElementById("load_spinner").classList.add("hide");
-											login_email.disabled = false;
-											login_password.disabled = false;
-											overide_redirect = true;
+											signup_email.disabled = false;
+											signup_password.disabled = false;
+											overide_redirect = false;
 										});
 										if (overide_redirect){
 											document.getElementById("footer_content").classList.add("hide");
@@ -221,6 +224,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										}
 									}
 								} catch (e) {
+									console.log(e);
+									return;
 									window.location.href = "/error/unexpected";
 								}
 							});
@@ -657,7 +662,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							user.name = user.name || "";
 							user.photo = user.photo || "";
 						}
-						var content = "<div id=\"settings_ref_content_prof_picture_container\"><img id=\"settings_ref_content_prof_picture\"><p class=\"center_text no_margin\" id=\"settings_ref_content_prof_picture_actions_container\"><input type=\"file\" class=\"hide\" id=\"settings_ref_content_prof_picture_change\" accept=\"image/x-png,image/jpeg,image/jpg\"><a id=\"settings_ref_content_prof_picture_change_link\">Change profile picture</a><a id=\"settings_ref_content_prof_picture_remove_link\">Remove picture</a></p></div><div class=\"input_container\"><input type=\"text\" placeholder=\"Your name\" value=\"" + user.name + "\" id=\"settings_ref_content_prof_name_value\" /><p class=\"no_margin center_text\"><a id=\"settings_ref_content_prof_name_change_link\">Update your display name</a></p></div>";
+						var content = "<div id=\"settings_ref_content_prof_picture_container\"><img id=\"settings_ref_content_prof_picture\"><p class=\"center_text no_margin\" id=\"settings_ref_content_prof_picture_actions_container\"><input type=\"file\" class=\"hide\" id=\"settings_ref_content_prof_picture_change\" accept=\"image/x-png,image/jpeg,image/jpg\"><a id=\"settings_ref_content_prof_picture_change_link\">Change profile picture</a><a id=\"settings_ref_content_prof_picture_remove_link\">Remove picture</a></p></div><div class=\"input_container\"><input type=\"text\" placeholder=\"Your name\" value=\"" + user.name + "\" id=\"settings_ref_content_prof_name_value\" autocomplete=\"name\"/><p class=\"no_margin center_text\"><a id=\"settings_ref_content_prof_name_change_link\">Update your display name</a></p></div>";
 						document.getElementById("settings_loading_statement").outerHTML = "";
 						document.getElementById("setting_ref_content").innerHTML = content;
 						document.getElementById("settings_ref_content_prof_picture_change_link").addEventListener("click",function(){
