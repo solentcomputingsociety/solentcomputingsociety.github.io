@@ -61,6 +61,11 @@ div.content {
 div.footer {
 	height: 5vh;
 }
+span#password_forgotten_link {
+	color: #ffffff;
+	font-weight: bold;
+	cursor: pointer;
+}
 span#user_registration_action {
 	font-weight: bold;
 }

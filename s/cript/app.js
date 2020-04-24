@@ -166,6 +166,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								document.getElementById("load_spinner").classList.remove("hide");
 								window.location.href = "signup";
 							});
+							document.getElementById("password_forgotten_link").addEventListener("click",function(){
+								overide_redirect = true;
+								document.getElementById("footer_content").classList.add("hide");
+								document.getElementById("login_panel").classList.add("hide");
+								document.getElementById("login_panel_submit").classList.add("hide");
+								document.getElementById("load_spinner").classList.remove("hide");
+								window.location.href = "password";
+							});
 						}
 					});
 				}
@@ -224,8 +232,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										}
 									}
 								} catch (e) {
-									console.log(e);
-									return;
 									window.location.href = "/error/unexpected";
 								}
 							});
@@ -238,6 +244,61 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									document.getElementById("load_spinner").classList.remove("hide");
 									window.location.href = "login";
 								}
+							});
+						}
+					});
+				}
+				break;
+			case "5f4dcc3b5aa765d61d8327deb882cf99":
+				if (preload){
+					document.title = "Loading... | Solent Computing Society";
+					document.addEventListener("DOMContentLoaded", function(event){
+						document.getElementById("login_panel").classList.add("hide");
+						document.getElementById("load_spinner").classList.remove("hide");
+					});
+				} else {
+					firebase.auth().onAuthStateChanged(function(user) {
+						if (user) {
+							document.getElementById("footer_content").classList.add("hide");
+							location.assign("app/start.html");
+						} else {
+							document.title = "Password reset | Solent Computing Society";
+							document.getElementById("login_panel").classList.remove("hide");
+							document.getElementById("load_spinner").classList.add("hide");
+							document.getElementById("login_submit").addEventListener("click",async function(e){
+								e.preventDefault();
+								var credentials = [];
+								try {
+									var login_email = document.getElementById("login_email");
+									var error_panel = document.getElementById("login_panel_error");
+									document.getElementById("login_panel_submit").classList.add("hide");
+									document.getElementById("load_spinner").classList.remove("hide");
+									login_email.disabled = true;
+									credentials.push(login_email.value);
+									document.getElementById("footer_content").classList.add("hide");
+									await firebase.auth().sendPasswordResetEmail(credentials[0]).then(function(){
+										error_panel.innerHTML = "Please check \"" + credentials[0] + "\" for a password reset email.";
+										document.getElementById("load_spinner").classList.add("hide");
+										e.target.classList.add("hide");
+										login_email.classList.add("hide");
+									}).catch(function(error) {
+										error_panel.innerHTML = error.message;
+										document.getElementById("load_spinner").classList.add("hide");
+										login_email.disabled = false;
+									});
+									document.getElementById("login_panel_submit").classList.remove("hide");
+									document.getElementById("footer_content").classList.remove("hide");
+									error_panel.classList.remove("hide");
+								} catch (e) {
+									window.location.href = "/error/unexpected";
+								}
+							});
+							document.getElementById("user_registration_action").addEventListener("click",function(){
+								document.getElementById("footer_content").classList.add("hide");
+								document.getElementById("login_panel").classList.add("hide");
+								document.getElementById("login_panel_submit").classList.add("hide");
+								document.getElementById("load_spinner").classList.remove("hide");
+								window.location.href = "login";
 							});
 						}
 					});
@@ -562,7 +623,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										} else if (contents.pub.error == true){
 											out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin\"><p class=\"center_text\">Unable to load this week's pub!</p></div>";
 										} else {
-											out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin\"><p class=\"center_text\">This week we will be going to:</p><h2 class=\"center_text\">" + contents.pub.name + "</h2><p class=\"center_text\">" + contents.pub.address + "</p><p class=\"center_text\">" + contents.pub.postcode + "</p></div><iframe src=\"http://maps.google.com/maps?q=" + contents.pub.geo[0] + "," + contents.pub.geo[1] + "&z=18&output=embed\" id=\"pub_map\" frameborder=\"0\" style=\"border:0;background-image:url(\'" + img_blob("/app/img/map_loading.gif",false,true) + "\')\" allowfullscreen=\"\" aria-hidden=\"false\" tabindex=\"0\"></iframe>";
+											out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin\"><p class=\"center_text\">This week we will be going to:</p><h2 class=\"center_text\">" + contents.pub.name + "</h2><p class=\"center_text\">" + contents.pub.address + "</p><p class=\"center_text\">" + contents.pub.postcode + "</p></div><iframe src=\"https://maps.google.com/maps?q=" + contents.pub.geo[0] + "," + contents.pub.geo[1] + "&z=18&output=embed\" id=\"pub_map\" frameborder=\"0\" style=\"border:0;background-image:url(\'" + img_blob("/app/img/map_loading.gif",false,true) + "\')\" allowfullscreen=\"\" aria-hidden=\"false\" tabindex=\"0\"></iframe>";
 										}
 										break;
 								}
