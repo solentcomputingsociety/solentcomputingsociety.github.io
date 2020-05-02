@@ -349,7 +349,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						if (user) {
 							var sub_pages = ["nav_loc_messages","nav_loc_events","nav_loc_members","nav_loc_pub"];
 							var sub_page = sub_pages[0];
-							var contents = {posts:{},users:[],events:[true],pub:"tbc"};
+							var contents = {posts:{},users:[],events:true,pub:"tbc"};
 							sub_page_link_generation = 0;
 							var posts_base_load = false;
 							document.getElementById("s_banner").addEventListener("click",function(){
@@ -465,6 +465,45 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									}
 								});
 							});
+							var update_events = () => {
+								var url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS9zTijPhj-aPs27NCX3NYmwsTYjGLlvsR6nNWa_8DO1VjgGvX4uA9O3YyPM-I8ZdG_AkXKTPYzXNto/pub?gid=0&single=true&output=csv"
+								try {
+									var request = new XMLHttpRequest();
+									request.open('GET', url, true);
+									request.onreadystatechange = function() {
+										if (this.status >= 400) {
+											contents.events = false;
+											return false;
+										} else if (this.readyState === 4) {
+											var rows = this.responseText.split("\n");
+											rows.shift(0);
+											var display_rows = {}
+											for (var i = 0; i < rows.length; i++) {
+												rows[i] = rows[i].split(",");
+												var date = rows[i][3].split("/") || rows[i][3].split("-") || rows[i][3].split(".");
+												date = new Date(date[2],date[1]-1,date[0]) || 0;
+												var time = rows[i][4].split(":")
+												while (time.length < 3){
+													time.push("0");
+												}
+												time = (+time[0]) * 60 * 60 + (+time[1]) * 60 + (+time[2]) || 0;
+												if (typeof display_rows[date] === "undefined"){
+													display_rows[date] = [];
+												}
+												if (typeof display_rows[date][time] === "undefined"){
+													display_rows[date][time] = [];
+												}
+												display_rows[date][time].push(rows[i]);
+											}
+											contents.events = display_rows;
+										}
+									};
+									request.onerror = function () {
+										contents.events = false;
+									}
+									request.send();
+								} catch(err) {}
+							};
 							var refresh = async function(now){
 								if (now !== true){
 									now = false;
@@ -608,7 +647,78 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										out.html = out.html + "<div class=\"center_text\" id=\"post_end\"></div></div></div>";
 										break;
 									case "nav_loc_events":
-										out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin\"><p class=\"center_text\">This feature is coming soon...</p></div>";
+										out.html = "<div class=\"side_margin center_text\">";
+										if (contents.events === true){
+											out.html = out.html + "<p class=\"center_text\">Still loading events...</p><p class=\"center_text\"><a title=\"Try again?\" id=\"events_retry_action\">Retry</a></p>";
+											add.click.push(["events_retry_action",function(){
+												document.getElementById("nav_loc_events").click();
+											}]);
+										} else {
+											out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin center_text\">";
+											const months = ["January", "February", "March","April", "May", "June", "July", "August", "September", "October", "November", "December"];
+											const ordinal = ["th", "st", "nd", "rd"];
+											var events_added = false;
+											for (let day in contents.events) {
+												try {
+													let show_date = new Date(day);
+													if ((show_date instanceof Date && !isNaN(show_date)) && show_date >= new Date()){
+														if (contents.events[day].length > 0){
+															show_date = [show_date.getDate(),show_date.getMonth(),show_date.getFullYear(),]
+															show_date[3] = show_date[0] % 100;
+															out.html = out.html + "<h4 class=\"event_date\">" + show_date[0] + (ordinal[(show_date[3] - 20) % 10] || ordinal[show_date[1]] || ordinal[0]) + " of " + months[show_date[1]] + ", " + show_date[2] + ":</h4>";
+															for (let time in contents.events[day]){
+																for (var i = 0; i < contents.events[day][time].length; i++){
+																	out.html = out.html + "<div><h5 class=\"event_name\">" + contents.events[day][time][i][0];
+																	try {
+																		let end_date = contents.events[day][time][i][6].split("/") || contents.events[day][time][i][6].split("-") || contents.events[day][time][i][6].split(".");
+																		end_date = new Date(end_date[2],end_date[1]-1,end_date[0]) || -1;
+																		shown_end = false;
+																		if (contents.events[day][time][i][4].length > 0){
+																			out.html = out.html + " (" + contents.events[day][time][i][4];
+																			shown_end = true;
+																		}
+																		if (contents.events[day][time][i][5].length > 0){
+																			if (shown_end) {
+																				out.html = out.html + " - ";
+																			} else {
+																				out.html = out.html + " (until ";
+																			}
+																			out.html = out.html + contents.events[day][time][i][5]
+																			shown_end = true;
+																		}
+																		if(end_date.getTime() > new Date(day).getTime()){
+																			if (shown_end) {
+																				out.html = out.html + " ";
+																			} else {
+																				out.html = out.html + " (";
+																			}
+																			out.html = out.html + end_date.getDate() + "/" + end_date.getMonth() + "/" + end_date.getFullYear() + ")";
+																		} else if (shown_end){
+																			out.html = out.html + ")";
+																		}
+																	} catch (e) {}
+																	events_added = true;
+																	out.html = out.html + "</h5><p class=\"no_top\">" + contents.events[day][time][i][7].replace("\n","</p><p>").replace("<p></p>","") + "</p>";
+																	if (contents.events[day][time][i][2].length > 0){
+																		out.html = out.html + "<p class=\"no_top small\">Location: contents.events[day][time][i][2]</p>";
+																	}
+																	if (contents.events[day][time][i][1].length > 0){
+																		out.html = out.html + "<p class=\"no_top small\">Find out more: <a href=\"" + contents.events[day][time][i][1] + "\" title=\"Visit " + contents.events[day][time][i][1] + " for more information\" target=\"blank\" class=\"out_link\">" + contents.events[day][time][i][1] + "</a></p>";
+																	}
+																	out.html = out.html + "</div>";
+																}
+															}
+														}
+													} else {
+														continue;
+													}
+												} catch (e) {}
+											}
+											if (!events_added) {
+												out.html = out.html + "<p class=\"center_text\">Sadly there are no upcoming events.</p>";
+											}
+										}
+										out.html = out.html + "</div>";
 										break;
 									case "nav_loc_members":
 										out.html = "<div id=\"redundant_padding\"></div>";
@@ -671,12 +781,17 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										location.assign("menu?setup=true");
 									}
 									update_pub().then(async function(e){
+										update_events();
 										await firebase.firestore().collection("blog").doc("banner").get().then(async function(banner){
 											if (banner.exists){
 												banner = banner.data();
 												if (banner.show){
 													var banner_contents = document.getElementById("banner_contents");
 													banner_contents.innerHTML = banner.contents;
+													document.getElementById("banner_main").addEventListener("click",function(){
+														document.getElementById("banner_container").classList.add("hide");
+														document.getElementById("page_render").classList.remove("banner_top");
+													});
 													document.getElementById("banner_container").classList.remove("hide");
 													document.getElementById("page_render").classList.add("banner_top");
 													function resize(){

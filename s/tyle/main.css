@@ -11,6 +11,9 @@ html, body {
 	height: 0 !important;
 	padding: 0 !important;
 }
+.no_top {
+	margin-top: 0;
+}
 .show {
 	opacity: 1 !important;
 	display: block;
@@ -43,6 +46,12 @@ html, body {
 .red_error_bold {
 	color: red;
 	font-weight: bold;
+}
+.out_link {
+	-webkit-touch-callout: none !important;
+}
+.small {
+	font-size: small;
 }
 a {
 	text-decoration: none;
@@ -351,6 +360,23 @@ div#post_end:before, p#post_end_reason, p#settings_loading_statement {
 	padding: 0 10px;
 	width: 100%;
 }
+h4.event_date {
+	margin-top: 2em;
+	margin-bottom: 3px;
+	padding-bottom: 0.5em;
+	font-size: large;
+}
+h4.event_date:after {
+	content: "";
+	width: 50%;
+	margin: auto;
+	height: 1px;
+	display: block;
+	border-bottom: 1px solid #e7e7e7;
+}
+h5.event_name {
+	margin: 0;
+}
 #pub_map {
 	width: 90%;
 	height: 600px;
@@ -445,6 +471,12 @@ div#banner_main > p {
 	color: #ffffff;
 	margin: 0 10px;
 	text-align: center;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 div#banner_side_left {
 	background-color: #ffffff;
