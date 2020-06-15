@@ -82,13 +82,19 @@ div#welcome_page, div#page_contents, div#page_contents_static {
 	background-color: #e81717;
 	min-height: 100vh;
 }
-#page_contents, div#page_contents_static {
+#page_contents, div#page_contents_static, div.app_page_contents {
 	background-color: #ffffff !important;
 	opacity: 0;
 	min-height: unset !important;
 }
 div#page_contents_static {
 	opacity: 1 !important;
+}
+div.app_page_contents {
+	display: -ms-grid;
+	display: grid;
+	-ms-grid-columns: 15vw auto;
+	grid-template-columns: 15vw auto;
 }
 div#b_banner, div#s_banner {
 	width: 480px;
@@ -541,6 +547,10 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 	}
 }
 @media screen and (max-width: 900px){
+	div.app_page_contents {
+		-ms-grid-columns: 20vw auto;
+		grid-template-columns: 20vw auto;
+	}
 	div.base_nav, div.base_nav > ul {
 		width: 20vw;
 	}
@@ -549,6 +559,9 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 	}
 }
 @media screen and (max-width: 812px){
+	div.app_page_contents {
+		display: block !important;
+	}
 	div.app_nav, div.base_nav {
 		-webkit-box-shadow: 0px 6px 10px 0px rgba(232, 23, 23, 0.8);
 		box-shadow: 0px 6px 10px 0px rgba(232, 23, 23, 0.8);
