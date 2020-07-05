@@ -968,7 +968,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 
 																		}
 																		if (about_me["Favourite film"].trim().length > 0) {
-																			about_panel_out += "<h3>Relationship film:</h3><p>" + about_me["Favourite film"] + "</p>";
+																			about_panel_out += "<h3>Favourite film:</h3><p>" + about_me["Favourite film"] + "</p>";
 
 																		}
 																		if (about_me["Favourite TV show"].trim().length > 0) {
