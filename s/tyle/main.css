@@ -817,6 +817,9 @@ a#close_popup_dialog {
 	div.app_contents, div#banner_container {
 		width: 76vw;
 	}
+	div.members_list.about_me_edit {
+		width: 70%;
+	}
 }
 @media screen and (max-width: 812px){
 	div.app_page_contents {

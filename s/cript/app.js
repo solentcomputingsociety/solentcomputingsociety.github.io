@@ -877,20 +877,23 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																					} else {
 																						build_socials += "id=\"discord_link-" + user_view_about + "\" prof_tag=\""
 																					}
+																					var ref_url = about_me[social];
 																					if (ref_icon == "phone_number"){
-																						build_socials += "tel:";
+																						build_socials += encodeURI("tel:" + ref_url);
 																					} else if (ref_icon == "email"){
-																						build_socials += "mailto:";
+																						build_socials += encodeURI("mailto:" + ref_url);
 																					} else if (ref_icon == "facebook"){
-																						build_socials += "https://www.facebook.com/";
+																						build_socials += encodeURI("https://www.facebook.com/" + ref_url);
 																					} else if (ref_icon == "twitter"){
-																						build_socials += "https://twitter.com/";
+																						build_socials += encodeURI("https://twitter.com/" + ref_url);
 																					} else if (ref_icon == "instagram"){
-																						build_socials += "https://www.instagram.com/";
+																						build_socials += encodeURI("https://www.instagram.com/" + ref_url);
 																					} else if (ref_icon == "snapchat"){
-																						build_socials += "https://snapchat.com/add/";
+																						build_socials += encodeURI("https://snapchat.com/add/" + ref_url);
+																					} else {
+																						build_socials += encodeURI(ref_url);
 																					}
-																					build_socials += about_me[social] + "\"><div id=\"social_icon_" + ref_icon + "\"";
+																					build_socials += "\"><div id=\"social_icon_" + ref_icon + "\"";
 																					if (ref_icon == "website"){
 																						try {
 																							build_socials += " style=\"background-image:url(https://www.google.com/s2/favicons?domain=" + (new URL(about_me["Website"])).hostname +  ")\"";
@@ -910,7 +913,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																		}
 																		about_panel_out += "<div class=\"side_margin\">" + build_socials;
 																		if (about_me["Intro"].length > 0){
-																			about_panel_out += "<p class=\"center_text small_bottom\">" + about_me["Intro"] + "</p>";
+																			about_panel_out += "<p class=\"center_text small_bottom\">" + about_me["Intro"].replace('<','&lt;').replace('>','&gt;') + "</p>";
 																		}
 																		if (about_me["Subject"].length > 0){
 																			about_panel_out += "<div><h3 class=\"center_text small_bottom\">Studying:</h3><p class=\"center_text\">" + about_me["Subject"];
@@ -946,6 +949,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																							user_view_about = -1;
 																						}
 																					}
+																					console.log(prof_tag);
 																					if (prof_tag !== false) {
 																						alert("Discord username:",prof_tag);
 																					}
@@ -958,23 +962,23 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 
 																		}
 																		if (about_me["Favourite lecturer"].trim().length > 0) {
-																			about_panel_out += "<h3>Favourite lecturer:</h3><p>" + about_me["Favourite lecturer"] + "</p>";
+																			about_panel_out += "<h3>Favourite lecturer:</h3><p>" + about_me["Favourite lecturer"].replace('<','&lt;').replace('>','&gt;') + "</p>";
 
 																		}
 																		if (about_me["Favourite food"].trim().length > 0) {
-																			about_panel_out += "<h3>Favourite food:</h3><p>" + about_me["Favourite food"] + "</p>";
+																			about_panel_out += "<h3>Favourite food:</h3><p>" + about_me["Favourite food"].replace('<','&lt;').replace('>','&gt;') + "</p>";
 
 																		}
 																		if (about_me["Favourite drink"].trim().length > 0) {
-																			about_panel_out += "<h3>Favourite drink:</h3><p>" + about_me["Favourite drink"] + "</p>";
+																			about_panel_out += "<h3>Favourite drink:</h3><p>" + about_me["Favourite drink"].replace('<','&lt;').replace('>','&gt;') + "</p>";
 
 																		}
 																		if (about_me["Favourite film"].trim().length > 0) {
-																			about_panel_out += "<h3>Favourite film:</h3><p>" + about_me["Favourite film"] + "</p>";
+																			about_panel_out += "<h3>Favourite film:</h3><p>" + about_me["Favourite film"].replace('<','&lt;').replace('>','&gt;') + "</p>";
 
 																		}
 																		if (about_me["Favourite TV show"].trim().length > 0) {
-																			about_panel_out += "<h3>Favourite TV show:</h3><p>" + about_me["Favourite TV show"] + "</p>";
+																			about_panel_out += "<h3>Favourite TV show:</h3><p>" + about_me["Favourite TV show"].replace('<','&lt;').replace('>','&gt;') + "</p>";
 																		}
 																		if (about_panel_out != ""){
 																			about_panel_out = "<h2 class=\"no_top\" id=\"about_me_header_about\">About:</h2>" + about_panel_out;
@@ -1460,9 +1464,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							}
 							about_me_container_content += "\" id=\"about_me_removal_" + about_topic.split(" ").join("_") + "\" title=\"Delete " + about_topic.toLowerCase() + "\"></span></td></tr></tbody></table></td></tr><tr><td><div class=\"input_container_about\">";
 							if ([0,2].indexOf(about_sections[about_topic]) >= 0) {
-								about_me_container_content += "<input type=\"text\" id=\"about_me_input_" + about_topic.split(" ").join("_") + "\" value=\"" + (about_me[about_topic] || "") +"\" maxlength=\"1024\" />";
+								about_me_container_content += "<input type=\"text\" id=\"about_me_input_" + about_topic.split(" ").join("_") + "\" value=\"" + (about_me[about_topic] || "").split("\"").join("\\\"") +"\" maxlength=\"1024\" />";
 							} else if (about_sections[about_topic] == 1) {
-								about_me_container_content += "<textarea type=\"text\" id=\"about_me_textarea_" + about_topic.split(" ").join("_") + "\" value=\"" + (about_me[about_topic]||"") + "\" maxlength=\"1024\" />" + (about_me[about_topic]||"") + "</textarea>";
+								about_me_container_content += "<textarea type=\"text\" id=\"about_me_textarea_" + about_topic.split(" ").join("_") + "\" value=\"" + (about_me[about_topic]||"").split("\"").join("\\\"") + "\" maxlength=\"1024\" />" + (about_me[about_topic]||"") + "</textarea>";
 							} else {
 								about_me_container_content += "<select id=\"about_me_select_" + about_topic.split(" ").join("_") + "\">";
 								var about_section = about_sections[about_topic];
