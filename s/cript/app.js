@@ -124,8 +124,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		"Favourite TV show": 0,
 		"Phone number": 0,
 		"Email address": 0,
-		"Facebook": 0,
 		"Website": 2,
+		"Facebook": 0,
+		"Dev Community": 0,
+		"Github": 0,
+		"LinkedIn": 0,
 		"Twitter": 0,
 		"Instagram": 0,
 		"Snapchat": 0,
@@ -850,15 +853,15 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																about_docs.forEach(doc => {
 																	about[doc.id] = doc.is;
 																});
-																var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||0,"Intro":about["intro"]||"","Relationship status":about["relationship_status"]||0,"Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Discord":about["discord"]||"","Youtube":about["youtube"]||""}
+																var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||0,"Intro":about["intro"]||"","Relationship status":about["relationship_status"]||0,"Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Discord":about["discord"]||"","Youtube":about["youtube"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
 																try {
 																	if (document.getElementById("about_me_container").getAttribute("uid") == uid_ref && document.getElementById("about_me_container").getAttribute("outputted") != "yes"){
 																		document.getElementById("about_me_container").setAttribute("outputted","yes");
 																		await img_blob(contents.users[0][i].photo_large,"about_me_prof_img-"+user_view_about);
 																		var build_socials = "";
-																		if ((about_me["Facebook"] + about_me["Twitter"] + about_me["Discord"] + about_me["Instagram"] + about_me["Snapchat"] + about_me["Youtube"] + about_me["Phone number"] + about_me["Email"] + about_me["Website"]).length > 0){
+																		if ((about_me["Facebook"] + about_me["Twitter"] + about_me["Discord"] + about_me["Instagram"] + about_me["Snapchat"] + about_me["Youtube"],about_me["Dev Community"] + about_me["GitHub"] + about_me["LinkedIn"] + about_me["Phone number"] + about_me["Email"] + about_me["Website"]).length > 0){
 																			build_socials = "<div class=\"social_icon_links\">";
-																			["Phone number","Email","Facebook","Twitter","Instagram","Snapchat","Discord","Youtube","Website"].forEach(social => {
+																			["Phone number","Email","GitHub","Facebook","Twitter","Youtube","Instagram","Snapchat","Discord","LinkedIn","Dev Community","Website"].forEach(social => {
 																				var ref_icon = social.toLowerCase().replace(" ","_");
 																				if (about_me[social].length > 0){
 																					var call_tip = contents.users[0][i].name;
@@ -867,7 +870,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																					} else if (ref_icon == "website") {
 																						call_tip = "View " + call_tip + "'s website";
 																					} else if (ref_icon == "snapchat"){
-																						call_tip = "Add " + call_tip + " on " + social;
+																						call_tip = "Add " + call_tip + " on Snapchat";
+																					} else if (ref_icon == "discord"){
+																						call_tip = "Add " + call_tip + " on Discord";
+																					} else if (ref_icon == "linkedin"){
+																						call_tip = "Connect with " + call_tip + " on LinkedIn";
 																					} else {
 																						call_tip = "View " + call_tip + " on " + social;
 																					}
@@ -890,6 +897,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																						build_socials += encodeURI("https://instagram.com/_u/" + ref_url);
 																					} else if (ref_icon == "snapchat"){
 																						build_socials += encodeURI("https://snapchat.com/add/" + ref_url);
+																					} else if (ref_icon == "github"){
+																						build_socials += encodeURI("https://github.com/" + ref_url);
+																					} else if (ref_icon == "dev_community"){
+																						build_socials += encodeURI("https://dev.to/" + ref_url);
 																					} else {
 																						build_socials += encodeURI(ref_url);
 																					}
@@ -1450,7 +1461,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						about_docs.forEach(doc => {
 							about[doc.id] = doc.is;
 						});
-						var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||"","Intro":about["intro"]||"","Relationship status":about["relationship_status"]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||""}
+						var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||"","Intro":about["intro"]||"","Relationship status":about["relationship_status"]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""}
 						
 						document.getElementById("settings_loading_statement").remove();
 						document.getElementById("setting_ref_content").innerHTML = "<p class=\"side_margin margin_top center_text\">This information will be publicly viewable to all members of the Solect Computing Society!</p><div class=\"members_list about_me_edit margin_top\"><table id=\"about_me_container_host\"><tbody id=\"about_me_container\"></tbody></table><br></div>";
@@ -1521,6 +1532,12 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											max_length = 15;
 										} else if (about_me_element_id == "Discord"){
 											max_length = 32;
+										} else if (about_me_element_id == "Github"){
+											max_length = 39;
+										} else if (about_me_element_id == "LinkedIn"){
+											max_length = 58;
+										} else if (about_me_element_id == "Dev Community"){
+											max_length = 39;
 										} else if (about_me_element_id == "Email address") {
 											max_length = 320;
 										} else if (about_me_element_id == "Email address") {
@@ -1566,6 +1583,24 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												} else if (about_me_element_id == "Discord"){
 													if(/^((.+?)#\d{4})/.test(value) == false){
 														alert("Error","Invalid Discord username tag (<code>username#number</code>)!");
+														document.getElementById(element).removeAttribute("disabled");
+														return;
+													}
+												} else if (about_me_element_id == "Github"){
+													if(/([a-z0-9](?:-?[a-z0-9]){0,38})$/.test(value) == false){
+														alert("Error","Invalid Github username!");
+														document.getElementById(element).removeAttribute("disabled");
+														return;
+													}
+												} else if (about_me_element_id == "LinkedIn"){
+													if(/http(s)?:\/\/([\w]+\.)?linkedin\.com\/in\/[A-z0-9_-]+\/?/.test(value) == false){
+														alert("Error","Invalid LinkedIn URL <br>Such as: <code>https://www.linkedin.com/in/username</code>");
+														document.getElementById(element).removeAttribute("disabled");
+														return;
+													}
+												} else if (about_me_element_id == "Dev Community"){
+													if(/^(\w){1,15}$/.test(value) == false && /^[a-zA-Z][\w-_.]{1,13}[\w]$/.test(value) == false){
+														alert("Error","Invalid Dev Community profile username!");
 														document.getElementById(element).removeAttribute("disabled");
 														return;
 													}
