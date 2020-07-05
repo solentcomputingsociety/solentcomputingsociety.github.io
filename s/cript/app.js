@@ -908,8 +908,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																				break;
 																			}
 																		}
-																		about_panel_out += "<div class=\"side_margin\">" + build_socials + "<p class=\"center_text small_bottom\">" + about_me["Intro"] + "</p>";
-																		if (about_me["Subject"].trim().length > 0){
+																		about_panel_out += "<div class=\"side_margin\">" + build_socials;
+																		if (about_me["Intro"].length > 0){
+																			about_panel_out += "<p class=\"center_text small_bottom\">" + about_me["Intro"] + "</p>";
+																		}
+																		if (about_me["Subject"].length > 0){
 																			about_panel_out += "<div><h3 class=\"center_text small_bottom\">Studying:</h3><p class=\"center_text\">" + about_me["Subject"];
 																			if (about_me["Year of study"] > 0){
 																				about_panel_out += " - " + about_sections["Year of study"][about_me["Year of study"] - 1];
@@ -919,8 +922,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																			}																			
 																			about_panel_out += "</p>";
 																		} else if (about_me["Year of study"] > 0){
-																			about_panel_out += " - " + about_sections["Year of study"][about_me["Year of study"] - 1];
-																			about_panel_out += "<div><h3 class=\"center_text small_bottom\">Year of study:</h3><p class=\"center_text\">" + about_me["year_of_study"][about_sections["Year of study"] - 1];
+																			about_panel_out += "<div><h3 class=\"center_text small_bottom\">Year of study:</h3><p class=\"center_text\">" + about_sections["Year of study"][about_me["Year of study"] - 1];
 																			if (about_sections["Year of study"] != 6){
 																				about_panel_out += " year";
 																			}
@@ -973,7 +975,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																		}
 																		if (about_me["Favourite TV show"].trim().length > 0) {
 																			about_panel_out += "<h3>Favourite TV show:</h3><p>" + about_me["Favourite TV show"] + "</p>";
-
 																		}
 																		if (about_panel_out != ""){
 																			about_panel_out = "<h2 class=\"no_top\" id=\"about_me_header_about\">About:</h2>" + about_panel_out;
