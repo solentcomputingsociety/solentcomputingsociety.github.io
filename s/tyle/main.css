@@ -381,10 +381,11 @@ div#post_end:before, p#post_end_reason, p#settings_loading_statement {
 	border-radius: 50px;
 	cursor: pointer;
 }
-.members_list.about_me_edit {
+div.members_list.about_me_edit {
 	width: 40%;
 	margin: 1em auto;
 	display: block;
+	cursor: default;
 }
 .members_list > table {
 	padding: 0 10px;
