@@ -1491,6 +1491,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								var iteration = 0;
 								["input","select","textarea"].forEach(element => {
 									iteration += 1;
+									var element_type = element;
 									element = "about_me_" + element + "_" + about_me_element_id;
 									if (document.getElementById(element) != null)			
 									{
@@ -1499,7 +1500,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										var iteration_rel = iteration;
 										var value = document.getElementById(element).value;
 										if (e.target.classList.length == 1 && e.target.classList.item(0) == "about_me_removal") {
-											value = "";
+											if (element_type == "select") {
+												value = 0;
+											} else {
+												value = "";
+											}
 										}
 										var max_length = 1024;
 										if (about_me_element_id == "Facebook"){
@@ -1522,64 +1527,65 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											document.getElementById(element).removeAttribute("disabled");
 											return;
 										}
-										if (value.trim().length > 0){
-											if (about_me_element_id == "Facebook"){
-												if (/^[a-z\d.]{5,}$/.test(value) == false){
-													alert("Error","Invalid format for a Facebook username!");
-													document.getElementById(element).removeAttribute("disabled");
-													return;
-												}
-											} else if (about_me_element_id == "Twitter"){
-												if(/^@?(\w){1,15}$/.test(value) == false){
-													alert("Error","Invalid format for a Twitter username!");
-													document.getElementById(element).removeAttribute("disabled");
-													return;
-												}
-											} else if (about_me_element_id == "Instagram"){
-												if(/^([a-z0-9._])+$/.test(value) == false){
-													alert("Error","Invalid format for a Twitter username!");
-													document.getElementById(element).removeAttribute("disabled");
-													return;
-												}
-											} else if (about_me_element_id == "Snapchat"){
-												if(/^[a-zA-Z][\w-_.]{1,13}[\w]$/.test(value) == false){
-													alert("Error","Invalid format for a Snapchat username!");
-													document.getElementById(element).removeAttribute("disabled");
-													return;
-												}
-											} else if (about_me_element_id == "Youtube"){
-												if(/(?:(?:http|https):\/\/|)(?:www\.|)youtube\.com\/(channel|user)\/([A-Z][a-zA-Z0-9\-_]{1,})/.test(value) == false){
-													alert("Error","Invalid Youtube channel URL!");
-													document.getElementById(element).removeAttribute("disabled");
-													return;
-												}
-											} else if (about_me_element_id == "Discord"){
-												if(/^((.+?)#\d{4})/.test(value) == false){
-													alert("Error","Invalid Discord username tag (<code>username#number</code>)!");
-													document.getElementById(element).removeAttribute("disabled");
-													return;
-												}
-											} else if (about_me_element_id == "Phone number") {
-												if(/^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \/]?)?((?:\(?\d{1,}\)?[\-\.\ \/]?){0,})$/.test(value) == false){
-													alert("Error","Invalid phone number format!");
-													document.getElementById(element).removeAttribute("disabled");
-													return;
-												}
-											} else if (about_me_element_id == "Email address") {
-												if(/^\w+([\.-]?\w+)*@\\w+([\.-]?\\w+)*(\.\w{2,3})+$/.test(value) == false){
-													alert("Error","Invalid email address format!");
-													document.getElementById(element).removeAttribute("disabled");
-													return;
-												}
-											} else if (about_me_element_id == "Website") {
-												if(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/.test(value) == false){
-													alert("Error","Invalid website URL!");
-													document.getElementById(element).removeAttribute("disabled");
-													return;
+										if (element_type != "select"){
+											if (value.trim().length > 0){
+												if (about_me_element_id == "Facebook"){
+													if (/^[a-z\d.]{5,}$/.test(value) == false){
+														alert("Error","Invalid format for a Facebook username!");
+														document.getElementById(element).removeAttribute("disabled");
+														return;
+													}
+												} else if (about_me_element_id == "Twitter"){
+													if(/^@?(\w){1,15}$/.test(value) == false){
+														alert("Error","Invalid format for a Twitter username!");
+														document.getElementById(element).removeAttribute("disabled");
+														return;
+													}
+												} else if (about_me_element_id == "Instagram"){
+													if(/^([a-z0-9._])+$/.test(value) == false){
+														alert("Error","Invalid format for a Twitter username!");
+														document.getElementById(element).removeAttribute("disabled");
+														return;
+													}
+												} else if (about_me_element_id == "Snapchat"){
+													if(/^[a-zA-Z][\w-_.]{1,13}[\w]$/.test(value) == false){
+														alert("Error","Invalid format for a Snapchat username!");
+														document.getElementById(element).removeAttribute("disabled");
+														return;
+													}
+												} else if (about_me_element_id == "Youtube"){
+													if(/(?:(?:http|https):\/\/|)(?:www\.|)youtube\.com\/(channel|user)\/([A-Z][a-zA-Z0-9\-_]{1,})/.test(value) == false){
+														alert("Error","Invalid Youtube channel URL!");
+														document.getElementById(element).removeAttribute("disabled");
+														return;
+													}
+												} else if (about_me_element_id == "Discord"){
+													if(/^((.+?)#\d{4})/.test(value) == false){
+														alert("Error","Invalid Discord username tag (<code>username#number</code>)!");
+														document.getElementById(element).removeAttribute("disabled");
+														return;
+													}
+												} else if (about_me_element_id == "Phone number") {
+													if(/^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \/]?)?((?:\(?\d{1,}\)?[\-\.\ \/]?){0,})$/.test(value) == false){
+														alert("Error","Invalid phone number format!");
+														document.getElementById(element).removeAttribute("disabled");
+														return;
+													}
+												} else if (about_me_element_id == "Email address") {
+													if(/^\w+([\.-]?\w+)*@\\w+([\.-]?\\w+)*(\.\w{2,3})+$/.test(value) == false){
+														alert("Error","Invalid email address format!");
+														document.getElementById(element).removeAttribute("disabled");
+														return;
+													}
+												} else if (about_me_element_id == "Website") {
+													if(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/.test(value) == false){
+														alert("Error","Invalid website URL!");
+														document.getElementById(element).removeAttribute("disabled");
+														return;
+													}
 												}
 											}
-										}
-										if (["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14"].indexOf(value) >= 0){
+										} else if (["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14"].indexOf(value) >= 0){
 											value = parseInt(value);
 										}
 										firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/about/").doc(about_me_element_id.toLowerCase()).set({
