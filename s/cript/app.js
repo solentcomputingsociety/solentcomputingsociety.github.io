@@ -887,7 +887,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																					} else if (ref_icon == "twitter"){
 																						build_socials += encodeURI("https://twitter.com/" + ref_url);
 																					} else if (ref_icon == "instagram"){
-																						build_socials += encodeURI("https://www.instagram.com/" + ref_url);
+																						build_socials += encodeURI("https://instagram.com/_u/" + ref_url);
 																					} else if (ref_icon == "snapchat"){
 																						build_socials += encodeURI("https://snapchat.com/add/" + ref_url);
 																					} else {
