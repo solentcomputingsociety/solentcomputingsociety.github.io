@@ -42,6 +42,27 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		appId: "1:533900314169:web:aefbe09960c68045c5efe8"
 	};
 	var image_cache = {};
+	document.addEventListener('DOMContentLoaded', (event) => {
+		document.body.innerHTML+="<div id=\"popup_dialog\" class=\"overlay\"><div class=\"popup\"><h2 id=\"popup_header\"></h2><a id=\"close_popup_dialog\">&times;</a><div id=\"popup_content\" class=\"content\"></div></div></div>";
+		document.getElementById("close_popup_dialog").addEventListener("click",function(){
+			document.getElementById("popup_dialog").classList.remove("active");
+		});
+	});
+	function alert(title,content){
+		title = title || "";
+		content = content || "";
+		if (title.trim().length > 0 && content.trim().length == 0){
+			content = title;
+			title = "";
+		}
+		if (content.trim().length == 0){
+			return;
+		} else {
+			document.getElementById("popup_header").innerHTML = title;
+			document.getElementById("popup_content").innerHTML = content;
+			document.getElementById("popup_dialog").classList.add("active");
+		}
+	}
 	function img_blob(url,rep_id,return_blob){
 		url = url || false;
 		rep_id = rep_id || false;
@@ -52,7 +73,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			if (return_blob) {
 				return image_cache[url];
 			}
+			if (document.getElementById(rep_id).tagName.toLowerCase() == "span"){
+				document.getElementById(rep_id).outerHTML = "<img" + (document.getElementById(rep_id).outerHTML.substring(5)).substring(0,document.getElementById(rep_id).outerHTML.length-7);
+			}
 			document.getElementById(rep_id).setAttribute("src",image_cache[url]);
+			document.getElementById(rep_id).classList.remove("loading");
 		} else {
 			var xhr = new XMLHttpRequest();
 			xhr.open( "GET", url );
@@ -65,7 +90,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				var image_url = url_creator.createObjectURL( blob );
 				if (rep_id){
 					try {
+						if (document.getElementById(rep_id).tagName == "span"){
+							document.getElementById(rep_id).outerHTML = "<img" + (document.getElementById(rep_id).outerHTML.substring(5)).substring(0,document.getElementById(rep_id).outerHTML.length-7);
+						}
 						document.getElementById(rep_id).setAttribute("src",image_url);
+						document.getElementById(rep_id).classList.remove("loading");
 					} catch (e) {}
 				}
 				image_cache[url] = image_url;
@@ -77,11 +106,31 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		}
 	}
 	var storage_download = async function(url){
-		return firebase.storage().ref().child(url).getDownloadURL().then(async function(url) {
+		return await firebase.storage().ref().child(url).getDownloadURL().then(async function(url) {
 			return url;
 		}).catch(async function(error) {
 			return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
 		});
+	};
+	var about_sections = {
+		"Subject": 0,
+		"Year of study": ["Foundation", "1st", "2nd", "3rd", "4th", "Placement year", "Masters"],
+		"Intro": 1,
+		"Relationship status": ["Single", "In a relationship", "Open to offers", "😏", "🍆", "🍑", "Married", "It's complicated", "You be you", "Love struck", "Single and ready to mingle", "HMU", "Bored", "Waiting..."],
+		"Favourite lecturer": 0,
+		"Favourite food": 0,
+		"Favourite drink": 0,
+		"Favourite film": 0,
+		"Favourite TV show": 0,
+		"Phone number": 0,
+		"Email address": 0,
+		"Facebook": 0,
+		"Website": 2,
+		"Twitter": 0,
+		"Instagram": 0,
+		"Snapchat": 0,
+		"Discord": 0,
+		"Youtube": 0,
 	};
 	var host_page = async function(page,preload){
 		page = page || false;
@@ -369,22 +418,24 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								}
 							});
 							sub_pages.forEach(function(nav_id){
-								var sub_page_link_ref = sub_pages[sub_page_link_generation];
-								document.getElementById(nav_id).addEventListener("click",function(e){
-									if (e.target.classList.contains("disabled")){
-										return;
-									}
-									for (var type_key in contents) {
-										if ([[],null].indexOf(contents[type_key]) >= 0){
+								if (nav_id != "nav_loc_member_about"){
+									var sub_page_link_ref = sub_pages[sub_page_link_generation];
+									document.getElementById(nav_id).addEventListener("click",function(e){
+										if (e.target.classList.contains("disabled")){
 											return;
 										}
-									}
-									load_page(sub_page_link_ref);
-								});
-								document.getElementById(nav_id).classList.add("disabled");
-								sub_page_link_generation += 1;
+										for (var type_key in contents) {
+											if ([[],null].indexOf(contents[type_key]) >= 0){
+												return;
+											}
+										}
+										load_page(sub_page_link_ref);
+									});
+									document.getElementById(nav_id).classList.add("disabled");
+									sub_page_link_generation += 1;
+								}
 							});
-							var post_db = firebase.database().ref("blog/chat/post");
+							var post_db = firebase.database().ref("blog/chat/post").orderByKey().limitToLast(100);
 							post_db.on("value",function(snapshot){
 								snapshot.forEach(function(post){
 									var doc_data = post.val();
@@ -413,13 +464,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										if ("deleted" in doc_data){
 											if (doc_data.deleted == true){
 												doc_data.photo = "/app/img/deleted.png";
+												doc_data.photo_large = "/app/img/deleted.png";
 												doc_data.name = "deleted";
 												return doc_data;
 											}
 										}
 										return doc_data;
 									});
-									var positions = {events_organiser:null,president:null,social_secretary:null,treasurer:null,"vice-president":null,data:null};
+									var positions = {"events_organiser":null,"president":null,"social_secretary":null,"treasurer":null,"vice-president":null,data:null};
 									positions.data = await firebase.firestore().collection("users").doc("positions").get();
 									try {
 										positions.data = positions.data.data();
@@ -434,6 +486,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										if (users[i].photo != "/app/img/deleted.png"){
 											if (typeof users[i].photo === "undefined" || users[i].photo.length == 0){
 												users[i].photo = "/app/img/prof.png";
+												users[i].photo_large = "/app/img/prof.png";
 											} else {
 												users[i].photo = await storage_download("profile/"+users[i].id +"_50x50");
 											}
@@ -479,7 +532,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								});
 							});
 							var update_events = () => {
-								var url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS9zTijPhj-aPs27NCX3NYmwsTYjGLlvsR6nNWa_8DO1VjgGvX4uA9O3YyPM-I8ZdG_AkXKTPYzXNto/pub?gid=0&single=true&output=csv"
+								var url = "https://sheets.googleapis.com/v4/spreadsheets/1sIyjKOdteE08ElqXiNkWJC1KLM-TbrGCD0YmftGL1EE/values/list?key=AIzaSyBdg7VmX9uP7iZDUq1QNlJkHVLIOqldzq4";
 								try {
 									var request = new XMLHttpRequest();
 									request.open('GET', url, true);
@@ -488,11 +541,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											contents.events = false;
 											return false;
 										} else if (this.readyState === 4) {
-											var rows = this.responseText.split("\n");
+											var rows = JSON.parse(this.responseText)["values"];
 											rows.shift(0);
 											var display_rows = {}
 											for (var i = 0; i < rows.length; i++) {
-												rows[i] = rows[i].split(",");
 												var date = rows[i][3].split("/") || rows[i][3].split("-") || rows[i][3].split(".");
 												date = new Date(date[2],date[1]-1,date[0]) || 0;
 												var time = rows[i][4].split(":")
@@ -577,11 +629,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							}
 							var current_page = null;
 							var pubs_data = [];
+							var user_view_about = -1;
 							var load_page = async function(page_id,sub_ref){
 								page_id = page_id || sub_page;
 								sub_ref = sub_ref || false;
 								sub_page = page_id;
-								if (sub_pages.indexOf(page_id) < 0){
+								var sub_pages_rel = sub_pages;
+								sub_pages_rel.push("nav_loc_member_about");
+								if (sub_pages_rel.indexOf(page_id) < 0){
 									return;
 								}
 								var out = {html:null};
@@ -593,73 +648,83 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								add.change = [];
 								switch (page_id){
 									case "nav_loc_messages":
-										if (sub_ref == "posts_host_container"){
-											out.html = "<div>";
-										} else {
-											out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin\"><div id=\"new_post_container\"><div id=\"new_post_content_container\"><textarea id=\"new_post_content\" placeholder=\"What's the message?\"></textarea></div><div id=\"error_container\" class=\"red_error_bold\"></div><div id=\"new_post_actions\"><div id=\"new_post_actions_remaining_container\" class=\"hide\">Remaining: <span id=\"new_post_actions_remaining\"></span></div><div id=\"new_post_actions_post_container\"><button id=\"new_post_actions_post_submit\">Post</button></div></div></div><p class=\"center_text\"><a title=\"click to refresh\" id=\"message_refresh\"></a></p><div id=\"posts_host_container\">";
-											add.click.push(["message_refresh",refresh]);
-											add.click.push(["new_post_actions_post_submit",post]);
-											add.typing.push(["new_post_content",post_validate]);
-											add.call_back.push(post_validate);
-											add.call_back.push(refresh);
-										}
-										if (Object.keys(contents.posts).length == 0){
-											if (!posts_base_load){
-												out.html = out.html + "<p class=\"center_text\" id=\"post_end_reason\">Still loading...</p></div></div>";
+										try {
+											if (sub_ref == "posts_host_container"){
+												out.html = "<div>";
+											} else {
+												out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin\"><div id=\"new_post_container\"><div id=\"new_post_content_container\"><textarea id=\"new_post_content\" placeholder=\"What's the message?\"></textarea></div><div id=\"error_container\" class=\"red_error_bold\"></div><div id=\"new_post_actions\"><div id=\"new_post_actions_remaining_container\" class=\"hide\">Remaining: <span id=\"new_post_actions_remaining\"></span></div><div id=\"new_post_actions_post_container\"><button id=\"new_post_actions_post_submit\">Post</button></div></div></div><p class=\"center_text\"><a title=\"click to refresh\" id=\"message_refresh\"></a></p><div id=\"posts_host_container\">";
+												add.click.push(["message_refresh",refresh]);
+												add.click.push(["new_post_actions_post_submit",post]);
+												add.typing.push(["new_post_content",post_validate]);
+												add.call_back.push(post_validate);
+												add.call_back.push(refresh);
+											}
+											if (Object.keys(contents.posts).length == 0){
+												if (!posts_base_load){
+													out.html = out.html + "<p class=\"center_text\" id=\"post_end_reason\">Still loading...</p></div></div>";
+													break;
+												}
+												out.html = out.html + "<p class=\"center_text\" id=\"post_end_reason\">No posts have been loaded" + {true:"",false:", because you are currently offline"}[navigator.onLine] + "!</p></div></div>";
 												break;
 											}
-											out.html = out.html + "<p class=\"center_text\" id=\"post_end_reason\">No posts have been loaded" + {true:"",false:", because you are currently offline"}[navigator.onLine] + "!</p></div></div>";
-											break;
-										}
-										for (var i = Object.keys(contents.posts).length - 1; i >= 0; i--) {
-											for (var ii = contents.posts[Object.keys(contents.posts)[i]].length - 1; ii >= 0; ii--) {
-												var post_content = contents.posts[Object.keys(contents.posts)[i]][ii];
-												var user_match = 1;
-												while (user_match in [0,1]) {
-													for (var iii = 0; iii < contents.users[0].length; iii++) {
-														if (contents.users[0][iii].id == post_content.user) {
-															user_match = contents.users[0][iii];
+											for (var i = Object.keys(contents.posts).length - 1; i >= 0; i--) {
+												for (var ii = contents.posts[Object.keys(contents.posts)[i]].length - 1; ii >= 0; ii--) {
+													var post_content = contents.posts[Object.keys(contents.posts)[i]][ii];
+													var user_match = 1;
+													while (user_match in [0,1]) {
+														for (var iii = 0; iii < contents.users[0].length; iii++) {
+															if (contents.users[0][iii].id == post_content.user) {
+																user_match = contents.users[0][iii];
+																break;
+															}
+														}
+														if (!(user_match in [0,1])){
 															break;
 														}
-													}
-													if (!(user_match in [0,1])){
-														break;
-													}
-													if (user_match == 1){
-														await update_users();
-													}
-													user_match -= 1;
-												}
-												if (user_match <= 0){
-													user_match = {name:"Deleted",photo:"/app/img/deleted.png",id:null};
-												}
-												img.push([user_match.photo,post_content.id + "_p-img"]);
-												out.html = out.html + "<div class=\"post\"><table><tr><td valign=\"top\" width=\"58px\"><img id=\"" + post_content.id + "_p-img\" class=\"post_img_s\"></td><td valign=\"top\">";
-												var post_contents = post_content.content.split("\n");
-												if (post_contents.length == 1){
-													post_contents = post_contents[0].split("\\n");
-												}
-												for (var iii = 0; iii < post_contents.length; iii++) {
-													post_contents[iii] = post_contents[iii].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-													post_contents[iii] = (post_contents[iii] || "").replace(/([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
-														function(match, space, url){
-															var hyperlink = url;
-															if (!hyperlink.match('^https?:\/\/')) {
-																hyperlink = "http://" + hyperlink;
-															}
-															return space + "<a href=\"" + hyperlink + "\" title=\"Go to " + hyperlink + "\" target=\"_blank\">" + url + "</a>";
+														if (user_match == 1){
+															await update_users();
 														}
-													);
-													if (iii == post_contents.length - 1){
-														out.html = out.html + "<p>" + post_contents[iii] + "</p>";
-													} else {
-														out.html = out.html + "<p class=\"no_bottom\">" + post_contents[iii] + "</p>";
+														user_match -= 1;
 													}
+													if (user_match <= 0){
+														user_match = {name:"Deleted",photo:"/app/img/deleted.png",id:null};
+													}
+													img.push([user_match.photo,post_content.id + "_p-img"]);
+													out.html = out.html + "<div class=\"post\"><table><tr><td valign=\"top\" width=\"58px\"><span id=\"" + post_content.id + "_p-img\" class=\"post_img_s user_reference_link loading\" uid=\"" + user_match.id + "\" title=\"View " + user_match.name + "'s profile\"></span></td><td valign=\"top\">";
+													var post_contents = post_content.content.split("\n");
+													if (post_contents.length == 1){
+														post_contents = post_contents[0].split("\\n");
+													}
+													for (var iii = 0; iii < post_contents.length; iii++) {
+														post_contents[iii] = post_contents[iii].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+														post_contents[iii] = (post_contents[iii] || "").replace(/([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
+															function(match, space, url){
+																var hyperlink = url;
+																if (!hyperlink.match('^https?:\/\/')) {
+																	hyperlink = "http://" + hyperlink;
+																}
+																return space + "<a href=\"" + hyperlink + "\" title=\"Go to " + hyperlink + "\" target=\"_blank\">" + url + "</a>";
+															}
+														);
+														if (iii == post_contents.length - 1){
+															out.html = out.html + "<p>" + post_contents[iii] + "</p>";
+														} else {
+															out.html = out.html + "<p class=\"no_bottom\">" + post_contents[iii] + "</p>";
+														}
+													}
+													out.html = out.html + "</td></tr></table><div><div class=\"post_by\"><span id=\"" + post_content.id + "_uid_post_ref\" uid=\"" + user_match.id + "\" class=\"user_reference_link\" title=\"View " + user_match.name + "'s profile\">" + user_match.name + "</span></div><div class=\"post_time\" title=\"Posted at: " + post_content.time.join(" - ") + "\"><span>at: </span>" + post_content.time[0] + {true:" - " + post_content.time[1],false:""}[post_content.time[1] != new Date().toLocaleDateString(window.navigator.userLanguage || window.navigator.language)] + "</div></div></div>";
+													[post_content.id + "_uid_post_ref",post_content.id + "_p-img"].forEach(element => {
+														add.click.push([element,function(e){
+															if (typeof(e.target.getAttribute("uid")) !== "undefined"){
+																user_view_about = e.target.getAttribute("uid");
+																load_page("nav_loc_member_about",user_view_about);
+															}
+														}]);
+													});
 												}
-												out.html = out.html + "</td></tr></table><div><div class=\"post_by\"><span>" + user_match.name + "</span></div><div class=\"post_time\" title=\"Posted at: " + post_content.time.join(" - ") + "\"><span>at: </span>" + post_content.time[0] + {true:" - " + post_content.time[1],false:""}[post_content.time[1] != new Date().toLocaleDateString(window.navigator.userLanguage || window.navigator.language)] + "</div></div></div>";
 											}
-										}
-										out.html = out.html + "<div class=\"center_text\" id=\"post_end\"></div></div></div>";
+											out.html = out.html + "<div class=\"center_text\" id=\"post_end\"></div></div></div>";
+										} catch (e) {}
 										break;
 									case "nav_loc_events":
 										out.html = "<div class=\"side_margin center_text\">";
@@ -713,12 +778,12 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																		}
 																	} catch (e) {}
 																	events_added = true;
-																	out.html = out.html + "</h5><p class=\"no_top\">" + contents.events[day][time][i][7].replace("\n","</p><p>").replace("<p></p>","") + "</p>";
+																	out.html = out.html + "</h5><p class=\"no_top small_bottom\">" + contents.events[day][time][i][7].replace("\n","</p><p>").replace("<p></p>","") + "</p>";
 																	if (contents.events[day][time][i][2].length > 0){
-																		out.html = out.html + "<p class=\"no_top small\">Location: contents.events[day][time][i][2]</p>";
+																		out.html = out.html + "<p class=\"no_top small_bottom small\">Location: " + contents.events[day][time][i][2] + "</p>";
 																	}
 																	if (contents.events[day][time][i][1].length > 0){
-																		out.html = out.html + "<p class=\"no_top small\">Find out more: <a href=\"" + contents.events[day][time][i][1] + "\" title=\"Visit " + contents.events[day][time][i][1] + " for more information\" target=\"blank\" class=\"out_link\">" + contents.events[day][time][i][1] + "</a></p>";
+																		out.html = out.html + "<p class=\"no_top small_bottom small\">Find out more: <a href=\"" + contents.events[day][time][i][1] + "\" title=\"Visit " + contents.events[day][time][i][1] + " for more information\" target=\"blank\" class=\"out_link\">" + contents.events[day][time][i][1] + "</a></p>";
 																	}
 																	out.html = out.html + "</div>";
 																}
@@ -738,9 +803,209 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									case "nav_loc_members":
 										out.html = "<div id=\"redundant_padding\"></div>";
 										for (var i = 0; i < contents.users[0].length; i++) {
-											out.html = out.html + "<div class=\"members_list\"><table><tr><td width=\"50px\" valign=\"middle\"><img class=\"members_list_img_s\" id=\"" + contents.users[0][i].id + "_r-img\"></td><td valign=\"middle\"><span class=\"members_list_name\">" + contents.users[0][i].name + "</span></td></tr></table></div>";
+											out.html = out.html + "<div class=\"members_list\" id=\"view_prof_" + contents.users[0][i].id + "\" uid=\"" + contents.users[0][i].id + "\" title=\"View " + contents.users[0][i].name + "'s profile\"><table><tr><td width=\"50px\" valign=\"middle\"><img class=\"members_list_img_s loading\" id=\"" + contents.users[0][i].id + "_r-img\"></td><td valign=\"middle\"><span class=\"members_list_name\">" + contents.users[0][i].name + "</span></td></tr></table></div>";
 											img.push([contents.users[0][i].photo,contents.users[0][i].id + "_r-img"]);
+											add.click.push(["view_prof_" + contents.users[0][i].id,function(e){
+												var parent_check = 5;
+												var reference_check = e.target;
+												while (parent_check >= 0){
+													if (reference_check.hasAttribute("uid")){
+														user_view_about = reference_check.getAttribute("uid");
+														break;
+													} else {
+														reference_check = reference_check.parentNode;
+														parent_check -= 1;
+														user_view_about = -1;
+													}
+												}
+												load_page("nav_loc_member_about",user_view_about);
+											}]);
 										}
+										break;
+									case "nav_loc_member_about":
+										out.html = "<div id=\"redundant_padding\"></div>";
+										var match = false;
+										for (var i = 0; i < contents.users[0].length; i++) {
+											if (contents.users[0][i].id == sub_ref){
+												out.html += "<div id=\"about_me_container\" class=\"loading\" uid=\"" + sub_ref + "\"><div id=\"about_me_side_ref\"><img id=\"about_me_prof_img-" + sub_ref + "\" class=\"about_me_prof_img loading\"><h1 class=\"small_bottom\">" + contents.users[0][i].name + "</h1></div><div id=\"about_me_main_ref\"><p id=\"about_me_loading\"></p></div></div>";
+												var loaded = async function(){
+													var uid_ref = user_view_about;
+													for (let i = 0; i < contents.users[0].length; i++) {
+														if (contents.users[0][i].id == uid_ref){
+															if (typeof(contents.users[0][i].photo_large) === "undefined"){
+																try {
+																	contents.users[0][i].photo_large = await storage_download("profile/"+uid_ref);
+																} catch (e) {
+																	alert(e);
+																	document.getElementById("about_me_loading").classList.add("error");
+																}
+															}
+															await firebase.firestore().collection("users/members/id/" + uid_ref + "/about/").get().then(async function(about){
+																about_docs = about.docs.map( doc => {
+																	var doc_data = doc.data();
+																	doc_data.id = doc.id;
+																	return doc_data;
+																});
+																var about = {};
+																about_docs.forEach(doc => {
+																	about[doc.id] = doc.is;
+																});
+																var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||0,"Intro":about["intro"]||"","Relationship status":about["relationship_status"]||0,"Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Discord":about["discord"]||"","Youtube":about["youtube"]||""}
+																try {
+																	if (document.getElementById("about_me_container").getAttribute("uid") == uid_ref && document.getElementById("about_me_container").getAttribute("outputted") != "yes"){
+																		document.getElementById("about_me_container").setAttribute("outputted","yes");
+																		await img_blob(contents.users[0][i].photo_large,"about_me_prof_img-"+user_view_about);
+																		var build_socials = "";
+																		if ((about_me["Facebook"] + about_me["Twitter"] + about_me["Discord"] + about_me["Instagram"] + about_me["Snapchat"] + about_me["Youtube"] + about_me["Phone number"] + about_me["Email"] + about_me["Website"]).length > 0){
+																			build_socials = "<div class=\"social_icon_links\">";
+																			["Phone number","Email","Facebook","Twitter","Instagram","Snapchat","Discord","Youtube","Website"].forEach(social => {
+																				var ref_icon = social.toLowerCase().replace(" ","_");
+																				if (about_me[social].length > 0){
+																					var call_tip = contents.users[0][i].name;
+																					if (ref_icon == "phone_number"){
+																						call_tip = "Call " + call_tip;
+																					} else if (ref_icon == "website") {
+																						call_tip = "View " + call_tip + "'s website";
+																					} else if (ref_icon == "snapchat"){
+																						call_tip = "Add " + call_tip + " on " + social;
+																					} else {
+																						call_tip = "View " + call_tip + " on " + social;
+																					}
+																					build_socials += "<div class=\"social_icon_link_container\"><a target=\"_blank\" title=\"" + call_tip + "\"";
+																					if (ref_icon != "discord"){
+																						build_socials += "href=\"";
+																					} else {
+																						build_socials += "id=\"discord_link-" + user_view_about + "\" prof_tag=\""
+																					}
+																					if (ref_icon == "phone_number"){
+																						build_socials += "tel:";
+																					} else if (ref_icon == "email"){
+																						build_socials += "mailto:";
+																					} else if (ref_icon == "facebook"){
+																						build_socials += "https://www.facebook.com/";
+																					} else if (ref_icon == "twitter"){
+																						build_socials += "https://twitter.com/";
+																					} else if (ref_icon == "instagram"){
+																						build_socials += "https://www.instagram.com/";
+																					} else if (ref_icon == "snapchat"){
+																						build_socials += "https://snapchat.com/add/";
+																					}
+																					build_socials += about_me[social] + "\"><div id=\"social_icon_" + ref_icon + "\"";
+																					if (ref_icon == "website"){
+																						try {
+																							build_socials += " style=\"background-image:url(https://www.google.com/s2/favicons?domain=" + (new URL(about_me["Website"])).hostname +  ")\"";
+																						} catch (e) {};
+																					}
+																					build_socials += "></div></a></div>";
+																				}
+																			});
+																			build_socials += "</div>";
+																		}
+																		var about_panel_out = "";
+																		for(var position in contents.users[1]){
+																			if (contents.users[1][position] == uid_ref){
+																				about_panel_out += "<h3 class=\"side_margin center_text\">" + position.toUpperCase() + "</h3>";
+																				break;
+																			}
+																		}
+																		about_panel_out += "<div class=\"side_margin\">" + build_socials + "<p class=\"center_text small_bottom\">" + about_me["Intro"] + "</p>";
+																		if (about_me["Subject"].trim().length > 0){
+																			about_panel_out += "<div><h3 class=\"center_text small_bottom\">Studying:</h3><p class=\"center_text\">" + about_me["Subject"];
+																			if (about_me["Year of study"] > 0){
+																				about_panel_out += " - " + about_sections["Year of study"][about_me["Year of study"] - 1];
+																				if (about_sections["Year of study"] != 6){
+																					about_panel_out += " year";
+																				}
+																			}																			
+																			about_panel_out += "</p>";
+																		} else if (about_me["Year of study"] > 0){
+																			about_panel_out += " - " + about_sections["Year of study"][about_me["Year of study"] - 1];
+																			about_panel_out += "<div><h3 class=\"center_text small_bottom\">Year of study:</h3><p class=\"center_text\">" + about_me["year_of_study"][about_sections["Year of study"] - 1];
+																			if (about_sections["Year of study"] != 6){
+																				about_panel_out += " year";
+																			}
+																			about_panel_out += "</p>";
+																		}
+																		about_panel_out += "</div>";
+																		document.getElementById("about_me_side_ref").innerHTML += about_panel_out;
+																		if (about_me["Discord"].length > 1) {
+																			document.getElementById("discord_link-" + user_view_about).addEventListener("click",function(e){
+																				try {
+																					var prof_tag = false;
+																					var parent_check = 1;
+																					var reference_check = e.target;
+																					while (parent_check >= 0){
+																						if (reference_check.hasAttribute("prof_tag")){
+																							prof_tag = reference_check.getAttribute("prof_tag");
+																							break;
+																						} else {
+																							reference_check = reference_check.parentNode;
+																							parent_check -= 1;
+																							user_view_about = -1;
+																						}
+																					}
+																					if (prof_tag !== false) {
+																						alert("Discord username:",prof_tag);
+																					}
+																				} catch (e) {}
+																			});
+																		}
+																		about_panel_out = "";
+																		if (about_me["Relationship status"] > 0) {
+																			about_panel_out += "<h3>Relationship status:</h3><p>" + about_sections["Relationship status"][about_me["Relationship status"] - 1] + "</p>";
+
+																		}
+																		if (about_me["Favourite lecturer"].trim().length > 0) {
+																			about_panel_out += "<h3>Favourite lecturer:</h3><p>" + about_me["Favourite lecturer"] + "</p>";
+
+																		}
+																		if (about_me["Favourite food"].trim().length > 0) {
+																			about_panel_out += "<h3>Favourite food:</h3><p>" + about_me["Favourite food"] + "</p>";
+
+																		}
+																		if (about_me["Favourite drink"].trim().length > 0) {
+																			about_panel_out += "<h3>Favourite drink:</h3><p>" + about_me["Favourite drink"] + "</p>";
+
+																		}
+																		if (about_me["Favourite film"].trim().length > 0) {
+																			about_panel_out += "<h3>Relationship film:</h3><p>" + about_me["Favourite film"] + "</p>";
+
+																		}
+																		if (about_me["Favourite TV show"].trim().length > 0) {
+																			about_panel_out += "<h3>Favourite TV show:</h3><p>" + about_me["Favourite TV show"] + "</p>";
+
+																		}
+																		if (about_panel_out != ""){
+																			about_panel_out = "<h2 class=\"no_top\" id=\"about_me_header_about\">About:</h2>" + about_panel_out;
+																		} else {
+																			about_panel_out = "<div class=\"desktop_only\"><br><br><br></div><p class=\"no_top side_margin center_text\">Nothing else was found...<br><br>It appears that " + contents.users[0][i].name + " wishes to have a sense of mystery about them.</p>"
+																		}
+																		document.getElementById("about_me_main_ref").innerHTML = about_panel_out;
+																	}
+																} catch (e) {}
+															}).catch(function(error){
+																if (document.getElementById("about_me_container").getAttribute("uid") == uid_ref){
+																	document.getElementById("about_me_loading").classList.add("error");
+																}
+															});
+														}
+													}
+												}
+												add.call_back.push(loaded);
+												if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
+													add.call_back.push(function(){
+														document.getElementById("about_me_prof_img-"+document.getElementById("about_me_container").getAttribute("uid")).classList.add("firefoxIssue");
+													});
+												}
+												match = true;
+												break;
+											}
+										}
+										if (!match){
+											load_page("nav_loc_members");
+											return;
+										}
+										sub_ref = false;
 										break;
 									case "nav_loc_pub":
 										var is_president = contents.users[1].president == firebase.auth().currentUser.uid;
@@ -861,12 +1126,19 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												if (banner.show){
 													var banner_contents = document.getElementById("banner_contents");
 													banner_contents.innerHTML = banner.contents;
+													banner_contents.setAttribute("title","Click to dismiss");
 													document.getElementById("banner_main").addEventListener("click",function(){
 														document.getElementById("banner_container").classList.add("hide");
 														document.getElementById("page_render").classList.remove("banner_top");
+														try {
+															document.getElementById("redundant_padding").remove();															
+														} catch (e) {}
 													});
 													document.getElementById("banner_container").classList.remove("hide");
 													document.getElementById("page_render").classList.add("banner_top");
+													try {
+														document.getElementById("redundant_padding").remove();															
+													} catch (e) {}
 													function resize(){
 														try {
 															document.getElementById("redundant_padding").style.minHeight = (document.getElementById("banner_contents").offsetHeight + 20 - (16 * 4)) + "px";
@@ -876,8 +1148,12 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												}
 											}
 										});
+										var valid_setup = true;
 										sub_pages.forEach(function(nav_id){
-											document.getElementById(nav_id).classList.remove("disabled");
+											if (nav_id != "nav_loc_member_about")
+											{
+												document.getElementById(nav_id).classList.remove("disabled");
+											}
 										});
 										load_page();
 									});
@@ -900,7 +1176,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					document.getElementById("page_ref_settings_content").classList.remove("hide");
 					document.getElementById("page_ref_settings_setup").classList.add("hide");
 					document.getElementById("page_ref_settings_forbidden").classList.add("hide");
-					document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><div class=\"spacer\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Go to more settings\" id=\"settings_ref_more\">More settings</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go Back To Menu</a></p>";
+					document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Go to more settings\" id=\"settings_ref_more\">More settings</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go Back To Menu</a></p>";
 					document.getElementById("page_ref_title").innerHTML = "Settings";
 					firebase.firestore().collection("users/members/id").doc(firebase.auth().currentUser.uid).get().then(async function(user){
 						if(!user.exists){
@@ -1123,6 +1399,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							e.message = "Failed to load your user settings because you're offline!";
 						}
 						document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\">" + e.message + "</p>" + document.getElementById("page_ref_settings_content").innerHTML;
+						document.getElementById("settings_ref_more").remove();
+						document.getElementById("settings_ref_back").addEventListener("click",function(){
+							document.title = "Menu | Solent Computing Society";
+							document.getElementById("page_ref_menu_contents").classList.remove("hide");
+							document.getElementById("page_ref_settings_content").classList.add("hide");
+							document.getElementById("page_ref_settings_forbidden").classList.add("hide");
+							document.getElementById("page_ref_title").innerHTML = "Menu";
+						});
 					});
 					["settings_ref_back","settings_ref_base_forbidden"].forEach(function(e){
 						document.getElementById(e).addEventListener("click",function(){
@@ -1133,7 +1417,262 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							document.getElementById("page_ref_title").innerHTML = "Menu";
 						});
 					});
+				};
 
+				var about_page = async function(){
+					document.title = "About me | Solent Computing Society";
+					document.getElementById("page_ref_menu_contents").classList.add("hide");
+					document.getElementById("page_ref_settings_content_more").classList.add("hide");
+					document.getElementById("page_ref_settings_content").classList.remove("hide");
+					document.getElementById("page_ref_settings_setup").classList.add("hide");
+					document.getElementById("page_ref_settings_forbidden").classList.add("hide");
+					document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go Back To Menu</a></p><br>";
+					document.getElementById("page_ref_title").innerHTML = "About me";
+					document.getElementById("settings_ref_back").addEventListener("click",function(){
+						document.title = "Menu | Solent Computing Society";
+						document.getElementById("page_ref_menu_contents").classList.remove("hide");
+						document.getElementById("page_ref_settings_content").classList.add("hide");
+						document.getElementById("page_ref_settings_forbidden").classList.add("hide");
+						document.getElementById("page_ref_title").innerHTML = "Menu";
+					});
+					firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/about/").get().then(async function(about){
+						about_docs = about.docs.map( doc => {
+							var doc_data = doc.data();
+							doc_data.id = doc.id;
+							return doc_data;
+						});
+						var about = {};
+						about_docs.forEach(doc => {
+							about[doc.id] = doc.is;
+						});
+						var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||"","Intro":about["intro"]||"","Relationship status":about["relationship_status"]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||""}
+						
+						document.getElementById("settings_loading_statement").remove();
+						document.getElementById("setting_ref_content").innerHTML = "<p class=\"side_margin margin_top center_text\">This information will be publicly viewable to all members of the Solect Computing Society!</p><div class=\"members_list about_me_edit margin_top\"><table id=\"about_me_container_host\"><tbody id=\"about_me_container\"></tbody></table><br></div>";
+						var about_me_container_content = "";
+						for (var about_topic in about_sections) {
+							about_me_container_content += "<tr><td><table><tbody><tr><td class=\"about_me_header\"><h4 class=\"no_bottom\">" + about_topic + ":</h4></td><td class=\"about_me_subject_removal_container\"><span class=\"about_me_removal";
+							if (typeof about_me[about_topic] === "undefined"){
+								about_me_container_content += " disabled";
+							} else if (about_me[about_topic].length == 0) {
+								about_me_container_content += " disabled";
+							}
+							about_me_container_content += "\" id=\"about_me_removal_" + about_topic.split(" ").join("_") + "\" title=\"Delete " + about_topic.toLowerCase() + "\"></span></td></tr></tbody></table></td></tr><tr><td><div class=\"input_container_about\">";
+							if ([0,2].indexOf(about_sections[about_topic]) >= 0) {
+								about_me_container_content += "<input type=\"text\" id=\"about_me_input_" + about_topic.split(" ").join("_") + "\" value=\"" + (about_me[about_topic] || "") +"\" maxlength=\"1024\" />";
+							} else if (about_sections[about_topic] == 1) {
+								about_me_container_content += "<textarea type=\"text\" id=\"about_me_textarea_" + about_topic.split(" ").join("_") + "\" value=\"" + (about_me[about_topic]||"") + "\" maxlength=\"1024\" />" + (about_me[about_topic]||"") + "</textarea>";
+							} else {
+								about_me_container_content += "<select id=\"about_me_select_" + about_topic.split(" ").join("_") + "\">";
+								var about_section = about_sections[about_topic];
+								about_section.unshift("");
+								for (let i = 0; i < about_section.length; i++) {
+									var value = about_section[i];
+									about_me_container_content += "<option";
+									if (i == about_me[about_topic] || (value == "" && typeof about_me[about_topic] === "undefined")){
+										about_me_container_content += " selected=\"selected\"";
+									}
+									if (value.length == 0) {
+										about_me_container_content += " disabled";
+										value = "Not selected";
+									}
+									about_me_container_content += " value=\"" + i + "\">" + value + "</option>";
+								}
+								about_me_container_content += "</select>";
+							}
+							about_me_container_content += "</div></td></tr>";
+						}
+						document.getElementById("about_me_container").innerHTML = about_me_container_content + "<br>";
+						for (var about_topic in about_sections) {
+							document.getElementById("about_me_removal_"+about_topic.split(" ").join("_")).addEventListener("click",function(e){
+								var about_me_element_id = e.target.getAttribute("id").replace("about_me_removal_","");
+								var invalid = true;
+								var iteration = 0;
+								["input","select","textarea"].forEach(element => {
+									iteration += 1;
+									element = "about_me_" + element + "_" + about_me_element_id;
+									if (document.getElementById(element) != null)			
+									{
+										invalid = false;
+										document.getElementById(element).setAttribute("disabled","disabled");
+										var iteration_rel = iteration;
+										var value = document.getElementById(element).value;
+										if (e.target.classList.length == 1 && e.target.classList.item(0) == "about_me_removal") {
+											value = "";
+										}
+										var max_length = 1024;
+										if (about_me_element_id == "Facebook"){
+											max_length = 50;
+										} else if (about_me_element_id == "Twitter"){
+											max_length = 15;
+										} else if (about_me_element_id == "Instagram"){
+											max_length = 30;
+										} else if (about_me_element_id == "Snapchat"){
+											max_length = 15;
+										} else if (about_me_element_id == "Discord"){
+											max_length = 32;
+										} else if (about_me_element_id == "Email address") {
+											max_length = 320;
+										} else if (about_me_element_id == "Email address") {
+											max_length = 15;
+										}
+										if (value.length > max_length){
+											alert("Unable to update your " + about_me_element_id.split("_").join(" "),"Max length is " + max_length + " characters - you can't get around this!");
+											document.getElementById(element).removeAttribute("disabled");
+											return;
+										}
+										if (value.trim().length > 0){
+											if (about_me_element_id == "Facebook"){
+												if (/^[a-z\d.]{5,}$/.test(value) == false){
+													alert("Error","Invalid format for a Facebook username!");
+													document.getElementById(element).removeAttribute("disabled");
+													return;
+												}
+											} else if (about_me_element_id == "Twitter"){
+												if(/^@?(\w){1,15}$/.test(value) == false){
+													alert("Error","Invalid format for a Twitter username!");
+													document.getElementById(element).removeAttribute("disabled");
+													return;
+												}
+											} else if (about_me_element_id == "Instagram"){
+												if(/^([a-z0-9._])+$/.test(value) == false){
+													alert("Error","Invalid format for a Twitter username!");
+													document.getElementById(element).removeAttribute("disabled");
+													return;
+												}
+											} else if (about_me_element_id == "Snapchat"){
+												if(/^[a-zA-Z][\w-_.]{1,13}[\w]$/.test(value) == false){
+													alert("Error","Invalid format for a Snapchat username!");
+													document.getElementById(element).removeAttribute("disabled");
+													return;
+												}
+											} else if (about_me_element_id == "Youtube"){
+												if(/(?:(?:http|https):\/\/|)(?:www\.|)youtube\.com\/(channel|user)\/([A-Z][a-zA-Z0-9\-_]{1,})/.test(value) == false){
+													alert("Error","Invalid Youtube channel URL!");
+													document.getElementById(element).removeAttribute("disabled");
+													return;
+												}
+											} else if (about_me_element_id == "Discord"){
+												if(/^((.+?)#\d{4})/.test(value) == false){
+													alert("Error","Invalid Discord username tag (<code>username#number</code>)!");
+													document.getElementById(element).removeAttribute("disabled");
+													return;
+												}
+											} else if (about_me_element_id == "Phone number") {
+												if(/^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \/]?)?((?:\(?\d{1,}\)?[\-\.\ \/]?){0,})$/.test(value) == false){
+													alert("Error","Invalid phone number format!");
+													document.getElementById(element).removeAttribute("disabled");
+													return;
+												}
+											} else if (about_me_element_id == "Email address") {
+												if(/^\w+([\.-]?\w+)*@\\w+([\.-]?\\w+)*(\.\w{2,3})+$/.test(value) == false){
+													alert("Error","Invalid email address format!");
+													document.getElementById(element).removeAttribute("disabled");
+													return;
+												}
+											} else if (about_me_element_id == "Website") {
+												if(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/.test(value) == false){
+													alert("Error","Invalid website URL!");
+													document.getElementById(element).removeAttribute("disabled");
+													return;
+												}
+											}
+										}
+										if (["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14"].indexOf(value) >= 0){
+											value = parseInt(value);
+										}
+										firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/about/").doc(about_me_element_id.toLowerCase()).set({
+											is: value
+										}).then(async function() {
+											e.target.classList.remove("approve");
+											if (iteration_rel == 2){
+												for(var i, j = 0; i = document.getElementById(element).options[j]; j++) {
+													if (j.toString() == value.toString()){
+														i.setAttribute("selected","selected");
+													} else {
+														i.removeAttribute("selected");
+													}
+												}
+												document.getElementById(element).value = value;
+											} else {
+												document.getElementById(element).setAttribute("value",value);
+												var event = document.createEvent('Event');
+												event.initEvent('input', true, true);
+												document.getElementById(element).value = value;
+												document.getElementById(element).dispatchEvent(event);
+											}
+											document.getElementById(element).removeAttribute("disabled");
+										}).catch(function(error){
+											document.getElementById(element).removeAttribute("disabled");
+											alert("Error","Unable to update your " + about_me_element_id.split("_").join(" ") + "!\n"+error.message);
+										});
+										return true;
+									}						
+								});
+								if (invalid){
+									alert("An unexpected error occured!");
+								}
+							});
+							if ([0,2].indexOf(about_sections[about_topic]) >= 0)
+							{
+								document.getElementById("about_me_input_" + about_topic.split(" ").join("_")).addEventListener("input",function(e){
+									var about_me_element_id = e.target.getAttribute("id").replace("about_me_input_","");
+									document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("disabled");
+									if (!(e.target.value.trim().length == 0 || e.target.value == e.target.getAttribute("value"))){
+										document.getElementById("about_me_removal_" + about_me_element_id).classList.add("approve");
+										document.getElementById("about_me_removal_" + about_me_element_id).setAttribute("title","Save changes?");
+									} else {
+										if (e.target.getAttribute("value").trim().length == 0){
+											document.getElementById("about_me_removal_" + about_me_element_id).classList.add("disabled");
+										}
+										document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("approve");
+										document.getElementById("about_me_removal_" + about_me_element_id).setAttribute("title","Delete " + about_me_element_id.toLowerCase());
+									}
+								});
+							} else if (about_sections[about_topic] == 1) {
+								["input","onpropertychange"].forEach(event => {
+									document.getElementById("about_me_textarea_" + about_topic.split(" ").join("_")).addEventListener(event,function(e){
+										var about_me_element_id = e.target.getAttribute("id").replace("about_me_textarea_","");
+										document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("disabled");
+										if (!(e.target.value.trim().length == 0 || e.target.value == e.target.getAttribute("value"))){
+											document.getElementById("about_me_removal_" + about_me_element_id).classList.add("approve");
+											document.getElementById("about_me_removal_" + about_me_element_id).setAttribute("title","Save changes?");
+										} else {
+											if (e.target.getAttribute("value").trim().length == 0){
+												document.getElementById("about_me_removal_" + about_me_element_id).classList.add("disabled");
+											}
+											document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("approve");
+											document.getElementById("about_me_removal_" + about_me_element_id).setAttribute("title","Delete " + about_me_element_id.toLowerCase());
+										}
+									});
+								});
+							} else {
+								document.getElementById("about_me_select_" + about_topic.split(" ").join("_")).addEventListener("change",function(e){
+									var about_me_element_id = e.target.getAttribute("id").replace("about_me_select_","");
+									document.getElementById("about_me_removal_" + about_me_element_id).classList.add("approve");
+									document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("disabled");
+									for(var i, j = 0; i = e.target.options[j]; j++) {
+										if(i.value.toString() == e.target.value.toString()) {
+											if (i.getAttribute("selected") == "selected"){
+												document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("approve");
+											}
+										}
+									}
+								});
+							}
+						}
+					}).catch(function(e){
+						if (e.message == "Failed to get document because the client is offline."){
+							e.message = "Failed to load your user settings because you're offline!";
+						}
+						var error_message = document.createElement("p");
+						error_message.classList.add("side_margin");
+						error_message.classList.add("margin_top");
+						error_message.classList.add("center_text");
+						error_message.innerText = e.message;
+						document.getElementById("page_ref_settings_content").insertBefore(error_message,document.getElementById("page_ref_settings_content").firstChild);
+						document.getElementById("settings_loading_statement").remove();
+					});
 				};
 				if(preload){
 					document.addEventListener("DOMContentLoaded", function(event){
@@ -1168,6 +1707,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								img_blob(img);
 							});
 							document.getElementById("menu_settings").addEventListener("click",base_settings_page);
+							document.getElementById("menu_settings_about").addEventListener("click",about_page);
 							document.getElementById("settings_ref_base").addEventListener("click",base_settings_page);
 							document.getElementById("settings_ref_forbidden").addEventListener("click",function(){
 								window.scroll(0,0);
