@@ -123,8 +123,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		"Favourite drink": 0,
 		"Favourite film": 0,
 		"Favourite TV show": 0,
-		"Phone number": 0,
-		"Email address": 0,
+		"Phone number": 3,
+		"Email address": 4,
 		"Website": 2,
 		"Facebook": 0,
 		"Dev Community": 0,
@@ -1207,7 +1207,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					document.getElementById("page_ref_settings_content").classList.remove("hide");
 					document.getElementById("page_ref_settings_setup").classList.add("hide");
 					document.getElementById("page_ref_settings_forbidden").classList.add("hide");
-					document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Go to more settings\" id=\"settings_ref_more\">More settings</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go Back To Menu</a></p>";
+					document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><div class=\"spacer\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Go to more settings\" id=\"settings_ref_more\">More settings</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go Back To Menu</a></p><br>";
 					document.getElementById("page_ref_title").innerHTML = "Settings";
 					firebase.firestore().collection("users/members/id").doc(firebase.auth().currentUser.uid).get().then(async function(user){
 						if(!user.exists){
@@ -1511,8 +1511,16 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								about_me_container_content += " disabled";
 							}
 							about_me_container_content += "\" id=\"about_me_removal_" + about_topic.split(" ").join("_") + "\" title=\"Delete " + about_topic.toLowerCase() + "\"></span></td></tr></tbody></table></td></tr><tr><td><div class=\"input_container_about\">";
-							if ([0,2].indexOf(about_sections[about_topic]) >= 0) {
-								about_me_container_content += "<input type=\"text\" id=\"about_me_input_" + about_topic.split(" ").join("_") + "\" value=\"" + (about_me[about_topic] || "").split("\"").join("\\\"") +"\" maxlength=\"1024\" />";
+							if ([0,2,3,4].indexOf(about_sections[about_topic]) >= 0) {
+								about_me_container_content += "<input type=\"text\" id=\"about_me_input_" + about_topic.split(" ").join("_") + "\" value=\"" + (about_me[about_topic] || "").split("\"").join("\\\"") +"\"";
+								if (about_sections[about_topic] == 2){
+									about_me_container_content += "autocomplete=\"url\"";
+								} else if (about_sections[about_topic] == 3){
+									about_me_container_content += "autocomplete=\"tel\"";
+								} else if (about_sections[about_topic] == 4){
+									about_me_container_content += "autocomplete=\"email\"";
+								}
+								about_me_container_content += " maxlength=\"1024\" />";
 							} else if (about_sections[about_topic] == 1) {
 								about_me_container_content += "<textarea type=\"text\" id=\"about_me_textarea_" + about_topic.split(" ").join("_") + "\" value=\"" + (about_me[about_topic]||"").split("\"").join("\\\"") + "\" maxlength=\"1024\" />" + (about_me[about_topic]||"") + "</textarea>";
 							} else {
@@ -1697,7 +1705,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									alert("An unexpected error occured!");
 								}
 							});
-							if ([0,2].indexOf(about_sections[about_topic]) >= 0)
+							if ([0,2,3,4].indexOf(about_sections[about_topic]) >= 0)
 							{
 								document.getElementById("about_me_input_" + about_topic.split(" ").join("_")).addEventListener("input",function(e){
 									var about_me_element_id = e.target.getAttribute("id").replace("about_me_input_","");
@@ -1824,7 +1832,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								document.getElementById("page_ref_settings_forbidden_content").innerHTML = "<p class=\"side_margin margin_top center_text\"><a id=\"delete_account_ref_page\">Delete your account</a></p>";
 								document.getElementById("delete_account_ref_page").addEventListener("click",function click(){
 									document.getElementById("page_ref_title").innerHTML = "Account removal";
-									document.getElementById("page_ref_settings_forbidden_content").innerHTML = "<p class=\"side_margin margin_top center_text thin_disclaimer\"><b>WARNING:</b> By completing this action all user account data, including: email address, username, password, and display name; will be removed from this service. However, all user submitted content will remain, unless removed at a later point. This action cannot be undone, by completing this action you take all liability on your behalf from the removal of your account, and you will no longer be able interact with this service.</p><p class=\"side_margin margin_top center_text thin_disclaimer\"><b>NOTE:</b> to complete this action you must have been signed in recently.</p><p class=\"side_margin margin_top center_text\"><a id=\"delete_account_ref_page\">Delete your account</a></p>";
+									document.getElementById("page_ref_settings_forbidden_content").innerHTML = "<p class=\"side_margin margin_top center_text thin_disclaimer\"><b>WARNING:</b> By completing this action all personal non-form submitted user account data, including: email address, username, password, display name, and &quot;about me&quot; content; will be removed from this service. However, all user submitted content will remain, unless removed at a later point. This action cannot be undone, by completing this action you take all liability on your behalf from the removal of your account, and you will no longer be able interact with this service.</p><p class=\"side_margin margin_top center_text thin_disclaimer\"><b>NOTE:</b> to complete this action you must have been signed in recently.</p><p class=\"side_margin margin_top center_text\"><a id=\"delete_account_ref_page\">Delete your account</a></p>";
 									document.getElementById("delete_account_ref_page").removeEventListener("click",click);
 									document.getElementById("delete_account_ref_page").setAttribute("id","delete_account_confirm");
 									document.getElementById("delete_account_confirm").addEventListener("click",async function(){
