@@ -141,6 +141,7 @@ div.input_container_about > input, div.input_container_about > select, div.input
 	box-sizing: border-box;
 	background-color: #FFFFFF;
 	width: 100%;
+	margin: 0 0 0.3em;
 }
 div.input_container_about > textarea {
 	resize: none;
@@ -173,6 +174,10 @@ span#user_registration_action, p.cancel_verification {
 }
 input[type=submit]{
 	cursor: pointer;
+}
+div#loading_progress > div#load_spinner {
+	border: 4.5px solid gray;
+	border-right-color: transparent;
 }
 div#load_spinner {
 	margin: 0 auto;
@@ -833,7 +838,7 @@ a#close_popup_dialog {
 }
 @media screen and (max-width: 812px){
 	div.app_page_contents {
-		display: block !important;
+		display: block;
 	}
 	div.app_nav, div.base_nav {
 		-webkit-box-shadow: 0px 6px 10px 0px rgba(232, 23, 23, 0.8);

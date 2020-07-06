@@ -44,6 +44,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 	var image_cache = {};
 	document.addEventListener('DOMContentLoaded', (event) => {
 		document.body.innerHTML+="<div id=\"popup_dialog\" class=\"overlay\"><div class=\"popup\"><h2 id=\"popup_header\"></h2><a id=\"close_popup_dialog\">&times;</a><div id=\"popup_content\" class=\"content\"></div></div></div>";
+		document.body.innerHTML+="<div id=\"loading_progress\" class=\"hide\"><div class=\"spacer\"></div><div class=\"spacer\"></div><div id=\"load_spinner\"></div></div>";
 		document.getElementById("close_popup_dialog").addEventListener("click",function(){
 			document.getElementById("popup_dialog").classList.remove("active");
 		});
@@ -127,7 +128,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		"Website": 2,
 		"Facebook": 0,
 		"Dev Community": 0,
-		"Github": 0,
+		"GitHub": 0,
 		"LinkedIn": 0,
 		"Twitter": 0,
 		"Instagram": 0,
@@ -405,19 +406,24 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							sub_page_link_generation = 0;
 							var posts_base_load = false;
 							document.getElementById("s_banner").addEventListener("click",function(){
-								if (document.body.getBoundingClientRect().top >= -3){
-									location.href = "menu.html";
-								} else {
-									var top = function() {
-										var position = document.body.scrollTop || document.documentElement.scrollTop;
-										if (position) {
-											window.scrollBy(0, -Math.max(1, Math.floor(position / 8)));
-											scrollAnimation = setTimeout(top, 30);
-										} else {
-											clearTimeout(top);
+								if (document.getElementById("s_banner").getAttribute("disabled") != "disabled"){
+									if (document.body.getBoundingClientRect().top >= -3){
+										document.getElementById("s_banner").setAttribute("disabled","disabled");
+										document.getElementById("page_contents_static").classList.add("hide");
+										document.getElementById("loading_progress").classList.remove("hide");
+										location.href = "menu.html";
+									} else {
+										var top = function() {
+											var position = document.body.scrollTop || document.documentElement.scrollTop;
+											if (position) {
+												window.scrollBy(0, -Math.max(1, Math.floor(position / 8)));
+												scrollAnimation = setTimeout(top, 30);
+											} else {
+												clearTimeout(top);
+											}
 										}
+										top();
 									}
-									top();
 								}
 							});
 							sub_pages.forEach(function(nav_id){
@@ -584,7 +590,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									try {
 										document.getElementById("message_refresh").classList.remove("loading");
 									}catch(e){}
-								},{true:0,false:600}[now]);
+								},{true:0,false:730}[now]);
 							}
 							function post_validate(){
 								const max_length = 1000;
@@ -869,6 +875,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																						call_tip = "Call " + call_tip;
 																					} else if (ref_icon == "website") {
 																						call_tip = "View " + call_tip + "'s website";
+																					} else if (ref_icon == "email") {
+																						call_tip = "Contact " + call_tip + " by email";
 																					} else if (ref_icon == "snapchat"){
 																						call_tip = "Add " + call_tip + " on Snapchat";
 																					} else if (ref_icon == "discord"){
@@ -960,7 +968,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																							user_view_about = -1;
 																						}
 																					}
-																					console.log(prof_tag);
 																					if (prof_tag !== false) {
 																						alert("Discord username:",prof_tag);
 																					}
@@ -1474,8 +1481,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								about_topic_header = "Facebook username";
 							} else if (about_topic_header == "Dev Community"){
 								about_topic_header = "Dev Community username";
-							} else if (about_topic_header == "Github"){
-								about_topic_header = "Github username";
+							} else if (about_topic_header == "GitHub"){
+								about_topic_header = "GitHub username";
 							} else if (about_topic_header == "LinkedIn"){
 								about_topic_header = "LinkedIn account URL";
 							} else if (about_topic_header == "Twitter"){
@@ -1554,7 +1561,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											max_length = 15;
 										} else if (about_me_element_id == "Discord"){
 											max_length = 32;
-										} else if (about_me_element_id == "Github"){
+										} else if (about_me_element_id == "GitHub"){
 											max_length = 39;
 										} else if (about_me_element_id == "LinkedIn"){
 											max_length = 58;
@@ -1608,15 +1615,16 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														document.getElementById(element).removeAttribute("disabled");
 														return;
 													}
-												} else if (about_me_element_id == "Github"){
+												} else if (about_me_element_id == "GitHub"){
 													if(/([a-z0-9](?:-?[a-z0-9]){0,38})$/.test(value) == false){
-														alert("Error","Invalid Github username!");
+														alert("Error","Invalid GitHub username!");
 														document.getElementById(element).removeAttribute("disabled");
 														return;
 													}
 												} else if (about_me_element_id == "LinkedIn"){
+													value = value.toLowerCase();
 													if(/http(s)?:\/\/([\w]+\.)?linkedin\.com\/in\/[A-z0-9_-]+\/?/.test(value) == false){
-														alert("Error","Invalid LinkedIn URL <br>Such as: <code>https://www.linkedin.com/in/username</code>");
+														alert("Error","Invalid LinkedIn URL!<p>Format accepted is: <code>https://www.linkedin.com/in/username</code></p>");
 														document.getElementById(element).removeAttribute("disabled");
 														return;
 													}
@@ -1744,6 +1752,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				};
 				if(preload){
 					document.addEventListener("DOMContentLoaded", function(event){
+						document.getElementById("loading_progress").classList.remove("hide");
+						document.getElementById("page_contents_static").classList.add("hide");
 						document.getElementById("page_ref_settings_content").classList.add("hide");
 						document.getElementById("page_ref_settings_content_more").classList.add("hide");
 						document.getElementById("page_ref_settings_forbidden").classList.add("hide");
@@ -1774,6 +1784,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							var load = ["/app/img/refresh_loading.gif"].forEach(function(img){
 								img_blob(img);
 							});
+							document.getElementById("loading_progress").classList.add("hide");
+							document.getElementById("page_contents_static").classList.remove("hide");
 							document.getElementById("menu_settings").addEventListener("click",base_settings_page);
 							document.getElementById("menu_settings_about").addEventListener("click",about_page);
 							document.getElementById("settings_ref_base").addEventListener("click",base_settings_page);
