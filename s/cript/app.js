@@ -1467,7 +1467,29 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						document.getElementById("setting_ref_content").innerHTML = "<p class=\"side_margin margin_top center_text\">This information will be publicly viewable to all members of the Solect Computing Society!</p><div class=\"members_list about_me_edit margin_top\"><table id=\"about_me_container_host\"><tbody id=\"about_me_container\"></tbody></table><br></div>";
 						var about_me_container_content = "";
 						for (var about_topic in about_sections) {
-							about_me_container_content += "<tr><td><table><tbody><tr><td class=\"about_me_header\"><h4 class=\"no_bottom\">" + about_topic + ":</h4></td><td class=\"about_me_subject_removal_container\"><span class=\"about_me_removal";
+							var about_topic_header = about_topic;
+							if (about_topic_header == "Website"){
+								about_topic_header = "Website URL";
+							} else if (about_topic_header == "Facebook"){
+								about_topic_header = "Facebook username";
+							} else if (about_topic_header == "Dev Community"){
+								about_topic_header = "Dev Community username";
+							} else if (about_topic_header == "Github"){
+								about_topic_header = "Github username";
+							} else if (about_topic_header == "LinkedIn"){
+								about_topic_header = "LinkedIn account URL";
+							} else if (about_topic_header == "Twitter"){
+								about_topic_header = "Twitter username";
+							} else if (about_topic_header == "Snapchat"){
+								about_topic_header = "Snapchat username";
+							} else if (about_topic_header == "Instagram"){
+								about_topic_header = "Instagram username";
+							} else if (about_topic_header == "Discord"){
+								about_topic_header = "Discord username#number";
+							} else if (about_topic_header == "Youtube"){
+								about_topic_header = "Youtube account URL";
+							}
+							about_me_container_content += "<tr><td><table><tbody><tr><td class=\"about_me_header\"><h4 class=\"no_bottom\">" + about_topic_header + ":</h4></td><td class=\"about_me_subject_removal_container\"><span class=\"about_me_removal";
 							if (typeof about_me[about_topic] === "undefined"){
 								about_me_container_content += " disabled";
 							} else if (about_me[about_topic].length == 0) {
