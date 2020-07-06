@@ -409,7 +409,15 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								if (document.getElementById("s_banner").getAttribute("disabled") != "disabled"){
 									if (document.body.getBoundingClientRect().top >= -3){
 										document.getElementById("s_banner").setAttribute("disabled","disabled");
-										document.getElementById("page_contents_static").classList.add("hide");
+										try {
+											document.getElementById("page_contents_static").classList.add("hide");
+										} catch (e) {
+											try {
+												document.getElementById("page_contents").classList.add("hide");
+											} catch (e) {
+												alert("Error","An unexpected error occured [REF:&nbsp;PLH00]");
+											}
+										}
 										document.getElementById("loading_progress").classList.remove("hide");
 										location.href = "menu.html";
 									} else {
