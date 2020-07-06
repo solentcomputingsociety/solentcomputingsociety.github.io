@@ -661,7 +661,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											if (sub_ref == "posts_host_container"){
 												out.html = "<div>";
 											} else {
-												out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin\"><div id=\"new_post_container\"><div id=\"new_post_content_container\"><textarea id=\"new_post_content\" placeholder=\"What's the message?\"></textarea></div><div id=\"error_container\" class=\"red_error_bold\"></div><div id=\"new_post_actions\"><div id=\"new_post_actions_remaining_container\" class=\"hide\">Remaining: <span id=\"new_post_actions_remaining\"></span></div><div id=\"new_post_actions_post_container\"><button id=\"new_post_actions_post_submit\">Post</button></div></div></div><p class=\"center_text\"><a title=\"click to refresh\" id=\"message_refresh\"></a></p><div id=\"posts_host_container\">";
+												out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin\"><div id=\"new_post_container\"><div id=\"new_post_content_container\"><textarea id=\"new_post_content\" placeholder=\" Say something...\"></textarea></div><div id=\"error_container\" class=\"red_error_bold\"></div><div id=\"new_post_actions\"><div id=\"new_post_actions_remaining_container\" class=\"hide\">Remaining: <span id=\"new_post_actions_remaining\"></span></div><div id=\"new_post_actions_post_container\"><button id=\"new_post_actions_post_submit\">Post</button></div></div></div><p class=\"center_text\"><a title=\"click to refresh\" id=\"message_refresh\"></a></p><div id=\"posts_host_container\">";
 												add.click.push(["message_refresh",refresh]);
 												add.click.push(["new_post_actions_post_submit",post]);
 												add.typing.push(["new_post_content",post_validate]);
@@ -1753,7 +1753,15 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				if(preload){
 					document.addEventListener("DOMContentLoaded", function(event){
 						document.getElementById("loading_progress").classList.remove("hide");
-						document.getElementById("page_contents_static").classList.add("hide");
+						try {
+							document.getElementById("page_contents_static").classList.add("hide");
+						} catch (e) {
+							try {
+								document.getElementById("page_contents").classList.add("hide");
+							} catch (e) {
+								alert("Error","An unexpected error occured [REF:&nbsp;PLH00]");
+							}
+						}
 						document.getElementById("page_ref_settings_content").classList.add("hide");
 						document.getElementById("page_ref_settings_content_more").classList.add("hide");
 						document.getElementById("page_ref_settings_forbidden").classList.add("hide");
@@ -1785,7 +1793,15 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								img_blob(img);
 							});
 							document.getElementById("loading_progress").classList.add("hide");
-							document.getElementById("page_contents_static").classList.remove("hide");
+							try {
+								document.getElementById("page_contents_static").classList.remove("hide");
+							} catch (e) {
+								try {
+									document.getElementById("page_contents").classList.remove("hide");
+								} catch(e) {
+									alert("Error","An unexpected error occured [REF:&nbsp;PLS01]");
+								}
+							}
 							document.getElementById("menu_settings").addEventListener("click",base_settings_page);
 							document.getElementById("menu_settings_about").addEventListener("click",about_page);
 							document.getElementById("settings_ref_base").addEventListener("click",base_settings_page);
