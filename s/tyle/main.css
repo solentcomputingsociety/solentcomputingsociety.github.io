@@ -60,6 +60,9 @@ html, body {
 .user_reference_link {
 	cursor: pointer;
 }
+.loading {
+	cursor: progress;
+}
 a {
 	text-decoration: none;
 	color: #376EB2;
@@ -77,7 +80,7 @@ div.content {
 div.footer {
 	height: 5vh;
 }
-div#banner_main > p, a#close_popup_dialog, div#banner_container *, div.base_nav * {
+.no_interact, div#banner_main > p, a#close_popup_dialog, div#banner_container *, div.base_nav *, .post_img_s, .members_list_img_s, span#s_user_name_container, #new_post_content, #new_post_actions_post_submit, .members_list_name {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -128,7 +131,45 @@ div#s_banner {
 	width: 150px !important;
 	height: 46px !important;
 	margin: 0 !important;
+	float: left;
+	display: inline-block;
+}
+div#s_banner.clickable {
 	cursor: pointer;
+}
+div#s_user, div#s_user_icon {
+	height: 50px;
+	min-width: 50px;
+	padding: 6px;
+	border-radius: 50px;
+	background-color: #e81717;
+	float: right;
+	margin: auto 2em 0 0;
+	cursor: pointer;
+}
+div#s_user_icon {
+	display: block;
+	width: 50px !important;
+	padding: 0 !important;
+	background-color: #ffffff;
+	margin: 0 !important;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+div#s_user_name > span {
+	line-height: 50px;
+	padding: 0 0 0 8px;
+	margin: 0 10px 0 0;
+	color: #ffffff;
+	max-width: 30vw;
+	max-height: 50px;
+	overflow: hidden;
+	display: block;
+	text-overflow: ellipsis;
+}
+div#s_user > div {
+	display: inline-block;
 }
 div.input_container, div.input_container_about {
 	text-align: center;
@@ -315,6 +356,7 @@ button#new_post_actions_post_submit, input#settings_ref_content_prof_password_ch
 	font-weight: bold;
 	cursor: pointer;
 	outline: none;
+	font-family: arial;
 }
 button#new_post_actions_post_submit.disabled {
 	background-color: #E6DEE3;
@@ -428,7 +470,7 @@ div#about_me_container {
   }
 
 }
-img.loading, span.loading {
+img.loading, span.loading, div#s_user_icon.loading {
 	background-color: #e7e7e7;
 	width: 100%;
 	height: 100%;
@@ -685,6 +727,7 @@ div#banner_main > p {
 	color: #ffffff;
 	margin: 0 10px;
 	text-align: center;
+	font-family: arial;
 }
 div#banner_side_left {
 	background-color: #ffffff;
@@ -756,7 +799,7 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 
 @media screen and (max-width: 450px){
 	.desktop_only {
-		display: none;
+		display: none !important;
 	}
 	div.input_container > input {
 		padding: 2vw 20px !important;
@@ -774,6 +817,9 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 		text-align: center;
 		border-top: 1px solid #b2b2b2;
 		margin-top: 40px;
+	}
+	div#s_user {
+		margin: 0 1em 0 0;
 	}
 	#about_me_main_ref > p, #about_me_main_ref > h3 {
 		margin-left: 1em;

@@ -427,6 +427,16 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				if (preload){
 					return;
 				} else {
+					var s_banner_button = document.getElementById("s_banner");
+					document.onscroll = function(){;
+						if ((document.body.scrollTop || document.documentElement.scrollTop) > 10){
+							s_banner_button.classList.add("clickable");
+							s_banner_button.setAttribute("title","Scroll to top");
+						} else {
+							s_banner_button.classList.remove("clickable");
+							s_banner_button.removeAttribute("title");
+						}
+					}
 					firebase.auth().onAuthStateChanged(function(user) {
 						if (user) {
 							var sub_pages = ["nav_loc_messages","nav_loc_events","nav_loc_members","nav_loc_pub"];
@@ -434,33 +444,38 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							var contents = {posts:{},users:[],events:true,pub:"tbc"};
 							sub_page_link_generation = 0;
 							var posts_base_load = false;
-							document.getElementById("s_banner").addEventListener("click",function(){
-								if (document.getElementById("s_banner").getAttribute("disabled") != "disabled"){
-									if (document.body.getBoundingClientRect().top >= -3){
-										document.getElementById("s_banner").setAttribute("disabled","disabled");
+							document.getElementById("s_user").addEventListener("click",function(){
+								if (document.getElementById("s_user").getAttribute("disabled") != "disabled"){
+									document.getElementById("s_user").setAttribute("disabled","disabled");
+									try {
+										document.getElementById("page_contents_static").classList.add("hide");
+									} catch (e) {
 										try {
-											document.getElementById("page_contents_static").classList.add("hide");
+											document.getElementById("page_contents").classList.add("hide");
 										} catch (e) {
-											try {
-												document.getElementById("page_contents").classList.add("hide");
-											} catch (e) {
-												alert("Error","An unexpected error occured [REF:&nbsp;PLH00]");
-											}
+											alert("Error","An unexpected error occured [REF:&nbsp;PLH00]");
 										}
-										document.getElementById("loading_progress").classList.remove("hide");
-										location.href = "menu.html";
-									} else {
-										var top = function() {
-											var position = document.body.scrollTop || document.documentElement.scrollTop;
+									}
+									document.getElementById("loading_progress").classList.remove("hide");
+									location.href = "menu.html";
+								}
+							});
+							document.getElementById("s_banner").addEventListener("click",function(){
+								if (document.body.getBoundingClientRect().top < -3){
+									var last_scroll_pos = document.body.scrollTop || document.documentElement.scrollTop;
+									var top = function() {
+										var position = document.body.scrollTop || document.documentElement.scrollTop;
+										if (position <= last_scroll_pos){
 											if (position) {
 												window.scrollBy(0, -Math.max(1, Math.floor(position / 8)));
+												last_scroll_pos = document.body.scrollTop || document.documentElement.scrollTop;
 												scrollAnimation = setTimeout(top, 30);
 											} else {
 												clearTimeout(top);
 											}
-										};
-										top();
-									}
+										}
+									};
+									top();
 								}
 							});
 							sub_pages.forEach(function(nav_id){
@@ -781,7 +796,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									case "nav_loc_events":
 										out.html = "<div class=\"side_margin center_text\">";
 										if (contents.events === true){
-											out.html = out.html + "<p class=\"center_text\">Still loading events...</p><p class=\"center_text\"><a title=\"Try again?\" id=\"events_retry_action\">Retry</a></p>";
+											out.html = out.html + "<p class=\"center_text no_interact\">Still loading events...</p><p class=\"center_text\"><a title=\"Try again?\" id=\"events_retry_action\" class=\"no_interact\">Retry</a></p>";
 											add.click.push(["events_retry_action",function(){
 												document.getElementById("nav_loc_events").click();
 											}]);
@@ -847,7 +862,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												} catch (e) {}
 											}
 											if (!events_added) {
-												out.html = out.html + "<p class=\"center_text\">Sadly, there are no upcoming events.</p>";
+												out.html = out.html + "<p class=\"center_text no_interact\">Sadly, there are no upcoming events.</p>";
 											}
 										}
 										out.html = out.html + "</div>";
@@ -1078,7 +1093,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin\"><p class=\"center_text\">";
 										if (is_president) {
 											if (pubs_data.length == 0){
-												document.getElementById({true:"page_render",false:sub_ref}[sub_ref == false]).innerHTML = "<div id=\"redundant_padding\"></div><div class=\"side_margin center_text\"><p class=\"center_text\">Loading...</p></div>";
+												document.getElementById({true:"page_render",false:sub_ref}[sub_ref == false]).innerHTML = "<div id=\"redundant_padding\"></div><div class=\"side_margin center_text\"><p class=\"center_text no_interact\">Loading...</p></div>";
 												await firebase.firestore().collection("places/pubs/listed").get().then(async function(snapshot){
 													pubs_data = snapshot.docs.map( doc => {
 														var doc_data = doc.data();
@@ -1128,11 +1143,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												out.html = out.html + "</div>";
 												break;
 											}
-											out.html = out.html + "<p class=\"center_text\">This week's pub hasn't been published yet...</p></div>";
+											out.html = out.html + "<p class=\"center_text no_interact\">This week's pub hasn't been published yet...</p></div>";
 										} else if (contents.pub.error == true){
-											out.html = out.html + "<p class=\"center_text\">Unable to load this week's pub!</p></div>";
+											out.html = out.html + "<p class=\"center_text no_interact\">Unable to load this week's pub!</p></div>";
 										} else {
-											out.html = out.html + "<p class=\"center_text\">This week we will be going to:</p><h2 class=\"center_text\">" + contents.pub.name + "</h2><p class=\"center_text\">" + contents.pub.address + "</p><p class=\"center_text\">" + contents.pub.postcode + "</p></div><iframe src=\"https://maps.google.com/maps?q=" + contents.pub.geo[0] + "," + contents.pub.geo[1] + "&z=18&output=embed\" id=\"pub_map\" frameborder=\"0\" style=\"border:0;background-image:url(\'" + img_blob("/app/img/map_loading.gif",false,true) + "\')\" allowfullscreen=\"\" aria-hidden=\"false\" tabindex=\"0\"></iframe>";
+											out.html = out.html + "<p class=\"center_text no_interact\">This week we will be going to:</p><h2 class=\"center_text\">" + contents.pub.name + "</h2><p class=\"center_text\">" + contents.pub.address + "</p><p class=\"center_text\">" + contents.pub.postcode + "</p></div><iframe src=\"https://maps.google.com/maps?q=" + contents.pub.geo[0] + "," + contents.pub.geo[1] + "&z=18&output=embed\" id=\"pub_map\" frameborder=\"0\" style=\"border:0;background-image:url(\'" + img_blob("/app/img/map_loading.gif",false,true) + "\')\" allowfullscreen=\"\" aria-hidden=\"false\" tabindex=\"0\"></iframe>";
 										}
 										break;
 								}
@@ -1172,6 +1187,39 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							var load = ["/app/img/map_loading.gif"].forEach(function(img){
 								img_blob(img);
 							});
+							var s_user_button = document.getElementById("s_user");
+							(async function(){
+								var u_user_icon = document.getElementById("s_user_icon");
+								var prof_pre_loader = document.createElement("img");
+								firebase.firestore().collection("users/members/id").doc(firebase.auth().currentUser.uid).get().then(async function(user){
+									var photo = "/app/img/prof.png";
+									var name = "";
+									if (user.exists){
+										user = user.data();
+										if (!(typeof user.photo === "undefined" && user.photo.length == 0)){
+											photo = await storage_download("profile/"+user.photo+"_50x50");
+										}
+										try {
+											name = user.name;
+										} catch (e) {}
+									}
+									prof_pre_loader.src = img_blob(photo,null,true);
+									var s_user_name = document.getElementById("s_user_name");
+									if (name.trim().length > 0){
+										document.getElementById("s_user_name_container").innerText = name;
+									}
+								}).catch(function(error){
+									prof_pre_loader.src = img_blob("/app/img/prof.png",null,true);
+								});
+								prof_pre_loader.addEventListener("load",(event) => {
+									u_user_icon.style.backgroundImage = "url(\""+ prof_pre_loader.getAttribute("src") + "\")";
+									u_user_icon.classList.remove("loading");
+									if (s_user_name.innerText.length > 0){
+										s_user_name.classList.remove("hide");
+									}
+								});
+							})();
+							s_user_button.classList.remove("hide");
 							setTimeout(function () {
 								update_users().then(function(e){
 									var user_set_up = -1;
@@ -1222,6 +1270,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												document.getElementById(nav_id).classList.remove("disabled");
 											}
 										});
+										document.getElementById("page_render").classList.remove("loading");
 										load_page();
 									});
 								});
@@ -1832,11 +1881,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							document.getElementById("s_banner").addEventListener("click",function(){
 								var top = function() {
 									var position = document.body.scrollTop || document.documentElement.scrollTop;
-									if (position) {
-										window.scrollBy(0, -Math.max(1, Math.floor(position / 8)));
-										scrollAnimation = setTimeout(top, 30);
-									} else {
-										clearTimeout(top);
+									if (position <= last_scroll_pos){
+										if (position) {
+											window.scrollBy(0, -Math.max(1, Math.floor(position / 8)));
+											last_scroll_pos = document.body.scrollTop || document.documentElement.scrollTop;
+											scrollAnimation = setTimeout(top, 30);
+										} else {
+											clearTimeout(top);
+										}
 									}
 								};
 								top();
