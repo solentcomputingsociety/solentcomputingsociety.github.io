@@ -22,6 +22,9 @@
 <body>
 	<div class="app_nav show">
 		<div id="s_banner"></div>
+		<div id="s_user" class="menu">
+			<div id="s_user_icon" class="loading"></div>
+		</div>
 	</div>
 	<div id="app_nav_padding"></div>
 	<div id="page_contents_static">
@@ -31,6 +34,7 @@
 			<p class="side_margin margin_top center_text"><a id="menu_settings" title="Modify your account settings">Settings</a></p>
 			<p class="side_margin margin_top center_text"><a id="menu_settings_about" title="Update your 'about me' page">About me</a></p>
 			<p class="side_margin margin_top center_text"><a id="menu_logout" title="Sign out of your account">Logout</a></p>
+			<div class="small_spacer"></div>
 			<p class="side_margin margin_top center_text"><a id="menu_back" title="Go back to the main content">Go Back</a></p>
 		</div>
 		<div id="page_ref_settings_content">
@@ -39,10 +43,10 @@
 		<div id="page_ref_settings_content_more">
 			<form>
 				<div class="input_container margin_top_small center_text"><input type="email" placeholder="New email" id="settings_ref_content_prof_email_input" autocomplete="email"><br><p class="side_margin center_text red_error_bold hide" id="settings_ref_content_prof_email_error"></p><input type="submit" value="Update email" id="settings_ref_content_prof_email_change_button"></div>
-				<div class="input_container margin_top center_text"><input type="password" placeholder="Current password" id="current_password" autocomplete="current-password"><br><input type="password" placeholder="New password" id="new_password" autocomplete="new-password"><br><input type="password" placeholder="Confirm password" id="new_password_confirm" autocomplete="new-password"><br><p class="side_margin center_text red_error_bold hide" id="settings_ref_content_prof_password_error"></p><input type="submit" value="Change password" id="settings_ref_content_prof_password_change_button"></div><div class="spacer"></div><p class="side_margin margin_top center_text"><a id="settings_ref_forbidden">Go to the forbidden settings?</a></p><p class="side_margin margin_top center_text"><a id="settings_ref_base">Back to main settings</a></p><br>
+				<div class="input_container margin_top center_text"><input type="password" placeholder="Current password" id="current_password" autocomplete="current-password"><br><input type="password" placeholder="New password" id="new_password" autocomplete="new-password"><br><input type="password" placeholder="Confirm password" id="new_password_confirm" autocomplete="new-password"><br><p class="side_margin center_text red_error_bold hide" id="settings_ref_content_prof_password_error"></p><input type="submit" value="Change password" id="settings_ref_content_prof_password_change_button"></div><div class="small_spacer"></div><p class="side_margin margin_top center_text"><a id="settings_ref_forbidden">Go to the forbidden settings?</a></p><p class="side_margin margin_top center_text"><a id="settings_ref_base">Back to main settings</a></p><br>
 			</form>
 		</div>
-		<div id="page_ref_settings_forbidden"><div id="page_ref_settings_forbidden_content"></div><div class="spacer"></div><p class="side_margin margin_top center_text"><a id="settings_ref_base_forbidden">Back to main settings</a></p></div>
+		<div id="page_ref_settings_forbidden"><div id="page_ref_settings_forbidden_content"></div><div class="small_spacer"></div><p class="side_margin margin_top center_text"><a id="settings_ref_base_forbidden">Back to main settings</a></p></div>
 		<div id="page_ref_settings_setup"><p class="side_margin margin_top center_text">You need to complete setup of your account before you can access anything else...</p><p class="side_margin margin_top center_text"><a id="menu_settings_ok">OK</a></p></div>
 	</div>
 </body>

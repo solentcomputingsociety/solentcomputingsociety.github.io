@@ -4,6 +4,7 @@
 }
 html, body {
 	margin: 0;
+	overscroll-behavior: contain;
 }
 .hide {
 	display: none !important;
@@ -74,13 +75,16 @@ p {
 div.spacer {
 	min-height: 6em;
 }
+div.small_spacer {
+	min-height: 3em;
+}
 div.content {
 	min-height: 95vh;
 }
 div.footer {
 	height: 5vh;
 }
-.no_interact, div#banner_main > p, a#close_popup_dialog, div#banner_container *, div.base_nav *, .post_img_s, .members_list_img_s, span#s_user_name_container, #new_post_content, #new_post_actions_post_submit, .members_list_name {
+.no_interact, div#banner_main > p, a#close_popup_dialog, div#banner_container *, div.base_nav *, .post_img_s, .members_list_img_s, #new_post_content, #new_post_actions_post_submit, .members_list_name {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -140,11 +144,11 @@ div#s_banner.clickable {
 div#s_user, div#s_user_icon {
 	height: 50px;
 	min-width: 50px;
-	padding: 6px;
+	padding: 3.5px;
 	border-radius: 50px;
-	background-color: #e81717;
+	background-color: #fbdddd;
 	float: right;
-	margin: auto 2em 0 0;
+	margin: 1.25px 2em 1.25px 1.25px;
 	cursor: pointer;
 }
 div#s_user_icon {
@@ -157,19 +161,11 @@ div#s_user_icon {
 	background-repeat: no-repeat;
 	background-position: center;
 }
-div#s_user_name > span {
-	line-height: 50px;
-	padding: 0 0 0 8px;
-	margin: 0 10px 0 0;
-	color: #ffffff;
-	max-width: 30vw;
-	max-height: 50px;
-	overflow: hidden;
-	display: block;
-	text-overflow: ellipsis;
-}
 div#s_user > div {
 	display: inline-block;
+}
+div#s_user.menu * {
+	cursor: default !important;
 }
 div.input_container, div.input_container_about {
 	text-align: center;
@@ -438,7 +434,7 @@ div#post_end:before, p#post_end_reason, p#settings_loading_statement {
 	cursor: pointer;
 }
 div.members_list.about_me_edit {
-	width: 40%;
+	width: 58%;
 	margin: 1em auto;
 	display: block;
 	cursor: default;
@@ -875,7 +871,7 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 		width: 76vw;
 	}
 	div.members_list.about_me_edit {
-		width: 70%;
+		width: 90%;
 	}
 }
 @media screen and (max-width: 812px){

@@ -143,6 +143,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			firebase.initializeApp(firebaseConfig);
 		}
 		try {
+			var u_user_icon = document.getElementById("s_user_icon");
+			if (typeof(Storage) !== "undefined") {
+				if (sessionStorage.profile_image) {
+					u_user_icon.style.backgroundImage = "url('data:image/png;base64," + sessionStorage.profile_image + "')";
+					u_user_icon.classList.remove("loading");
+				}
+			}
 			var verified = true;
 			await firebase.auth().onAuthStateChanged(async function(user) {
 				if (user) {
@@ -152,6 +159,47 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						location.assign("/error/auth_verification");
 						return;
 					}
+				}
+				var s_user_button = document.getElementById("s_user");
+				if (typeof(s_user_button) !== "undefined"){
+					(async function(){
+						var prof_pre_loader = new Image();
+						prof_pre_loader.crossOrigin = 'Anonymous';
+						await firebase.firestore().collection("users/members/id").doc(firebase.auth().currentUser.uid).get().then(async function(user){
+							var photo = "/app/img/prof.png";
+							var name = "";
+							if (user.exists){
+								user = user.data();
+								if (!(typeof user.photo === "undefined" || user.photo.trim().length == 0)){
+									photo = await storage_download("profile/"+user.photo+"_50x50");
+								}
+								try {
+									name = user.name;
+								} catch (e) {}
+							}
+							prof_pre_loader.src = img_blob(photo,null,true);
+						}).catch(function(error){
+							prof_pre_loader.src = img_blob("/app/img/prof.png",null,true);
+						});
+						prof_pre_loader.onload = function(){
+							if (typeof(Storage) !== "undefined") {
+								var prof_pre_canvas = document.createElement("canvas");
+								prof_pre_canvas.width = 50;
+								prof_pre_canvas.height = 50;
+								var prof_pre_canvas_render = prof_pre_canvas.getContext("2d");
+								prof_pre_canvas_render.drawImage(prof_pre_loader, 0, 0, 50, 50);
+								var prof_image_base64 = prof_pre_canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
+								if (sessionStorage.profile_image == prof_image_base64){
+									u_user_icon.classList.remove("loading");
+									return;
+								} else {
+									sessionStorage.profile_image = prof_image_base64;
+								}
+							}
+							u_user_icon.style.backgroundImage = "url(\""+ prof_pre_loader.getAttribute("src") + "\")";
+							u_user_icon.classList.remove("loading");
+						};
+					})();
 				}
 			});
 			if (!verified) {
@@ -1187,39 +1235,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							var load = ["/app/img/map_loading.gif"].forEach(function(img){
 								img_blob(img);
 							});
-							var s_user_button = document.getElementById("s_user");
-							(async function(){
-								var u_user_icon = document.getElementById("s_user_icon");
-								var prof_pre_loader = document.createElement("img");
-								firebase.firestore().collection("users/members/id").doc(firebase.auth().currentUser.uid).get().then(async function(user){
-									var photo = "/app/img/prof.png";
-									var name = "";
-									if (user.exists){
-										user = user.data();
-										if (!(typeof user.photo === "undefined" && user.photo.length == 0)){
-											photo = await storage_download("profile/"+user.photo+"_50x50");
-										}
-										try {
-											name = user.name;
-										} catch (e) {}
-									}
-									prof_pre_loader.src = img_blob(photo,null,true);
-									var s_user_name = document.getElementById("s_user_name");
-									if (name.trim().length > 0){
-										document.getElementById("s_user_name_container").innerText = name;
-									}
-								}).catch(function(error){
-									prof_pre_loader.src = img_blob("/app/img/prof.png",null,true);
-								});
-								prof_pre_loader.addEventListener("load",(event) => {
-									u_user_icon.style.backgroundImage = "url(\""+ prof_pre_loader.getAttribute("src") + "\")";
-									u_user_icon.classList.remove("loading");
-									if (s_user_name.innerText.length > 0){
-										s_user_name.classList.remove("hide");
-									}
-								});
-							})();
-							s_user_button.classList.remove("hide");
 							setTimeout(function () {
 								update_users().then(function(e){
 									var user_set_up = -1;
@@ -1323,6 +1338,27 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								prof_image_preview.style.backgroundImage = "";
 								prof_image_preview.style.border = "1px solid #aaaaaa";
 								img_blob("/app/img/prof.png","settings_ref_content_prof_picture");
+								var prof_pre_loader = new Image();
+								prof_pre_loader.src = img_blob("/app/img/prof.png",null,true);
+								prof_pre_loader.onload = function(){
+									if (typeof(Storage) !== "undefined") {
+										var prof_pre_canvas = document.createElement("canvas");
+										prof_pre_canvas.width = 50;
+										prof_pre_canvas.height = 50;
+										var prof_pre_canvas_render = prof_pre_canvas.getContext("2d");
+										prof_pre_canvas_render.drawImage(prof_pre_loader, 0, 0, 50, 50);
+										var prof_image_base64 = prof_pre_canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
+										if (sessionStorage.profile_image == prof_image_base64){
+											u_user_icon.classList.remove("loading");
+											return;
+										} else {
+											sessionStorage.profile_image = prof_image_base64;
+										}
+									}
+									try {
+										u_user_icon.style.backgroundImage = "url(\""+ prof_pre_loader.getAttribute("src") + "\")";
+									} catch (e) {}
+								};
 							}).catch(function(error){
 								prof_image_preview.style.backgroundImage = "";
 								prof_image_preview.style.border = "1px solid #aaaaaa";
@@ -1357,6 +1393,26 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														prof_image_preview.removeEventListener("load",load);
 													});
 													document.getElementById("settings_ref_content_prof_picture_actions_container").style.display = "block";
+													var prof_pre_loader = document.getElementById("settings_ref_content_prof_picture");
+													prof_pre_loader.onload = function(){
+														if (typeof(Storage) !== "undefined") {
+															var prof_pre_canvas = document.createElement("canvas");
+															prof_pre_canvas.width = 50;
+															prof_pre_canvas.height = 50;
+															var prof_pre_canvas_render = prof_pre_canvas.getContext("2d");
+															prof_pre_canvas_render.drawImage(prof_pre_loader, 0, 0, 50, 50);
+															var prof_image_base64 = prof_pre_canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
+															if (sessionStorage.profile_image == prof_image_base64){
+																u_user_icon.classList.remove("loading");
+																return;
+															} else {
+																sessionStorage.profile_image = prof_image_base64;
+															}
+														}
+														try {
+															u_user_icon.style.backgroundImage = "url(\""+ prof_pre_loader.getAttribute("src") + "\")";
+														} catch (e) {}
+													};
 												}).catch(function(error){
 													document.getElementById("settings_ref_content_prof_picture_actions_container").style.display = "block";
 													prof_image_preview.setAttribute("src",prof_image_preview_src);
@@ -1435,6 +1491,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									settings_ref_content_prof_email_error.innerHTML = error.message;
 									if (error.code == "auth/requires-recent-login"){
 										document.getElementById("e_logout").addEventListener("click",function(){
+											sessionStorage.removeItem("profile_image");
 											firebase.auth().signOut();
 											location.href = "/login";
 										});
@@ -1879,6 +1936,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					firebase.auth().onAuthStateChanged(function(user) {
 						if (user) {
 							document.getElementById("s_banner").addEventListener("click",function(){
+								var last_scroll_pos = document.body.scrollTop || document.documentElement.scrollTop;
 								var top = function() {
 									var position = document.body.scrollTop || document.documentElement.scrollTop;
 									if (position <= last_scroll_pos){
