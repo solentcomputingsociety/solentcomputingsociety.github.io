@@ -44,7 +44,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 	var image_cache = {};
 	document.addEventListener('DOMContentLoaded', (event) => {
 		document.body.innerHTML+="<div id=\"popup_dialog\" class=\"overlay\"><div class=\"popup\"><h2 id=\"popup_header\"></h2><a id=\"close_popup_dialog\">&times;</a><div id=\"popup_content\" class=\"content\"></div></div></div>";
-		document.body.innerHTML+="<div id=\"loading_progress\" class=\"hide\"><div class=\"spacer\"></div><div class=\"spacer\"></div><div id=\"load_spinner\"></div></div>";
+		document.body.innerHTML+="<div id=\"loading_progress\" class=\"hide\"><div class=\"spacer\"></div><div id=\"load_spinner\"></div></div>";
 		document.getElementById("close_popup_dialog").addEventListener("click",function(){
 			document.getElementById("popup_dialog").classList.remove("active");
 		});
@@ -160,12 +160,15 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		} catch(e) {}
 		switch (page) {
 			case "d56b699830e77ba53855679cb1d252da":
+				var login_panel = document.getElementById("login_panel");
+				var load_spinner = document.getElementById("load_spinner");
+				var footer_content = document.getElementById("footer_content");
 				if (preload){
 					document.title = "Loading... | Solent Computing Society";
 					document.addEventListener("DOMContentLoaded", function(event){
-						document.getElementById("login_panel").classList.add("hide");
-						document.getElementById("load_spinner").classList.remove("hide");
-						document.getElementById("footer_content").classList.add("hide");
+						login_panel.classList.add("hide");
+						load_spinner.classList.remove("hide");
+						footer_content.classList.add("hide");
 					});
 				} else {
 					firebase.auth().onAuthStateChanged(function(user) {
@@ -179,14 +182,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							return;
 						} else {
 							document.title = "Login | Solent Computing Society";
-							document.getElementById("login_panel").classList.remove("hide");
-							document.getElementById("load_spinner").classList.add("hide");
-							document.getElementById("footer_content").classList.remove("hide");
+							login_panel.classList.remove("hide");
+							load_spinner.classList.add("hide");
+							footer_content.classList.remove("hide");
 							document.getElementById("login_submit").addEventListener("click",function(e){
 								e.preventDefault();
 								document.getElementById("login_panel_submit").classList.add("hide");
-								document.getElementById("load_spinner").classList.remove("hide");
-								document.getElementById("footer_content").classList.add("hide");
+								load_spinner.classList.remove("hide");
+								footer_content.classList.add("hide");
 								var credentials = [];
 								try {
 									var login_email = document.getElementById("login_email");
@@ -201,8 +204,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										error_panel.innerHTML = error.message;
 										error_panel.classList.remove("hide");
 										document.getElementById("login_panel_submit").classList.remove("hide");
-										document.getElementById("load_spinner").classList.add("hide");
-										document.getElementById("footer_content").classList.remove("hide");
+										load_spinner.classList.add("hide");
+										footer_content.classList.remove("hide");
 										login_email.disabled = false;
 										login_password.disabled = false;
 										overide_redirect = false;
@@ -213,18 +216,18 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							});
 							document.getElementById("user_registration_action").addEventListener("click",function(){
 								overide_redirect = true;
-								document.getElementById("footer_content").classList.add("hide");
-								document.getElementById("login_panel").classList.add("hide");
+								footer_content.classList.add("hide");
+								login_panel.classList.add("hide");
 								document.getElementById("login_panel_submit").classList.add("hide");
-								document.getElementById("load_spinner").classList.remove("hide");
+								load_spinner.classList.remove("hide");
 								window.location.href = "signup";
 							});
 							document.getElementById("password_forgotten_link").addEventListener("click",function(){
 								overide_redirect = true;
-								document.getElementById("footer_content").classList.add("hide");
-								document.getElementById("login_panel").classList.add("hide");
+								footer_content.classList.add("hide");
+								login_panel.classList.add("hide");
 								document.getElementById("login_panel_submit").classList.add("hide");
-								document.getElementById("load_spinner").classList.remove("hide");
+								load_spinner.classList.remove("hide");
 								window.location.href = "password";
 							});
 						}
@@ -232,22 +235,29 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				}
 				break;
 			case "7d2abf2d0fa7c3a0c13236910f30bc43":
+				var login_panel = document.getElementById("login_panel");
+				var load_spinner = document.getElementById("load_spinner");
+				var footer_content = document.getElementById("footer_content");
 				if (preload){
 					document.addEventListener("DOMContentLoaded", function(event){
-						document.getElementById("login_panel").classList.add("hide");
-						document.getElementById("load_spinner").classList.remove("hide");
+						login_panel.classList.add("hide");
+						load_spinner.classList.remove("hide");
 					});
 				} else {
 					var overide_redirect = false;
 					firebase.auth().onAuthStateChanged(function(user) {
 						if (user) {
-							document.getElementById("footer_content").classList.add("hide");
+							footer_content.classList.add("hide");
 							if (!overide_redirect){
-								location.assign("app/start.html");
+								if (!user.emailVerified){
+									location.assign("/error/auth_verification");
+								} else if(!overide_redirect) {
+									location.assign("app/start.html");
+								}
 							}
 						} else {
-							document.getElementById("login_panel").classList.remove("hide");
-							document.getElementById("load_spinner").classList.add("hide");
+							login_panel.classList.remove("hide");
+							load_spinner.classList.add("hide");
 							document.getElementById("login_submit").addEventListener("click",async function(e){
 								e.preventDefault();
 								var credentials = [];
@@ -261,27 +271,27 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										return;
 									} else {
 										document.getElementById("login_panel_submit").classList.add("hide");
-										document.getElementById("load_spinner").classList.remove("hide");
+										load_spinner.classList.remove("hide");
 										signup_email.disabled = true;
 										signup_password.disabled = true;
 										credentials.push(signup_email.value);
 										credentials.push(signup_password.value);
-										document.getElementById("footer_content").classList.add("hide");
+										footer_content.classList.add("hide");
 										overide_redirect = true;
 										await firebase.auth().createUserWithEmailAndPassword(credentials[0], credentials[1]).catch(function(error) {
 											error_panel.innerHTML = error.message;
 											error_panel.classList.remove("hide");
 											document.getElementById("login_panel_submit").classList.remove("hide");
-											document.getElementById("load_spinner").classList.add("hide");
+											load_spinner.classList.add("hide");
 											signup_email.disabled = false;
 											signup_password.disabled = false;
 											overide_redirect = false;
 										});
 										if (overide_redirect){
-											document.getElementById("footer_content").classList.add("hide");
+											footer_content.classList.add("hide");
 											window.location.href = "/error/auth_verification";
 										} else {
-											document.getElementById("footer_content").classList.remove("hide");
+											footer_content.classList.remove("hide");
 										}
 									}
 								} catch (e) {
@@ -291,10 +301,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							document.getElementById("user_registration_action").addEventListener("click",function(){
 								if (!overide_redirect){
 									overide_redirect = true;
-									document.getElementById("footer_content").classList.add("hide");
-									document.getElementById("login_panel").classList.add("hide");
+									footer_content.classList.add("hide");
+									login_panel.classList.add("hide");
 									document.getElementById("login_panel_submit").classList.add("hide");
-									document.getElementById("load_spinner").classList.remove("hide");
+									load_spinner.classList.remove("hide");
 									window.location.href = "login";
 								}
 							});
@@ -303,21 +313,28 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				}
 				break;
 			case "5f4dcc3b5aa765d61d8327deb882cf99":
+				var login_panel = document.getElementById("login_panel");
+				var load_spinner = document.getElementById("load_spinner");
+				var footer_content = document.getElementById("footer_content");
 				if (preload){
 					document.title = "Loading... | Solent Computing Society";
 					document.addEventListener("DOMContentLoaded", function(event){
-						document.getElementById("login_panel").classList.add("hide");
-						document.getElementById("load_spinner").classList.remove("hide");
+						login_panel.classList.add("hide");
+						load_spinner.classList.remove("hide");
 					});
 				} else {
 					firebase.auth().onAuthStateChanged(function(user) {
 						if (user) {
-							document.getElementById("footer_content").classList.add("hide");
-							location.assign("app/start.html");
+							footer_content.classList.add("hide");
+							if (!user.emailVerified){
+								location.assign("/error/auth_verification");
+							} else if(!overide_redirect) {
+								location.assign("app/start.html");
+							}
 						} else {
 							document.title = "Password reset | Solent Computing Society";
-							document.getElementById("login_panel").classList.remove("hide");
-							document.getElementById("load_spinner").classList.add("hide");
+							login_panel.classList.remove("hide");
+							load_spinner.classList.add("hide");
 							document.getElementById("login_submit").addEventListener("click",async function(e){
 								e.preventDefault();
 								var credentials = [];
@@ -325,32 +342,32 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									var login_email = document.getElementById("login_email");
 									var error_panel = document.getElementById("login_panel_error");
 									document.getElementById("login_panel_submit").classList.add("hide");
-									document.getElementById("load_spinner").classList.remove("hide");
+									load_spinner.classList.remove("hide");
 									login_email.disabled = true;
 									credentials.push(login_email.value);
-									document.getElementById("footer_content").classList.add("hide");
+									footer_content.classList.add("hide");
 									await firebase.auth().sendPasswordResetEmail(credentials[0]).then(function(){
 										error_panel.innerHTML = "Please check \"" + credentials[0] + "\" for a password reset email.";
-										document.getElementById("load_spinner").classList.add("hide");
+										load_spinner.classList.add("hide");
 										e.target.classList.add("hide");
 										login_email.classList.add("hide");
 									}).catch(function(error) {
 										error_panel.innerHTML = error.message;
-										document.getElementById("load_spinner").classList.add("hide");
+										load_spinner.classList.add("hide");
 										login_email.disabled = false;
 									});
 									document.getElementById("login_panel_submit").classList.remove("hide");
-									document.getElementById("footer_content").classList.remove("hide");
+									footer_content.classList.remove("hide");
 									error_panel.classList.remove("hide");
 								} catch (e) {
 									window.location.href = "/error/unexpected";
 								}
 							});
 							document.getElementById("user_registration_action").addEventListener("click",function(){
-								document.getElementById("footer_content").classList.add("hide");
-								document.getElementById("login_panel").classList.add("hide");
+								footer_content.classList.add("hide");
+								login_panel.classList.add("hide");
 								document.getElementById("login_panel_submit").classList.add("hide");
-								document.getElementById("load_spinner").classList.remove("hide");
+								load_spinner.classList.remove("hide");
 								window.location.href = "login";
 							});
 						}
@@ -358,40 +375,52 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				}
 				break;
 			case "770cd2f0fc573368510bcf08355f9fbc":
+				var login_panel = document.getElementById("login_panel");
+				var load_spinner = document.getElementById("load_spinner");
+				var footer_content = document.getElementById("footer_content");
 				if (!preload){
 					var overide_redirect = false;
-					firebase.auth().onAuthStateChanged(function(user) {
-						if (user){
-							if (user.emailVerified){
-								if (!overide_redirect){
-									location.assign("/app/start.html");
+					var refresh_state_check = function (){
+						firebase.auth().onAuthStateChanged(function(user) {
+							if (user){
+								if (user.emailVerified){
+									if (!overide_redirect){
+										if (!user.emailVerified){
+											location.assign("/error/auth_verification");
+										} else if(!overide_redirect) {
+											location.assign("app/start.html");
+										}
+									}
+								} else {
+									document.getElementById("email_address").innerHTML = user.email;
+									login_panel.classList.remove("hide");
+									load_spinner.classList.add("hide");
+									document.getElementById("login_submit").addEventListener("click",async function(e){
+										e.preventDefault();
+										e.target.classList.add("hide");
+										load_spinner.classList.remove("hide");
+										await firebase.auth().currentUser.sendEmailVerification().then(function() {
+											document.getElementById("login_panel_error_content").innerHTML = "Please check your email for the verification email...";
+										}).catch(function(error){
+											document.getElementById("login_panel_error_content").innerHTML = "<br><b>[" + error.code + "]:</b> " + error.message;
+										});
+										e.target.classList.remove("hide");
+										load_spinner.classList.add("hide");
+									});
+									setTimeout(function () {
+										refresh_state_check();										
+									}, 10000);
 								}
 							} else {
-								document.getElementById("email_address").innerHTML = user.email;
-								document.getElementById("login_panel").classList.remove("hide");
-								document.getElementById("load_spinner").classList.add("hide");
-								document.getElementById("login_submit").addEventListener("click",async function(e){
-									e.preventDefault();
-									e.target.classList.add("hide");
-									document.getElementById("load_spinner").classList.remove("hide");
-									await firebase.auth().currentUser.sendEmailVerification().then(function() {
-										document.getElementById("login_panel_error_content").innerHTML = "Please check your email for the verification email...";
-									}).catch(function(error){
-										document.getElementById("login_panel_error_content").innerHTML = "<br><b>[" + error.code + "]:</b> " + error.message;
-									});
-									e.target.classList.remove("hide");
-									document.getElementById("load_spinner").classList.add("hide");
-								});
+								location.assign("/login");
 							}
-						} else {
-							location.assign("/login");
-						}
-						document.getElementById("cancel_verification").addEventListener("click",function(){
-							overide_redirect = true;
-							firebase.auth().signOut();
+							document.getElementById("cancel_verification").addEventListener("click",function(){
+								overide_redirect = true;
+								firebase.auth().signOut();
+							});
 						});
-					});
-
+					};
+					refresh_state_check();
 				}
 				break;
 			case "d2a57dc1d883fd21fb9951699df71cc7":
@@ -429,7 +458,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											} else {
 												clearTimeout(top);
 											}
-										}
+										};
 										top();
 									}
 								}
@@ -437,7 +466,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							sub_pages.forEach(function(nav_id){
 								if (nav_id != "nav_loc_member_about"){
 									var sub_page_link_ref = sub_pages[sub_page_link_generation];
-									document.getElementById(nav_id).addEventListener("click",function(e){
+									var page_ref_nav_id = document.getElementById(nav_id);
+									page_ref_nav_id.addEventListener("click",function(e){
 										if (e.target.classList.contains("disabled")){
 											return;
 										}
@@ -448,7 +478,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										}
 										load_page(sub_page_link_ref);
 									});
-									document.getElementById(nav_id).classList.add("disabled");
+									page_ref_nav_id.classList.add("disabled");
 									sub_page_link_generation += 1;
 								}
 							});
@@ -587,18 +617,23 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								} catch(err) {}
 							};
 							var refresh = async function(now){
-								if (now !== true){
-									now = false;
-									try {
-										document.getElementById("message_refresh").classList.add("loading");
-									}catch(e){}
-								}
-								setTimeout(async function () {
-									await load_page("nav_loc_messages","posts_host_container");
-									try {
-										document.getElementById("message_refresh").classList.remove("loading");
-									}catch(e){}
-								},{true:0,false:730}[now]);
+								var refresh_id = Math.floor(Math.random() * Math.floor(9999999));
+								try {
+									var message_refresh_container = document.getElementById("message_refresh");
+									if (now !== true){
+										now = false;
+										message_refresh_container.classList.add("loading");
+										message_refresh_container.setAttribute("refresh_id",refresh_id);
+									}
+									setTimeout(async function () {
+										try {
+											await load_page("nav_loc_messages","posts_host_container");
+											if (message_refresh_container.getAttribute("refresh_id") == refresh_id){
+												message_refresh_container.classList.remove("loading");
+											}
+										} catch (e) {}
+									},{true:0,false:960}[now]);
+								} catch (e) {}
 							}
 							function post_validate(){
 								const max_length = 1000;
@@ -1151,6 +1186,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									}
 									update_pub().then(async function(e){
 										update_events();
+										setInterval(update_events,600000);
 										await firebase.firestore().collection("blog").doc("banner").get().then(async function(banner){
 											if (banner.exists){
 												banner = banner.data();
@@ -1802,7 +1838,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									} else {
 										clearTimeout(top);
 									}
-								}
+								};
 								top();
 							});
 							var load = ["/app/img/refresh_loading.gif"].forEach(function(img){
@@ -1853,25 +1889,24 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														firebase.auth().signOut();
 														location.href = "/login";
 													});
-													firebase.firestore().collection("users/members/id").doc(remove_user_id).delete().then(function() {
-														overide_redirect = false;
-														location.href = "/login";
-													}).catch(function(error){
-														document.getElementById("page_ref_settings_forbidden_content").innerHTML = "<p class=\"side_margin margin_top center_text thin_disclaimer\">Unable to delete your account - due to the following error:</p><p class=\"center_text\"><b>[" + error.code + "]: </b> " + error.message + "</p>";
-													});
 												}).catch(function(error){
 													overide_redirect = false;
 													if (error.code == "auth/requires-recent-login"){
 														error.message = "This operation is sensitive and requires recent authentication. Log in again before retrying this request. Click <a id=\"logout\" title=\"Sign in\">here</a> to reauthenticate your account!";
 													}
 													document.getElementById("settings_ref_base_forbidden").classList.remove("hide");
-													document.getElementById("page_ref_settings_forbidden").innerHTML = "<p class=\"side_margin margin_top center_text thin_disclaimer\">Unable to delete your account due to an error which occurred. The reason this action could not be completed is due to the following error:</p><p class=\"center_text\"><b>[" + error.code + "]: </b>" + error.message + "</p>";
+													document.getElementById("page_ref_settings_forbidden").innerHTML = "<p class=\"side_margin margin_top center_text thin_disclaimer\">Unable to delete your account due to an error which occurred. The reason this action could not be completed is due to the following error:</p><p class=\"center_text side_margin\"><b>[" + error.code + "]: </b>" + error.message + "</p>";
 													if (error.code == "auth/requires-recent-login"){
 														document.getElementById("logout").addEventListener("click",function(){
 															firebase.auth().signOut();
 															location.href = "/login";
 														});
 													}
+													firebase.firestore().collection("users/members/id").doc(remove_user_id).set({
+														delete: firebase.firestore.FieldValue.delete()
+													}).then(function(){}).catch(function(error){
+														alert("Error","Your account in in a permeable deletion state");
+													});
 												});
 											}).catch(function(){
 												return;
