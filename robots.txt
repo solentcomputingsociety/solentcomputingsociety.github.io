@@ -1,7 +1,3 @@
 User-agent: *
-Disallow: /app/
 Disallow: /error/
-Disallow: /img/
-Disallow: /password
-Allow: /
-Allow: /img/local/
+Disallow: /s/
