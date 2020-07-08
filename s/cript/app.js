@@ -142,7 +142,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		subscribe = subscribe || false;
 		if (!subscribe){
 			firebaseMessaging.getToken().then((token) => firebaseMessaging.deleteToken(token)).then(() => {
-				firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid).doc(token).delete().catch(function(error){
+				firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/tokens").doc(token).delete().catch(function(error){
 					console.warn("error-delete:",error);
 				});
 			}).catch((error) => {
@@ -154,7 +154,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 	}
 	function subscribeToNotificationsRefresh(){
 		firebaseMessaging.getToken().then((token) => {
-			firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid).doc(token).set({
+			firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/tokens").doc(token).set({
 				notificationToken: token
 			}).catch(function(error){
 				console.warn("token-refresh:",error);
