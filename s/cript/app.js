@@ -138,18 +138,32 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		"Discord": 0,
 		"Youtube": 0,
 	};
-	function subscribeToNotifications(){
-		firebaseMessaging.requestPermission();
+	function subscribeToNotifications(subscribe){
+		subscribe = subscribe || false;
+		if (!subscribe){
+			firebaseMessaging.getToken().then((token) => firebaseMessaging.deleteToken(token)).then(() => {
+				firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid).doc(token).delete().catch(function(error){
+					
+				});
+			}).catch(() => {});
+		} else {
+			firebaseMessaging.requestPermission().then(() => subscribeToNotificationsRefresh()).catch(()=> {});
+		}
+	}
+	function subscribeToNotificationsRefresh(){
+		firebaseMessaging.getToken().then((token) => {
+			firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid).doc(token).set({
+				notificationToken: token
+			}).catch(function(error){
+				
+			});
+		});
 	}
 	var host_page = async function(page,preload){
 		page = page || false;
 		preload = preload || false;
 		if (!preload){
 			firebase.initializeApp(firebaseConfig);
-			if (["a0e4c77eb59a7abc3aaf39af77d8617e","d2a57dc1d883fd21fb9951699df71cc7"].includes(page_ref)){
-				firebaseMessaging = firebase.messaging();
-				subscribeToNotifications();
-			}
 		}
 		try {
 			var u_user_icon = document.getElementById("s_user_icon");
@@ -213,6 +227,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			});
 			if (!verified) {
 				return;
+			} else {
+				if (["a0e4c77eb59a7abc3aaf39af77d8617e","d2a57dc1d883fd21fb9951699df71cc7"].includes(page_ref)){
+					firebaseMessaging = firebase.messaging();
+					subscribeToNotifications(true);
+				}
 			}
 		} catch(e) {}
 		switch (page) {
