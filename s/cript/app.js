@@ -6,12 +6,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		location.assign("/error/page_ref");
 		return;
 	}
-	var scripts = ["https://www.gstatic.com/firebasejs/7.14.0/firebase-app.js","https://www.gstatic.com/firebasejs/7.10.0/firebase-firestore.js","https://www.gstatic.com/firebasejs/7.10.0/firebase-auth.js"];
+	var scripts = ["https://www.gstatic.com/firebasejs/7.15.0/firebase-app.js","https://www.gstatic.com/firebasejs/7.15.0/firebase-firestore.js","https://www.gstatic.com/firebasejs/7.15.0/firebase-auth.js"];
 	if (page_ref == "d2a57dc1d883fd21fb9951699df71cc7"){
-		scripts.push("https://www.gstatic.com/firebasejs/7.14.0/firebase-database.js");
+		scripts.push("https://www.gstatic.com/firebasejs/7.15.0/firebase-database.js");
 	}
-	if (["a0e4c77eb59a7abc3aaf39af77d8617e","d2a57dc1d883fd21fb9951699df71cc7"].includes(page_ref )){
-		scripts.push("https://www.gstatic.com/firebasejs/7.14.0/firebase-storage.js");
+	if (["a0e4c77eb59a7abc3aaf39af77d8617e","d2a57dc1d883fd21fb9951699df71cc7"].includes(page_ref)){
+		scripts.push("https://www.gstatic.com/firebasejs/7.15.0/firebase-storage.js");
+		scripts.push("https://www.gstatic.com/firebasejs/7.15.0/firebase-messaging.js");
 	}
 	var load_remains = scripts.length;
 	for (var i = 0; i < scripts.length; i++) {
@@ -41,6 +42,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		messagingSenderId: "533900314169",
 		appId: "1:533900314169:web:aefbe09960c68045c5efe8"
 	};
+	var firebaseMessaging;
 	var image_cache = {};
 	document.addEventListener('DOMContentLoaded', (event) => {
 		document.body.innerHTML+="<div id=\"popup_dialog\" class=\"overlay\"><div class=\"popup\"><h2 id=\"popup_header\"></h2><a id=\"close_popup_dialog\">&times;</a><div id=\"popup_content\" class=\"content\"></div></div></div>";
@@ -136,11 +138,18 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		"Discord": 0,
 		"Youtube": 0,
 	};
+	function subscribeToNotifications(){
+		firebaseMessaging.requestPermission();
+	}
 	var host_page = async function(page,preload){
 		page = page || false;
 		preload = preload || false;
 		if (!preload){
 			firebase.initializeApp(firebaseConfig);
+			if (["a0e4c77eb59a7abc3aaf39af77d8617e","d2a57dc1d883fd21fb9951699df71cc7"].includes(page_ref)){
+				firebaseMessaging = firebase.messaging();
+				subscribeToNotifications();
+			}
 		}
 		try {
 			var u_user_icon = document.getElementById("s_user_icon");
@@ -161,7 +170,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					}
 				}
 				var s_user_button = document.getElementById("s_user");
-				if (typeof(s_user_button) !== "undefined"){
+				if (typeof(s_user_button) !== "undefined" && s_user_button != null){
 					(async function(){
 						var prof_pre_loader = new Image();
 						prof_pre_loader.crossOrigin = 'Anonymous';
@@ -208,17 +217,23 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		} catch(e) {}
 		switch (page) {
 			case "d56b699830e77ba53855679cb1d252da":
-				var login_panel = document.getElementById("login_panel");
-				var load_spinner = document.getElementById("load_spinner");
-				var footer_content = document.getElementById("footer_content");
+				var login_panel;
+				var load_spinner;
+				var footer_content;
 				if (preload){
 					document.title = "Loading... | Solent Computing Society";
 					document.addEventListener("DOMContentLoaded", function(event){
+						login_panel = document.getElementById("login_panel");
+						load_spinner = document.getElementById("load_spinner");
+						footer_content = document.getElementById("footer_content");
 						login_panel.classList.add("hide");
 						load_spinner.classList.remove("hide");
 						footer_content.classList.add("hide");
 					});
 				} else {
+					login_panel = document.getElementById("login_panel");
+					load_spinner = document.getElementById("load_spinner");
+					footer_content = document.getElementById("footer_content");
 					firebase.auth().onAuthStateChanged(function(user) {
 						var overide_redirect = false;
 						if (user) {
@@ -1246,48 +1261,49 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									}
 									if (user_set_up == -1 || contents.users[0][i].name == ""){
 										location.assign("menu?setup=true");
-									}
-									update_pub().then(async function(e){
-										update_events();
-										setInterval(update_events,600000);
-										await firebase.firestore().collection("blog").doc("banner").get().then(async function(banner){
-											if (banner.exists){
-												banner = banner.data();
-												if (banner.show){
-													var banner_contents = document.getElementById("banner_contents");
-													banner_contents.innerHTML = banner.contents;
-													banner_contents.setAttribute("title","Click to dismiss");
-													document.getElementById("banner_main").addEventListener("click",function(){
-														document.getElementById("banner_container").classList.add("hide");
-														document.getElementById("page_render").classList.remove("banner_top");
+									} else {
+										update_pub().then(async function(e){
+											update_events();
+											setInterval(update_events,600000);
+											await firebase.firestore().collection("blog").doc("banner").get().then(async function(banner){
+												if (banner.exists){
+													banner = banner.data();
+													if (banner.show){
+														var banner_contents = document.getElementById("banner_contents");
+														banner_contents.innerHTML = banner.contents;
+														banner_contents.setAttribute("title","Click to dismiss");
+														document.getElementById("banner_main").addEventListener("click",function(){
+															document.getElementById("banner_container").classList.add("hide");
+															document.getElementById("page_render").classList.remove("banner_top");
+															try {
+																document.getElementById("redundant_padding").remove();															
+															} catch (e) {}
+														});
+														document.getElementById("banner_container").classList.remove("hide");
+														document.getElementById("page_render").classList.add("banner_top");
 														try {
 															document.getElementById("redundant_padding").remove();															
 														} catch (e) {}
-													});
-													document.getElementById("banner_container").classList.remove("hide");
-													document.getElementById("page_render").classList.add("banner_top");
-													try {
-														document.getElementById("redundant_padding").remove();															
-													} catch (e) {}
-													function resize(){
-														try {
-															document.getElementById("redundant_padding").style.minHeight = (document.getElementById("banner_contents").offsetHeight + 20 - (16 * 4)) + "px";
-														} catch(e){};
+														function resize(){
+															try {
+																document.getElementById("redundant_padding").style.minHeight = (document.getElementById("banner_contents").offsetHeight + 20 - (16 * 4)) + "px";
+															} catch(e){};
+														}
+														new ResizeObserver(resize).observe(banner_contents)
 													}
-													new ResizeObserver(resize).observe(banner_contents)
 												}
-											}
+											});
+											var valid_setup = true;
+											sub_pages.forEach(function(nav_id){
+												if (nav_id != "nav_loc_member_about")
+												{
+													document.getElementById(nav_id).classList.remove("disabled");
+												}
+											});
+											document.getElementById("page_render").classList.remove("loading");
+											load_page();
 										});
-										var valid_setup = true;
-										sub_pages.forEach(function(nav_id){
-											if (nav_id != "nav_loc_member_about")
-											{
-												document.getElementById(nav_id).classList.remove("disabled");
-											}
-										});
-										document.getElementById("page_render").classList.remove("loading");
-										load_page();
-									});
+									}
 								});
 							}, 100);
 							setInterval(function(){ 
