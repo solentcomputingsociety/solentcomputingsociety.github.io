@@ -140,6 +140,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 	};
 	function subscribeToNotifications(subscribe){
 		subscribe = subscribe || false;
+		console.log(subscribe);
 		if (!subscribe){
 			firebaseMessaging.getToken().then((token) => firebaseMessaging.deleteToken(token)).then(() => {
 				firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/tokens").doc(token).delete().catch(function(error){
