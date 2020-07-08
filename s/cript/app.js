@@ -140,15 +140,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 	};
 	function subscribeToNotifications(subscribe){
 		subscribe = subscribe || false;
-		console.log(subscribe);
 		if (!subscribe){
 			firebaseMessaging.getToken().then((token) => firebaseMessaging.deleteToken(token)).then(() => {
-				firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/tokens").doc(token).delete().catch(function(error){
-					console.warn("error-delete:",error);
-				});
-			}).catch((error) => {
-				console.warn("error-delete-token:",error);
-			});
+				firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/tokens").doc(token).delete().catch(function(error){});
+			}).catch((error) => {});
 		} else {
 			firebaseMessaging.requestPermission().then(() => subscribeToNotificationsRefresh()).catch(()=> {});
 		}
@@ -157,9 +152,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		firebaseMessaging.getToken().then((token) => {
 			firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/tokens").doc(token).set({
 				notificationToken: token
-			}).catch(function(error){
-				console.warn("token-refresh:",error);
-			});
+			}).catch(function(error){});
 		});
 	}
 	var host_page = async function(page,preload){
