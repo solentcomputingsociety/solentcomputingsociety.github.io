@@ -101,7 +101,7 @@ span#user_registration_action {
 	font-weight: bold;
 }
 div#welcome_page, div#page_contents, div#page_contents_static {
-	background-color: #f04747;
+	background-color: #ec4848;
 	min-height: 100vh;
 }
 #page_contents, div#page_contents_static, div.app_page_contents {
@@ -235,7 +235,7 @@ div#load_spinner {
 	border-radius: 100%;
 }
 div.app_nav {
-	background-color: #f04747;
+	background-color: #ec4848;
 	padding: 10px 0;
 	min-height: 46px;
 	position: fixed;
@@ -290,7 +290,7 @@ fieldset#loading_screen_tip {
 	margin: auto;
 	max-width: 70vw;
 	border-radius: 15px;
-	border: 2px solid #f04747;
+	border: 2px solid #ec4848;
 }
 fieldset#loading_screen_tip > legend {
 	margin-left: 10px;
@@ -378,7 +378,7 @@ a#message_refresh:after {
 }
 a#message_refresh.loading:after {
 	content: "Refreshing...";
-	min-width: 140px;
+	min-width: 139px;
 	text-align: left;
 	display: inline-block;
 }
@@ -688,7 +688,7 @@ div#banner_container {
 	cursor: pointer;
 }
 div#banner {
-	background-color: #f04747;
+	background-color: #ec4848;
 	padding-top: 5px;
 }
 div#banner_base {
@@ -697,7 +697,7 @@ div#banner_base {
 }
 div#banner_base > div {
 	display: inline-block;
-	background-color: #f04747;
+	background-color: #ec4848;
 	min-height: 1em;
 	float: left;
 }
@@ -892,14 +892,14 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 		position: sticky !important;
 		top: 82px;
 		padding-top: 10px;
-		background-color: #f04747;
+		background-color: #ec4848;
 	}
 	div.base_nav > ul {
 		text-align: center;
 		padding: 5px 0;
 	}
 	div.base_nav {
-		background-color: #f04747;
+		background-color: #ec4848;
 		position: unset;
 		top: 0;
 	}
