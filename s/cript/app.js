@@ -187,6 +187,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					}
 				}
 				var s_user_button = document.getElementById("s_user");
+				if (["a0e4c77eb59a7abc3aaf39af77d8617e","d2a57dc1d883fd21fb9951699df71cc7"].includes(page_ref)){
+					firebaseMessaging = firebase.messaging();
+					subscribeToNotifications(true);
+				}
 				if (typeof(s_user_button) !== "undefined" && s_user_button != null){
 					(async function(){
 						var prof_pre_loader = new Image();
@@ -230,11 +234,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			});
 			if (!verified) {
 				return;
-			} else {
-				if (["a0e4c77eb59a7abc3aaf39af77d8617e","d2a57dc1d883fd21fb9951699df71cc7"].includes(page_ref)){
-					firebaseMessaging = firebase.messaging();
-					subscribeToNotifications(true);
-				}
 			}
 		} catch(e) {}
 		switch (page) {
