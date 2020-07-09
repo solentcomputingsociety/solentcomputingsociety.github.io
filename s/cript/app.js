@@ -12,7 +12,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 	}
 	if (["a0e4c77eb59a7abc3aaf39af77d8617e","d2a57dc1d883fd21fb9951699df71cc7"].includes(page_ref)){
 		scripts.push("https://www.gstatic.com/firebasejs/7.15.0/firebase-storage.js");
-		scripts.push("https://www.gstatic.com/firebasejs/7.15.0/firebase-messaging.js");
 	}
 	var load_remains = scripts.length;
 	for (var i = 0; i < scripts.length; i++) {
@@ -42,7 +41,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		messagingSenderId: "533900314169",
 		appId: "1:533900314169:web:aefbe09960c68045c5efe8"
 	};
-	var firebaseMessaging;
 	var image_cache = {};
 	document.addEventListener('DOMContentLoaded', (event) => {
 		document.body.innerHTML+="<div id=\"popup_dialog\" class=\"overlay\"><div class=\"popup\"><h2 id=\"popup_header\"></h2><a id=\"close_popup_dialog\">&times;</a><div id=\"popup_content\" class=\"content\"></div></div></div>";
@@ -138,23 +136,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		"Discord": 0,
 		"Youtube": 0,
 	};
-	function subscribeToNotifications(subscribe){
-		subscribe = subscribe || false;
-		if (!subscribe){
-			firebaseMessaging.getToken().then((token) => firebaseMessaging.deleteToken(token)).then(() => {
-				firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/tokens").doc(token).delete().catch(function(error){});
-			}).catch((error) => {});
-		} else {
-			firebaseMessaging.requestPermission().then(() => subscribeToNotificationsRefresh()).catch(()=> {});
-		}
-	}
-	function subscribeToNotificationsRefresh(){
-		firebaseMessaging.getToken().then((token) => {
-			firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/tokens").doc(token).set({
-				notificationToken: token
-			}).catch(function(error){});
-		});
-	}
 	var host_page = async function(page,preload){
 		page = page || false;
 		preload = preload || false;
@@ -180,10 +161,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					}
 				}
 				var s_user_button = document.getElementById("s_user");
-				if (["a0e4c77eb59a7abc3aaf39af77d8617e","d2a57dc1d883fd21fb9951699df71cc7"].includes(page_ref)){
-					firebaseMessaging = firebase.messaging();
-					subscribeToNotifications(true);
-				}
 				if (typeof(s_user_button) !== "undefined" && s_user_button != null){
 					(async function(){
 						var prof_pre_loader = new Image();
