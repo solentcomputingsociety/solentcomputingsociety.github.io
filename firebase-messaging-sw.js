@@ -12,6 +12,18 @@ firebase.initializeApp({
     messagingSenderId: "533900314169",
     appId: "1:533900314169:web:aefbe09960c68045c5efe8",
     measurementId: 'G-measurement-id',
+    messagingSenderId: '533900314169',
 });
 
 const messaging = firebase.messaging();
+messaging.usePublicVapidKey("BKAhDaPyPBFZtwQq9w7RKRbKjFbAwLfCYL2I-dprXCNyqhWPSHuiszuFuCwt0OwgmGUKGVe0G6963qruCz2cfSc");
+
+messaging.setBackgroundMessageHandler(function(payload){
+    var obj = JSON.parse(payload.data.notification);
+    var notificationTitle = obj.title;
+    var notificationOptions = {
+        body: obj.body,
+        icon: obj.icon
+    };
+    return self.registration.showNotification(notificationTitle,notificationOptions);
+});
