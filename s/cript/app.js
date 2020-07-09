@@ -996,8 +996,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																});
 																var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||0,"Intro":about["intro"]||"","Relationship status":about["relationship_status"]||0,"Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Discord":about["discord"]||"","Youtube":about["youtube"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
 																try {
-																	if (document.getElementById("about_me_container").getAttribute("uid") == uid_ref && document.getElementById("about_me_container").getAttribute("outputted") != "yes"){
-																		document.getElementById("about_me_container").setAttribute("outputted","yes");
+																	var about_me_container = document.getElementById("about_me_container");
+																	if (about_me_container.getAttribute("uid") == uid_ref && about_me_container.getAttribute("outputted") != "yes"){
+																		about_me_container.setAttribute("outputted","yes");
+																		about_me_container.classList.reomve("loading");
 																		await img_blob(contents.users[0][i].photo_large,"about_me_prof_img-"+user_view_about);
 																		var build_socials = "";
 																		if ((about_me["Facebook"] + about_me["Twitter"] + about_me["Discord"] + about_me["Instagram"] + about_me["Snapchat"] + about_me["Youtube"],about_me["Dev Community"] + about_me["GitHub"] + about_me["LinkedIn"] + about_me["Phone number"] + about_me["Email"] + about_me["Website"]).length > 0){
@@ -1378,11 +1380,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										var prof_pre_canvas_render = prof_pre_canvas.getContext("2d");
 										prof_pre_canvas_render.drawImage(prof_pre_loader, 0, 0, 50, 50);
 										var prof_image_base64 = prof_pre_canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
-										if (sessionStorage.profile_image == prof_image_base64){
+										if (localStorage.profile_image == prof_image_base64){
 											u_user_icon.classList.remove("loading");
 											return;
 										} else {
-											sessionStorage.profile_image = prof_image_base64;
+											localStorage.profile_image = prof_image_base64;
 										}
 									}
 									try {
@@ -1432,11 +1434,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															var prof_pre_canvas_render = prof_pre_canvas.getContext("2d");
 															prof_pre_canvas_render.drawImage(prof_pre_loader, 0, 0, 50, 50);
 															var prof_image_base64 = prof_pre_canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
-															if (sessionStorage.profile_image == prof_image_base64){
+															if (localStorageStorage.profile_image == prof_image_base64){
 																u_user_icon.classList.remove("loading");
 																return;
 															} else {
-																sessionStorage.profile_image = prof_image_base64;
+																localStorageStorage.profile_image = prof_image_base64;
 															}
 														}
 														try {
@@ -1521,7 +1523,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									settings_ref_content_prof_email_error.innerHTML = error.message;
 									if (error.code == "auth/requires-recent-login"){
 										document.getElementById("e_logout").addEventListener("click",function(){
-											sessionStorage.removeItem("profile_image");
+											localStorage.removeItem("profile_image");
 											firebase.auth().signOut();
 											location.href = "/login";
 										});
@@ -1639,7 +1641,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						document.getElementById("page_ref_title").innerHTML = "Menu";
 					});
 					firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/about/").get().then(async function(about){
-						about_docs = about.docs.map( doc => {
+						var about_docs = about.docs.map( doc => {
 							var doc_data = doc.data();
 							doc_data.id = doc.id;
 							return doc_data;
