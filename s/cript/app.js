@@ -164,8 +164,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		try {
 			var u_user_icon = document.getElementById("s_user_icon");
 			if (typeof(Storage) !== "undefined") {
-				if (sessionStorage.profile_image) {
-					u_user_icon.style.backgroundImage = "url('data:image/png;base64," + sessionStorage.profile_image + "')";
+				if (localStorage.profile_image) {
+					u_user_icon.style.backgroundImage = "url('data:image/png;base64," + localStorage.profile_image + "')";
 					u_user_icon.classList.remove("loading");
 				}
 			}
@@ -212,11 +212,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								var prof_pre_canvas_render = prof_pre_canvas.getContext("2d");
 								prof_pre_canvas_render.drawImage(prof_pre_loader, 0, 0, 50, 50);
 								var prof_image_base64 = prof_pre_canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
-								if (sessionStorage.profile_image == prof_image_base64){
+								if (localStorage.profile_image == prof_image_base64){
 									u_user_icon.classList.remove("loading");
 									return;
 								} else {
-									sessionStorage.profile_image = prof_image_base64;
+									localStorage.profile_image = prof_image_base64;
 								}
 							}
 							u_user_icon.style.backgroundImage = "url(\""+ prof_pre_loader.getAttribute("src") + "\")";
