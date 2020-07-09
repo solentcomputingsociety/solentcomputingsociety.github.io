@@ -487,7 +487,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				if (preload){
 					return;
 				} else if (sub_page_ref_core_loaded == null){
-					sub_page_ref_core_loaded = true;
+					sub_page_ref_core_loaded = false;
 					["/app/img/refresh_loading.gif","/app/img/map_loading.gif"].forEach(function(img){
 						img_blob(img,false,true);
 					});
@@ -530,6 +530,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						document.getElementById("page_menu").classList.add("hide");
 						s_user_button.classList.remove("disabled");
 						s_user_button.setAttribute("title","Manage your profile");
+						if (sub_page_ref_core_loaded){
+							return;
+						}
+						sub_page_ref_core_loaded = true;
 						try {
 							document.getElementById("page_contents").classList.add("app_page_contents");
 						} catch (e) {
