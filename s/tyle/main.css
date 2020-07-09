@@ -9,6 +9,9 @@ html, body {
 .hide {
 	display: none !important;
 }
+.fadeout {
+	opacity: 0;
+}
 .no_height {
 	height: 0 !important;
 	padding: 0 !important;
@@ -584,7 +587,7 @@ img.loading, span.loading, div#s_user_icon.loading {
 #about_me_loading.error {
 	padding-top: 4em;
 }
-#about_me_loading.error:before {
+#about_me_loading.error:before, p#failed_loading:before {
 	padding-top: 3.6em;
 	content: "Failed to load profile information!";
 	background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4IiB3aWR0aD0iNDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGg0OHY0OEgwVjB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTIyIDMwaDR2NGgtNHptMC0xNmg0djEyaC00em0xLjk5LTEwQzEyLjk0IDQgNCAxMi45NSA0IDI0czguOTQgMjAgMTkuOTkgMjBTNDQgMzUuMDUgNDQgMjQgMzUuMDQgNCAyMy45OSA0ek0yNCA0MGMtOC44NCAwLTE2LTcuMTYtMTYtMTZTMTUuMTYgOCAyNCA4czE2IDcuMTYgMTYgMTYtNy4xNiAxNi0xNiAxNnoiIGZpbGw9IiNlODE3MTciLz48L3N2Zz4=");
@@ -592,6 +595,9 @@ img.loading, span.loading, div#s_user_icon.loading {
 	background-position-x: center;
 	background-position-y: top;
 	cursor: default;
+}
+p#failed_loading:before {
+	content: "Failed to load content!";
 }
 #about_me_container_host {
 	max-width: calc(100% - 20px);
@@ -750,7 +756,7 @@ div#banner_side_right {
 	background-color: #ffffff;
 	border-top-left-radius: 2em;
 }
-div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel_error, div.app_nav_padding_smooth, img#settings_ref_content_prof_picture {
+div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel_error, div.app_nav_padding_smooth, img#settings_ref_content_prof_picture, .error_state_with_animation {
 	-webkit-transition: all 300ms ease-in-out;
 	-moz-transition: all 300ms ease-in-out;
 	-o-transition: all 300ms ease-in-out;

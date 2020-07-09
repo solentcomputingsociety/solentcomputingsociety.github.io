@@ -1277,8 +1277,30 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										document.getElementById("redundant_padding").style.minHeight = (document.getElementById("banner_contents").offsetHeight + 20 - (16 * 4)) + "px";
 									} catch(e){};
 								}
+								var error_show = function(animation_state){
+									animation_state = animation_state || 0;
+									var page_render = document.getElementById("page_render");
+									switch (animation_state){
+										case 0:
+											page_render.classList.add("error_state_with_animation");
+											break;
+										case 1:
+											page_render.classList.add("fadeout");
+											break;
+										case 2:
+											page_render.innerHTML = "<div class=\"spacer\"></div><p id=\"failed_loading\" class=\"side_padding center_text\"></p>";
+											page_render.classList.remove("fadeout");
+											break;
+										case 3:
+											page_render.classList.remove("error_state_with_animation");
+											return true;
+									}
+									setTimeout(function(){
+										error_show(animation_state + 1)
+									}, 1000);
+								}
 								setTimeout(function () {
-									update_users().then(function(e){
+									update_users().then(async function(e){
 										var user_set_up = -1;
 										for (var i = contents.users[0].length - 1; i >= 0; i--) {
 											if (contents.users[0][i].id == firebase.auth().currentUser.uid) {
@@ -1291,7 +1313,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											host_page("d2a57dc1d883fd21fb9951699df71cc7",false,"1762d64c002e4e329279f20f89c61fa5");
 											return;
 										} else {
-											update_pub().then(async function(e){
+											await update_pub().then(async function(e){
 												update_events();
 												setInterval(update_events,600000);
 												await firebase.firestore().collection("blog").doc("banner").get().then(async function(banner){
@@ -1321,6 +1343,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															new ResizeObserver(resize).observe(banner_contents)
 														}
 													}
+												}).catch(function(error){
+													if (!navigator.onLine){
+														location.href = "offline.html";
+													} else {
+														alert("Error","Unable to load content [ref: pub]");
+														error_show();
+													}
 												});
 												var valid_setup = true;
 												sub_pages.forEach(function(nav_id){
@@ -1331,6 +1360,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												});
 												document.getElementById("page_render").classList.remove("loading");
 												load_page();
+											}).catch(function(error){
+												if (!navigator.onLine){
+													location.href = "offline.html";
+												} else {
+													alert("Error","Unable to load content [ref: pub]");
+													error_show();
+												}
 											});
 										}
 									});
