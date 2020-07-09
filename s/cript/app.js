@@ -2021,11 +2021,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															location.href = "/login";
 														});
 													}
-													firebase.firestore().collection("users/members/id").doc(remove_user_id).set({
-														delete: firebase.firestore.FieldValue.delete()
-													}).then(function(){}).catch(function(error){
-														alert("Error","Your account in in a permeable deletion state");
-													});
 												});
 											}).catch(function(){
 												return;
