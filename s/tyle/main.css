@@ -447,6 +447,9 @@ div#about_me_container {
 	display: grid;
 	grid-template-columns: 33.3333% auto;
 }
+div#about_me_container.error {
+	display: block !important;
+}
 .about_me_prof_img {
 	width: 95%;
 	min-height: 50px;
@@ -574,7 +577,7 @@ img.loading, span.loading, div#s_user_icon.loading {
 	background-repeat: no-repeat;
 	background-position-x: center;
 	background-position-y: top;
-
+	cursor: default;
 }
 #about_me_container_host {
 	max-width: calc(100% - 20px);

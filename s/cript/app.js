@@ -976,7 +976,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	var about_me_container = document.getElementById("about_me_container");
 																	if (about_me_container.getAttribute("uid") == uid_ref && about_me_container.getAttribute("outputted") != "yes"){
 																		about_me_container.setAttribute("outputted","yes");
-																		about_me_container.classList.reomve("loading");
+																		about_me_container.classList.remove("loading");
 																		await img_blob(contents.users[0][i].photo_large,"about_me_prof_img-"+user_view_about);
 																		var build_socials = "";
 																		if ((about_me["Facebook"] + about_me["Twitter"] + about_me["Discord"] + about_me["Instagram"] + about_me["Snapchat"] + about_me["Youtube"],about_me["Dev Community"] + about_me["GitHub"] + about_me["LinkedIn"] + about_me["Phone number"] + about_me["Email"] + about_me["Website"]).length > 0){
@@ -1119,10 +1119,20 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																		}
 																		document.getElementById("about_me_main_ref").innerHTML = about_panel_out;
 																	}
-																} catch (e) {}
+																} catch (e) {
+																	if (document.getElementById("about_me_container").getAttribute("uid") == uid_ref){
+																		document.getElementById("about_me_loading").classList.add("error");
+																		document.getElementById("about_me_container").classList.remove("loading")
+																		document.getElementById("about_me_container").classList.add("error");
+																		document.getElementById("about_me_side_ref").outerHTML = "";
+																	}
+																}
 															}).catch(function(error){
 																if (document.getElementById("about_me_container").getAttribute("uid") == uid_ref){
 																	document.getElementById("about_me_loading").classList.add("error");
+																	document.getElementById("about_me_container").classList.remove("loading")
+																	document.getElementById("about_me_container").classList.add("error");
+																	document.getElementById("about_me_side_ref").outerHTML = "";
 																}
 															});
 														}
