@@ -84,7 +84,7 @@ div.content {
 div.footer {
 	height: 5vh;
 }
-.no_interact, div#banner_main > p, a#close_popup_dialog, div#banner_container *, div.base_nav *, .post_img_s, .members_list_img_s, #new_post_content, #new_post_actions_post_submit, .members_list_name {
+.no_interact, div#banner_main > p, a#close_popup_dialog, div#banner_container *, div.base_nav *, .post_img_s, .members_list_img_s, #new_post_content, #new_post_actions_post_submit, .members_list_name, #version_number {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -112,11 +112,22 @@ div#welcome_page, div#page_contents, div#page_contents_static {
 div#page_contents_static {
 	opacity: 1 !important;
 }
-div.app_page_contents {
+div.app_page_contents > div#page_app {
 	display: -ms-grid;
 	display: grid;
 	-ms-grid-columns: 15vw auto;
 	grid-template-columns: 15vw auto;
+}
+div.app_page_contents > div#page_menu > div#page_ref_menu_contents {
+	margin-bottom: 30px;
+}
+div#version_number {
+	position: absolute;
+	bottom: 10px;
+	width: 100%;
+	text-align: center;
+	font-size: 11px;
+	color: #787878;
 }
 div#b_banner, div#s_banner {
 	width: 480px;
@@ -150,6 +161,9 @@ div#s_user, div#s_user_icon {
 	float: right;
 	margin: 1.25px 2em 1.25px 1.25px;
 	cursor: pointer;
+}
+div#s_user.disabled, div#s_user.disabled > * {
+	cursor: default !important;
 }
 div#s_user_icon {
 	display: block;
@@ -795,7 +809,13 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 		transform: rotate(360deg);
 	}
 }
-
+@media screen and (max-height: 470px){
+	div#version_number {
+		position: unset;
+		bottom: 0;
+		margin-top: 32px;
+	}
+}
 @media screen and (max-width: 450px){
 	.desktop_only {
 		display: none !important;
@@ -862,9 +882,12 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 		width: 70%;
 	}
 }
-@media screen and (max-width: 900px){
+@media screen and (max-width: 950px){
 	div.app_page_contents {
 		-ms-grid-columns: 20vw auto;
+		grid-template-columns: 20vw auto;
+	}
+	div.app_page_contents > div#page_app {
 		grid-template-columns: 20vw auto;
 	}
 	div.base_nav, div.base_nav > ul {
@@ -890,6 +913,9 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 		display: block;
 		margin: 0;
 		height: unset !important;
+	}
+	div.app_page_contents > div#page_app {
+		display: unset;
 	}
 	div#banner_container {
 		position: sticky !important;

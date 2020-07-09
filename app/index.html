@@ -28,18 +28,47 @@
 	</div>
 	<div class="app_nav_padding_smooth no_height" id="app_nav_padding"></div>
 	<div id="page_contents" class="app_page_contents">
-		<div class="base_nav">
-			<ul>
-				<li id="nav_loc_messages" class="disabled">Messages</li>
-				<li id="nav_loc_events" class="disabled">Events</li>
-				<li id="nav_loc_members" class="disabled">Members</li>
-				<li id="nav_loc_pub" class="disabled">Weekly pub</li>
-			</ul>
+		<div id="page_app">
+			<div class="base_nav">
+				<ul>
+					<li id="nav_loc_messages" class="disabled">Messages</li>
+					<li id="nav_loc_events" class="disabled">Events</li>
+					<li id="nav_loc_members" class="disabled">Members</li>
+					<li id="nav_loc_pub" class="disabled">Weekly pub</li>
+				</ul>
+			</div>
+			<div>
+				<div id="banner_container" class="hide"><div id="banner_base"><div class="banner_side"><div id="banner_side_left"></div></div><div id="banner_main"><p id="banner_contents"></p></div><div class="banner_side"><div id="banner_side_right"></div></div></div></div>
+				<div class="app_contents loading" id="page_render">
+					<fieldset id="loading_screen_tip" style="margin-top: 3em" class="no_interact"><legend>Tip</legend><div id="loading_screen_tip_contents" class="center_text"><script type="text/javascript">var tips = ["Remember to raise your landing gear after takeoff.","Do you even remember why you're here?","You are still a good person.","Cognitive dissonance is the uncomfortable feeling you get from believing two contradictory ideas at the same time.","Do not make fun of new players. When you started playing this game, you were once the same as them.","Remember, licking doorknobs is illegal on other planets.","\"I have a shell script for that\" - James Whale 2020","Whose name is jeff?"];document.getElementById("loading_screen_tip_contents").innerHTML = tips[Math.floor(Math.random()*tips.length)];</script></div></fieldset>
+					<p class="center_text no_interact" style="margin-top: 4em">Loading...</p>
+				</div>
+			</div>
 		</div>
-		<div id="banner_container" class="hide"><div id="banner_base"><div class="banner_side"><div id="banner_side_left"></div></div><div id="banner_main"><p id="banner_contents"></p></div><div class="banner_side"><div id="banner_side_right"></div></div></div></div>
-		<div class="app_contents loading" id="page_render">
-			<fieldset id="loading_screen_tip" style="margin-top: 3em" class="no_interact"><legend>Tip</legend><div id="loading_screen_tip_contents" class="center_text"><script type="text/javascript">var tips = ["Remember to raise your landing gear after takeoff.","Do you even remember why you're here?","You are still a good person.","Cognitive dissonance is the uncomfortable feeling you get from believing two contradictory ideas at the same time.","Do not make fun of new players. When you started playing this game, you were once the same as them.","Remember, licking doorknobs is illegal on other planets.","\"I have a shell script for that\" - James Whale 2020","Whose name is jeff?"];document.getElementById("loading_screen_tip_contents").innerHTML = tips[Math.floor(Math.random()*tips.length)];</script></div></fieldset>
-			<p class="center_text no_interact" style="margin-top: 4em">Loading...</p>
+		<div id="page_menu" class="hide">
+			<div class="margin_top show"></div>
+			<h2 class="side_margin margin_top center_text" id="page_ref_title">Menu</h2>
+			<div id="page_ref_menu_contents">
+				<div>
+					<p class="side_margin margin_top center_text"><a id="menu_settings" title="Modify your account settings">Settings</a></p>
+					<p class="side_margin margin_top center_text"><a id="menu_settings_about" title="Update your 'about me' page">About me</a></p>
+					<p class="side_margin margin_top center_text"><a id="menu_logout" title="Sign out of your account">Logout</a></p>
+					<div class="small_spacer"></div>
+					<p class="side_margin margin_top center_text"><a id="menu_back" title="Go back to the main content">Go Back</a></p>
+				</div>
+				<div id="version_number">Version: 0.1.a alpha</div>
+			</div>
+			<div id="page_ref_settings_content">
+				<p class="side_margin margin_top center_text" id="settings_loading_statement"></p>
+			</div>
+			<div id="page_ref_settings_content_more">
+				<form>
+					<div class="input_container margin_top_small center_text"><input type="email" placeholder="New email" id="settings_ref_content_prof_email_input" autocomplete="email"><br><p class="side_margin center_text red_error_bold hide" id="settings_ref_content_prof_email_error"></p><input type="submit" value="Update email" id="settings_ref_content_prof_email_change_button"></div>
+					<div class="input_container margin_top center_text"><input type="password" placeholder="Current password" id="current_password" autocomplete="current-password"><br><input type="password" placeholder="New password" id="new_password" autocomplete="new-password"><br><input type="password" placeholder="Confirm password" id="new_password_confirm" autocomplete="new-password"><br><p class="side_margin center_text red_error_bold hide" id="settings_ref_content_prof_password_error"></p><input type="submit" value="Change password" id="settings_ref_content_prof_password_change_button"></div><div class="small_spacer"></div><p class="side_margin margin_top center_text"><a id="settings_ref_forbidden">Go to the forbidden settings?</a></p><p class="side_margin margin_top center_text"><a id="settings_ref_base">Back to main settings</a></p><br>
+				</form>
+			</div>
+			<div id="page_ref_settings_forbidden"><div id="page_ref_settings_forbidden_content"></div><div class="small_spacer"></div><p class="side_margin margin_top center_text"><a id="settings_ref_base_forbidden">Back to main settings</a></p></div>
+			<div id="page_ref_settings_setup"><p class="side_margin margin_top center_text">You need to complete setup of your account before you can access anything else...</p><p class="side_margin margin_top center_text"><a id="menu_settings_ok">OK</a></p></div>
 		</div>
 	</div>
 	<script type="text/javascript">var s=document.cookie.match("(^|;) ?hideno=([^;]*)(;|$)");0==parseInt(s?s[2]:"1")?setTimeout(function(){document.getElementById("page_contents").setAttribute("id","page_contents_static"),document.getElementById("app_nav_padding").classList.remove("no_height","app_nav_padding_smooth")}):setTimeout(function(){document.getElementById("page_contents").classList.add("show"),document.getElementById("app_nav_padding").classList.remove("no_height"),document.cookie="hideno=0; expires=0; path=/app/"},1);</script>
