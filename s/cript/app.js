@@ -17,7 +17,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		script.type = "text/javascript";
 		script.src = scripts[i];
 		script.id = "dls" + i;
-		script.async = false
+		script.async = false;
 		document.getElementsByTagName("head")[0].appendChild(script);
 		document.getElementById(script.id).addEventListener("load",function(){base_load(true)});
 	}
@@ -787,7 +787,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										}, 500);
 									}
 								}
-								var current_page = null;
+								var current_page = [null,null];
 								var pubs_data = [];
 								var user_view_about = -1;
 								var load_page = async function(page_id,sub_ref){
@@ -884,7 +884,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 													}
 												}
 												out.html = out.html + "<div class=\"center_text\" id=\"post_end\"></div></div></div>";
-											} catch (e) {}
+											} catch (e) {
+												return;
+											}
 											break;
 										case "nav_loc_events":
 											out.html = "<div class=\"side_margin center_text\">";
@@ -1262,12 +1264,16 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												h = Math.imul(31, h) + s.charCodeAt(i) | 0;
 											return h;
 										}
-										if (current_page != hash(out.html)){
-											try {
-												document.getElementById({true:"page_render",false:sub_ref}[sub_ref == false]).innerHTML = out.html;
-											} catch(e) {}
+										if (page_id!=current_page[0]){
+											if (current_page[1] != hash(out.html)){
+												try {
+													document.getElementById({true:"page_render",false:sub_ref}[sub_ref == false]).innerHTML = out.html;
+												} catch(e) {
+													return;
+												}
+											}
 										}
-										current_page = hash(out.html);
+										current_page = [page_id,hash(out.html),out.html];
 										for (var i = img.length - 1; i >= 0; i--) {
 											img_blob(img[i][0],img[i][1]);
 										}
@@ -1372,6 +1378,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												});
 												document.getElementById("page_render").classList.remove("loading");
 												load_page();
+												setInterval(function(){ 
+													refresh(true);
+												},3000);
 											}
 										}).catch(function(error){
 											if (!navigator.onLine){
@@ -1390,9 +1399,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										}
 									});;
 								}, 100);
-								setInterval(function(){ 
-									refresh(true);
-								},3000);
 							} else {
 								location.assign("/login");
 							}
