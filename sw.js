@@ -1,6 +1,9 @@
-const version = "0.0.1";
-const cacheName = "offline" + version;
-function updateCache() {
+const version = "0.0.2";
+const cacheName = "offline";
+var updateCache = async function() {
+	await caches.open('offline').then(async function(cache) {
+		await cache.delete("/app/offline.html");
+	})
 	return caches.open(cacheName).then(function (cache) {
 		return cache.addAll(["/app/offline.html"]);
 	});
