@@ -115,15 +115,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			return await firebase.storage().ref().child(url).getDownloadURL().then(function(url) {
 				return url;
 			}).catch(function(error) {
-				console.log("ERROR\n\n\n\n\n\n\n\n");
-				console.error(error.message);
-				console.log("\n\n\n\n\n\n\n\nERROREND");
 				return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
 			});
 		} catch (error) {
-			console.log("ERROR_____\n\n\n\n\n\n\n\n");
-			console.error(error.message);
-			console.log("\n\n\n\n\n\n\n\n_____ERROREND");
 			return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
 		}
 	};
@@ -1316,7 +1310,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										error_show(animation_state + 1)
 									}, 1000);
 								}
-								console.log("123");
 								setTimeout(function () {
 									update_users().then(async function(e){
 										var user_set_up = -1;
