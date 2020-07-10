@@ -108,11 +108,24 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		}
 	}
 	var storage_download = async function(url){
-		return await firebase.storage().ref().child(url).getDownloadURL().then(async function(url) {
-			return url;
-		}).catch(async function(error) {
+		if (!navigator.onLine){
 			return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
-		});
+		}
+		try {
+			return await firebase.storage().ref().child(url).getDownloadURL().then(function(url) {
+				return url;
+			}).catch(function(error) {
+				console.log("ERROR\n\n\n\n\n\n\n\n");
+				console.error(error.message);
+				console.log("\n\n\n\n\n\n\n\nERROREND");
+				return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
+			});
+		} catch (error) {
+			console.log("ERROR_____\n\n\n\n\n\n\n\n");
+			console.error(error.message);
+			console.log("\n\n\n\n\n\n\n\n_____ERROREND");
+			return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
+		}
 	};
 	var about_sections = {
 		"Subject": 0,
@@ -600,7 +613,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									});
 									posts_base_load = true;
 								});
-								var update_users = () => new Promise(async function(resolve){
+								var update_users = () => new Promise(async function(resolve, reject){
 									firebase.firestore().collection("users/members/id").get().then(async function(snapshot){
 										var users = snapshot.docs.map( doc => {
 											var doc_data = doc.data();
@@ -638,9 +651,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										}
 										contents.users = [users,positions];
 										resolve(users);
+									}).catch(function(error){
+										reject(error);
 									});
 								});
-								var update_pub = () => new Promise(function(resolve){
+								var update_pub = () => new Promise(function(resolve, reject){
 									firebase.firestore().collection("places").doc("pubs").get().then(function(pub){
 										if (pub.exists){
 											pub = pub.data();
@@ -673,6 +688,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											contents.pub = "tbc";
 											resolve(pub);
 										}
+									}).catch(function(error){
+										reject(error);
 									});
 								});
 								var update_events = () => {
@@ -1299,6 +1316,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										error_show(animation_state + 1)
 									}, 1000);
 								}
+								console.log("123");
 								setTimeout(function () {
 									update_users().then(async function(e){
 										var user_set_up = -1;
@@ -1311,47 +1329,48 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										if (user_set_up == -1 || contents.users[0][i].name == ""){
 											setup = true;
 											host_page("d2a57dc1d883fd21fb9951699df71cc7",false,"1762d64c002e4e329279f20f89c61fa5");
-											return;
-										} else {
-											await update_pub().then(async function(e){
-												update_events();
-												setInterval(update_events,600000);
-												await firebase.firestore().collection("blog").doc("banner").get().then(async function(banner){
-													if (banner.exists){
-														banner = banner.data();
-														if (banner.show){
-															var banner_contents = document.getElementById("banner_contents");
-															banner_contents.innerHTML = banner.contents;
-															banner_contents.setAttribute("title","Click to dismiss");
-															document.getElementById("banner_main").addEventListener("click",function(){
-																document.getElementById("banner_container").classList.add("hide");
-																document.getElementById("page_render").classList.remove("banner_top");
-																try {
-																	document.getElementById("redundant_padding").remove();															
-																} catch (e) {}
-															});
-															document.getElementById("banner_container").classList.remove("hide");
-															document.getElementById("page_render").classList.add("banner_top");
+										}
+										await update_pub().then(async function(e){
+											update_events();
+											setInterval(update_events,600000);
+											var valid_setup = true;
+											await firebase.firestore().collection("blog").doc("banner").get().then(async function(banner){
+												if (banner.exists){
+													banner = banner.data();
+													if (banner.show){
+														var banner_contents = document.getElementById("banner_contents");
+														banner_contents.innerHTML = banner.contents;
+														banner_contents.setAttribute("title","Click to dismiss");
+														document.getElementById("banner_main").addEventListener("click",function(){
+															document.getElementById("banner_container").classList.add("hide");
+															document.getElementById("page_render").classList.remove("banner_top");
 															try {
 																document.getElementById("redundant_padding").remove();															
 															} catch (e) {}
-															function resize(){
-																try {
-																	document.getElementById("redundant_padding").style.minHeight = (document.getElementById("banner_contents").offsetHeight + 20 - (16 * 4)) + "px";
-																} catch(e){};
-															}
-															new ResizeObserver(resize).observe(banner_contents)
+														});
+														document.getElementById("banner_container").classList.remove("hide");
+														document.getElementById("page_render").classList.add("banner_top");
+														try {
+															document.getElementById("redundant_padding").remove();															
+														} catch (e) {}
+														function resize(){
+															try {
+																document.getElementById("redundant_padding").style.minHeight = (document.getElementById("banner_contents").offsetHeight + 20 - (16 * 4)) + "px";
+															} catch(e){};
 														}
+														new ResizeObserver(resize).observe(banner_contents)
 													}
-												}).catch(function(error){
-													if (!navigator.onLine){
-														location.href = "offline.html";
-													} else {
-														alert("Error","Unable to load content [ref: pub]");
-														error_show();
-													}
-												});
-												var valid_setup = true;
+												}
+											}).catch(function(error){
+												if (!navigator.onLine){
+													location.href = "offline.html";
+												} else {
+													alert("Error","Unable to load content [ref: pub]");
+													error_show();
+													valid_setup = false;
+												}
+											});
+											if (valid_setup){
 												sub_pages.forEach(function(nav_id){
 													if (nav_id != "nav_loc_member_about")
 													{
@@ -1360,16 +1379,23 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												});
 												document.getElementById("page_render").classList.remove("loading");
 												load_page();
-											}).catch(function(error){
-												if (!navigator.onLine){
-													location.href = "offline.html";
-												} else {
-													alert("Error","Unable to load content [ref: pub]");
-													error_show();
-												}
-											});
+											}
+										}).catch(function(error){
+											if (!navigator.onLine){
+												location.href = "offline.html";
+											} else {
+												alert("Error","Unable to load content [ref:&nbsp;pub" + error.code + "]");
+												error_show();
+											}
+										});
+									}).catch(function(error){
+										if (!navigator.onLine){
+											location.href = "offline.html";
+										} else {
+											alert("Error","Unable to load content [ref:&nbsp;user-" + error.code + "]");
+											error_show();
 										}
-									});
+									});;
 								}, 100);
 								setInterval(function(){ 
 									refresh(true);
@@ -1397,7 +1423,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							document.getElementById("page_ref_settings_content").classList.remove("hide");
 							document.getElementById("page_ref_settings_setup").classList.add("hide");
 							document.getElementById("page_ref_settings_forbidden").classList.add("hide");
-							document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><div class=\"spacer\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Go to more settings\" id=\"settings_ref_more\">More settings</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go Back To Menu</a></p><br>";
+							document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><div class=\"small_spacer\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Go to more settings\" id=\"settings_ref_more\">More settings</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go Back To Menu</a></p><br>";
 							document.getElementById("page_ref_title").innerHTML = "Settings";
 							await firebase.firestore().collection("users/members/id").doc(firebase.auth().currentUser.uid).get().then(async function(user){
 								if(!user.exists){
@@ -1754,14 +1780,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									} else {
 										about_me_container_content += "<select id=\"about_me_select_" + about_topic.split(" ").join("_") + "\">";
 										var about_section = about_sections[about_topic];
-										about_section.unshift("");
-										for (let i = 0; i < about_section.length; i++) {
-											var value = about_section[i];
+										for (let i = 0; i <= about_section.length; i++) {
+											var value = about_section[i - 1];
 											about_me_container_content += "<option";
 											if (i == about_me[about_topic] || (value == "" && typeof about_me[about_topic] === "undefined")){
 												about_me_container_content += " selected=\"selected\"";
 											}
-											if (value.length == 0) {
+											if (i == 0) {
 												about_me_container_content += " disabled";
 												value = "Not selected";
 											}

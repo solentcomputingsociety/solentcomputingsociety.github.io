@@ -395,7 +395,7 @@ a#message_refresh:after {
 }
 a#message_refresh.loading:after {
 	content: "Refreshing...";
-	min-width: 140px;
+	min-width: 142px;
 	text-align: left;
 	display: inline-block;
 }
