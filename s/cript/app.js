@@ -653,8 +653,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									firebase.firestore().collection("places").doc("pubs").get().then(function(pub){
 										if (pub.exists){
 											pub = pub.data();
-											pub.date = pub.date.toDate();
-											pub.date = pub.date.setHours(24,0,0,0);
+											pub.date_time = pub.date.toDate();
+											pub.date = pub.date_time;
+											pub.date = pub.date.setHours(23,0,0,0);
 											var pub_id = pub.this_week;
 											if (pub.date > new Date()){
 												firebase.firestore().collection("places/pubs/listed").doc(pub.this_week).get().then(function(pub_data){
@@ -663,6 +664,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														pub.this_week.id = pub_id;
 														pub.this_week.geo = [pub.this_week.geo.latitude,pub.this_week.geo.longitude];
 														pub.this_week.error = false;
+														pub.this_week.date_time = pub.date_time;
 														contents.pub = pub.this_week;
 														resolve(pub);
 													} else {
@@ -687,35 +689,108 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									});
 								});
 								var update_events = () => {
-									var url = "https://sheets.googleapis.com/v4/spreadsheets/1sIyjKOdteE08ElqXiNkWJC1KLM-TbrGCD0YmftGL1EE/values/list?key=AIzaSyBdg7VmX9uP7iZDUq1QNlJkHVLIOqldzq4";
+									var url = "https://sheets.googleapis.com/v4/spreadsheets/1sIyjKOdteE08ElqXiNkWJC1KLM-TbrGCD0YmftGL1EE/values/Events?key=AIzaSyBdg7VmX9uP7iZDUq1QNlJkHVLIOqldzq4";
 									try {
+										function add_pub(events){
+											event = events || [];
+											if (contents.pub != "tbc"){
+												var date = new Date();
+												date.setDate(date.getDate() + ((7-date.getDay())%7+3) % 7);
+												date.setHours(0,0,0,0);
+												if (date == new Date().setHours(0,0,0,0)){
+													if (new Date().getHours() > 23 && new Date().getMinutes() > 30){
+														return events;
+													}
+												}
+												if (typeof(events[date]) === "undefined"){
+													events[date] = {};
+												}
+												var time_of_pub = ((contents.pub.date_time.getHours() * 60) * 60) + (contents.pub.date_time.getMinutes() * 60) + contents.pub.date_time.getSeconds();
+												if (typeof(events[date][time_of_pub]) === "undefined"){
+													events[date][time_of_pub] = [];
+												}
+												events[date][time_of_pub].push(["Society drink up at " + contents.pub.name,"",contents.pub.name,date,"19:00","","","This week our weekly pub meetup is at " + contents.pub.name + ", come along for a drink and a catch up!","pub",false]);
+											}
+											return events;
+										}
 										var request = new XMLHttpRequest();
 										request.open('GET', url, true);
 										request.onreadystatechange = function() {
 											if (this.status >= 400) {
-												contents.events = false;
+												contents.events = add_pub();
 												return false;
 											} else if (this.readyState === 4) {
 												var rows = JSON.parse(this.responseText)["values"];
 												rows.shift(0);
 												var display_rows = {}
 												for (var i = 0; i < rows.length; i++) {
-													var date = rows[i][3].split("/") || rows[i][3].split("-") || rows[i][3].split(".");
-													date = new Date(date[2],date[1]-1,date[0]) || 0;
-													var time = rows[i][4].split(":")
-													while (time.length < 3){
-														time.push("0");
+													if (rows[i].length == 11){
+														if (rows[i][10] == "TRUE"){
+															rows[i].pop(10);
+															rows[i][9] = (rows[i][9] == "TRUE");
+															var date = rows[i][3].split("/") || rows[i][3].split("-") || rows[i][3].split(".");
+															var end_date = rows[i][6].split("/") || rows[i][6].split("-") || rows[i][6].split(".");
+															date = new Date(date[2],date[1]-1,date[0]) || 0;
+															if (end_date.length > 2){
+																try {
+																	end_date = new Date(end_date[2],end_date[1]-1,end_date[0]);
+																} catch(e) {
+																	end_date = 0;
+																}
+															} else {
+																end_date = 0;
+															}
+															if (end_date == 0){
+																end_date = date;
+																end_date.setDate(end_date.getDate()+1);
+																end_date.setHours(0,0,0,0);
+															} else if(rows[i][5].length > 0) {
+																var end_time = rows[i][5].split(':');
+																if (end_time.length > 0){
+																	end_date.setHours(end_time[0]);
+																}
+																if (end_time.length > 1){
+																	end_date.setMinutes(end_time[1]);
+																}
+																if (end_time.length > 2){
+																	end_date.setSeconds(end_time[2]);
+																}
+															}
+															rows[i][6] = end_date;
+															var current_date = new Date();
+															current_date.setHours(0,0,0,0);
+															var start_date = date;
+															date.setHours(0,0,0,0);
+															if (start_date <= current_date){
+																date = current_date;
+																current_date = new Date();
+																if (end_date < current_date){
+																	continue;
+																}
+															}
+															rows[i][3] = start_date;
+															var time = rows[i][4].split(":")
+															while (time.length < 3){
+																time.push("0");
+															}
+															time = (+time[0]) * 60 * 60 + (+time[1]) * 60 + (+time[2]) || 0;
+															if (typeof display_rows[date] === "undefined"){
+																display_rows[date] = {};
+															}
+															if (typeof display_rows[date][time] === "undefined"){
+																display_rows[date][time] = [];
+															}
+															display_rows[date][time].push(rows[i]);
+														}
 													}
-													time = (+time[0]) * 60 * 60 + (+time[1]) * 60 + (+time[2]) || 0;
-													if (typeof display_rows[date] === "undefined"){
-														display_rows[date] = [];
-													}
-													if (typeof display_rows[date][time] === "undefined"){
-														display_rows[date][time] = [];
-													}
-													display_rows[date][time].push(rows[i]);
 												}
-												contents.events = display_rows;
+												var sorted_display_rows = {};
+												var display_rows_keys = Object.keys(display_rows);
+												display_rows_keys.sort();
+												for (var i = 0; i < display_rows_keys.length; i++){
+													sorted_display_rows[display_rows_keys[i]] = display_rows[display_rows_keys[i]];
+												}
+												contents.events = add_pub(sorted_display_rows);
 											}
 										};
 										request.onerror = function () {
@@ -812,7 +887,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												if (sub_ref == "posts_host_container"){
 													out.html = "<div>";
 												} else {
-													out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin\"><div id=\"new_post_container\"><div id=\"new_post_content_container\"><textarea id=\"new_post_content\" placeholder=\" Say something...\"></textarea></div><div id=\"error_container\" class=\"red_error_bold\"></div><div id=\"new_post_actions\"><div id=\"new_post_actions_remaining_container\" class=\"hide\">Remaining: <span id=\"new_post_actions_remaining\"></span></div><div id=\"new_post_actions_post_container\"><button id=\"new_post_actions_post_submit\">Post</button></div></div></div><p class=\"center_text\"><a title=\"click to refresh\" id=\"message_refresh\"></a></p><div id=\"posts_host_container\">";
+													out.html = "<div class=\"side_margin\"><div id=\"new_post_container\"><div id=\"new_post_content_container\"><textarea id=\"new_post_content\" placeholder=\" Say something...\"></textarea></div><div id=\"error_container\" class=\"red_error_bold\"></div><div id=\"new_post_actions\"><div id=\"new_post_actions_remaining_container\" class=\"hide\">Remaining: <span id=\"new_post_actions_remaining\"></span></div><div id=\"new_post_actions_post_container\"><button id=\"new_post_actions_post_submit\">Post</button></div></div></div><p class=\"center_text\"><a title=\"click to refresh\" id=\"message_refresh\"></a></p><div id=\"posts_host_container\">";
 													add.click.push(["message_refresh",refresh]);
 													add.click.push(["new_post_actions_post_submit",post]);
 													add.typing.push(["new_post_content",post_validate]);
@@ -896,63 +971,113 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 													document.getElementById("nav_loc_events").click();
 												}]);
 											} else {
-												out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin center_text\">";
+												var now = new Date();
+												now = now.getSeconds() + (60 * (now.getMinutes() + (60 * now.getHours())));
+												out.html = "<div id=\"events_page_container\"><div id=\"events_page_side\">";
 												const months = ["January", "February", "March","April", "May", "June", "July", "August", "September", "October", "November", "December"];
 												const ordinal = ["th", "st", "nd", "rd"];
 												var events_added = false;
-												for (let day in contents.events) {
+												for (var day in contents.events) {
+													var priority_order = [];
 													try {
-														let show_date = new Date(day);
-														if ((show_date instanceof Date && !isNaN(show_date)) && show_date >= new Date()){
-															if (contents.events[day].length > 0){
-																show_date = [show_date.getDate(),show_date.getMonth(),show_date.getFullYear(),]
-																show_date[3] = show_date[0] % 100;
-																out.html = out.html + "<h4 class=\"event_date\">" + show_date[0] + (ordinal[(show_date[3] - 20) % 10] || ordinal[show_date[1]] || ordinal[0]) + " of " + months[show_date[1]] + ", " + show_date[2] + ":</h4>";
-																for (let time in contents.events[day]){
-																	for (var i = 0; i < contents.events[day][time].length; i++){
-																		out.html = out.html + "<div><h5 class=\"event_name\">" + contents.events[day][time][i][0];
-																		try {
-																			let end_date = contents.events[day][time][i][6].split("/") || contents.events[day][time][i][6].split("-") || contents.events[day][time][i][6].split(".");
-																			end_date = new Date(end_date[2],end_date[1]-1,end_date[0]) || -1;
-																			shown_end = false;
-																			if (contents.events[day][time][i][4].length > 0){
-																				out.html = out.html + " (" + contents.events[day][time][i][4];
-																				shown_end = true;
-																			}
-																			if (contents.events[day][time][i][5].length > 0){
-																				if (shown_end) {
-																					out.html = out.html + " - ";
-																				} else {
-																					out.html = out.html + " (until ";
-																				}
-																				out.html = out.html + contents.events[day][time][i][5]
-																				shown_end = true;
-																			}
-																			if(end_date.getTime() > new Date(day).getTime()){
-																				if (shown_end) {
-																					out.html = out.html + " ";
-																				} else {
-																					out.html = out.html + " (";
-																				}
-																				out.html = out.html + end_date.getDate() + "/" + end_date.getMonth() + "/" + end_date.getFullYear() + ")";
-																			} else if (shown_end){
-																				out.html = out.html + ")";
-																			}
-																		} catch (e) {}
-																		events_added = true;
-																		out.html = out.html + "</h5><p class=\"no_top small_bottom\">" + contents.events[day][time][i][7].replace("\n","</p><p>").replace("<p></p>","") + "</p>";
-																		if (contents.events[day][time][i][2].length > 0){
-																			out.html = out.html + "<p class=\"no_top small_bottom small\">Location: " + contents.events[day][time][i][2] + "</p>";
-																		}
-																		if (contents.events[day][time][i][1].length > 0){
-																			out.html = out.html + "<p class=\"no_top small_bottom small\">Find out more: <a href=\"" + contents.events[day][time][i][1] + "\" title=\"Visit " + contents.events[day][time][i][1] + " for more information\" target=\"blank\" class=\"out_link\">" + contents.events[day][time][i][1] + "</a></p>";
-																		}
-																		out.html = out.html + "</div>";
+														var show_date = new Date(day);
+														var event_date = show_date;
+														var date_check = new Date();
+														date_check.setHours(0,0,0,0);
+														if (Object.keys(contents.events[day]).length > 0){
+															show_date = [show_date.getDate(),show_date.getMonth(),show_date.getFullYear(),]
+															show_date[3] = show_date[0] % 100;
+															out.html = out.html + "<div><h4 class=\"event_date\">" + {true:"Today",false:show_date[0] + (ordinal[(show_date[3] - 20) % 10] || ordinal[show_date[1]] || ordinal[0]) + " of " + months[show_date[1]] + ", " + show_date[2]}[event_date.valueOf() <= date_check.valueOf()] + ":</h4><div><div class=\"event_daily_container\"><div class=\"event_content_container spacer_left desktop_only\"></div>";
+															for (var time in contents.events[day]){
+																for (var i = 0; i < contents.events[day][time].length; i++){
+																	if (contents.events[day][time][i][9]){
+																		priority_order.push([time,i,true]);
 																	}
 																}
 															}
-														} else {
-															continue;
+															for (var time in contents.events[day]){
+																for (var i = 0; i < contents.events[day][time].length; i++){
+																	match = false;
+																	for(var item in priority_order){
+																		if (priority_order[item][0] == time && priority_order[item][1] == i){
+																			match = true;
+																			break;
+																		}
+																	}
+																	if (!match) {
+																		priority_order.push([time,i,false]);
+																	}
+																}
+															}
+															for (var time_order in priority_order){
+																var time = priority_order[time_order][0];
+																var i = priority_order[time_order][1];
+																var priority = priority_order[time_order][2];
+																var event = contents.events[day][time][i][8].toLowerCase();
+																var pub = (event == "pub");
+																var start_date = contents.events[day][time][i][3];
+																var end_time = new Date(JSON.parse(JSON.stringify(contents.events[day][time][i][6]))); // to prevent reference changes
+																var end_date = contents.events[day][time][i][6];
+																try {
+																	end_date.setHours(0,0,0,0);
+																} catch (e) {
+																	end_date = "";
+																}
+																out.html = out.html + "<div id=\"" + {true:"pub_link_event_ref",false:"event_ref_id-e" + (new Date(day).getTime() + time)}[pub] + "\" class=\"event_content_container" + {true:" dynamic_tables",false:""}[navigator.appVersion.indexOf("Chrome") != -1] + " event_type_" + event.split(" ").join("_") + {true:" priority_event",false:""}[priority] + "\"><div><h3 class=\"event_name\">" + contents.events[day][time][i][0] + "</h3><div><div class=\"center_text\"><span>" + {true:"Started",false:"From"}[start_date < new Date(day) || time < now] + ": ";
+																try {
+																	if (start_date < new Date(day)){
+																		out.html = out.html + contents.events[day][time][i][6].getDate() + "/" + (contents.events[day][time][i][6].getMonth() + 1) + "/" + contents.events[day][time][i][6].getFullYear();
+																	}
+																	if (contents.events[day][time][i][4].length > 0){
+																		if (start_date < new Date(day)){
+																			out.html = out.html + " at ";
+																		}
+																		out.html = out.html + contents.events[day][time][i][4];
+																	} else if (start_date >= new Date(day)) {
+																		out.html = out.html + "Unknown";
+																	}
+																	out.html = out.html + "</span><br>"
+																	shown_end = false;
+																	out.html = out.html + "<span>" + {true:"Ending",false:"Until"}[start_date < new Date(day) || time < now] + ": ";
+																	if (end_date != ""){
+																		if (end_date.getTime() > new Date(day).getTime()){
+																			out.html = out.html + end_date.getDate() + "/" + (end_date.getMonth() + 1) + "/" + end_date.getFullYear();
+																			if (contents.events[day][time][i][5].length > 0){
+																				out.html = out.html + " at ";
+																			}
+																			shown_end = true;
+																		}
+																	}
+																	if ((pub)){
+																		out.html = out.html + " late";
+																		shown_end = true;
+																	} else if (end_time != ""){
+																		if (contents.events[day][time][i][5].length > 0){
+																			out.html = out.html + ("0"+end_time.getHours()).slice(-2) + ":" + ("0" + end_time.getMinutes()).slice(-2);
+																			shown_end = true;
+																		}
+																	}
+																	if (!shown_end){
+																		out.html = out.html + "Unknown";
+																	}
+																	out.html = out.html + "</span>";
+																} catch (e) {}
+																events_added = true;
+																out.html = out.html + "</div><div class=\"side_margin small_bottom\"><p>" + contents.events[day][time][i][7].replace("\n","</p><p>").replace("<p></p>","") + "</p></div>";
+																if (contents.events[day][time][i][1].length > 0){
+																	out.html = out.html + "<p class=\"no_top small_bottom small side_margin\">Find out more: <a href=\"" + contents.events[day][time][i][1] + "\" title=\"Visit " + contents.events[day][time][i][1] + " for more information\" target=\"blank\" class=\"out_link\">" + contents.events[day][time][i][1] + "</a></p>";
+																}
+																if (contents.events[day][time][i][2].length > 0){
+																	out.html = out.html + "<p class=\"no_top small_bottom small side_margin\">Location: " + contents.events[day][time][i][2] + "</p>";
+																}
+																out.html = out.html + "</div></div></div>";
+																if (pub){
+																	add.click.push(["pub_link_event_ref",function(){
+																		load_page("nav_loc_pub");
+																	}]);
+																}
+															}
+															out.html = out.html + "</div></div></div>";
 														}
 													} catch (e) {}
 												}
@@ -960,10 +1085,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 													out.html = out.html + "<p class=\"center_text no_interact\">Sadly, there are no upcoming events.</p>";
 												}
 											}
-											out.html = out.html + "</div>";
+											out.html = out.html + "</div></div>";
 											break;
 										case "nav_loc_members":
-											out.html = "<div id=\"redundant_padding\"></div>";
+											out.html = "";
 											for (var i = 0; i < contents.users[0].length; i++) {
 												out.html = out.html + "<div class=\"members_list\" id=\"view_prof_" + contents.users[0][i].id + "\" uid=\"" + contents.users[0][i].id + "\" title=\"View " + contents.users[0][i].name + "'s profile\"><table><tr><td width=\"50px\" valign=\"middle\"><img class=\"members_list_img_s loading\" id=\"" + contents.users[0][i].id + "_r-img\"></td><td valign=\"middle\"><span class=\"members_list_name\">" + contents.users[0][i].name + "</span></td></tr></table></div>";
 												img.push([contents.users[0][i].photo,contents.users[0][i].id + "_r-img"]);
@@ -985,7 +1110,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											}
 											break;
 										case "nav_loc_member_about":
-											out.html = "<div id=\"redundant_padding\"></div>";
+											out.html = "";
 											var match = false;
 											for (var i = 0; i < contents.users[0].length; i++) {
 												if (contents.users[0][i].id == sub_ref){
@@ -1196,10 +1321,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											break;
 										case "nav_loc_pub":
 											var is_president = contents.users[1].president == firebase.auth().currentUser.uid;
-											out.html = "<div id=\"redundant_padding\"></div><div class=\"side_margin\"><p class=\"center_text\">";
+											out.html = "<div class=\"side_margin\"><p class=\"center_text\">";
 											if (is_president) {
 												if (pubs_data.length == 0){
-													document.getElementById({true:"page_render",false:sub_ref}[sub_ref == false]).innerHTML = "<div id=\"redundant_padding\"></div><div class=\"side_margin center_text\"><p class=\"center_text no_interact\">Loading...</p></div>";
+													document.getElementById({true:"page_render",false:sub_ref}[sub_ref == false]).innerHTML = "<div class=\"side_margin center_text\"><p class=\"center_text no_interact\">Loading...</p></div>";
 													await firebase.firestore().collection("places/pubs/listed").get().then(async function(snapshot){
 														pubs_data = snapshot.docs.map( doc => {
 															var doc_data = doc.data();
@@ -1268,6 +1393,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											if (current_page[1] != hash(out.html)){
 												try {
 													document.getElementById({true:"page_render",false:sub_ref}[sub_ref == false]).innerHTML = out.html;
+													window.scrollTo(0,0);
 												} catch(e) {
 													return;
 												}
