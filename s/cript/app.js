@@ -533,6 +533,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				var s_user_button = document.getElementById("s_user");
 				switch(sub_page_ref){
 					case "6094ba739a3470744db4c6638ba75f64":
+						document.getElementById("nav_loc_messages").classList.remove("hide");
 						document.getElementById("page_app").classList.remove("hide");
 						document.getElementById("page_menu").classList.add("hide");
 						s_user_button.classList.remove("disabled");
@@ -688,7 +689,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										reject(error);
 									});
 								});
-								var update_events = () => {
+								var update_events = () => new Promise(function(resolve, reject){
 									var url = "https://sheets.googleapis.com/v4/spreadsheets/1sIyjKOdteE08ElqXiNkWJC1KLM-TbrGCD0YmftGL1EE/values/Events?key=AIzaSyBdg7VmX9uP7iZDUq1QNlJkHVLIOqldzq4";
 									try {
 										function add_pub(events){
@@ -718,6 +719,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										request.onreadystatechange = function() {
 											if (this.status >= 400) {
 												contents.events = add_pub();
+												if (contents.events == {}){
+													reject("Failed to load events");
+												}
+												resolve();
 												return false;
 											} else if (this.readyState === 4) {
 												var rows = JSON.parse(this.responseText)["values"];
@@ -794,6 +799,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 													sorted_display_rows[display_rows_keys[i]] = display_rows[display_rows_keys[i]];
 												}
 												contents.events = sorted_display_rows;
+												resolve();
 											}
 										};
 										request.onerror = function () {
@@ -801,7 +807,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										}
 										request.send();
 									} catch(err) {}
-								};
+								});
 								var refresh = async function(now){
 									var refresh_id = Math.floor(Math.random() * Math.floor(9999999));
 									try {
@@ -899,10 +905,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												}
 												if (Object.keys(contents.posts).length == 0){
 													if (!posts_base_load){
-														out.html = out.html + "<p class=\"center_text\" id=\"post_end_reason\">Still loading...</p></div></div>";
+														out.html = out.html + "<p class=\"center_text no_interact\" id=\"post_end_reason\">Still loading... Check back later!</p></div></div>";
 														break;
 													}
-													out.html = out.html + "<p class=\"center_text\" id=\"post_end_reason\">No posts have been loaded" + {true:"",false:", because you are currently offline"}[navigator.onLine] + "!</p></div></div>";
+													out.html = out.html + "<p class=\"center_text no_interact\" id=\"post_end_reason\">No posts have been loaded" + {true:"",false:", because you are currently offline"}[navigator.onLine] + "!</p></div></div>";
 													break;
 												}
 												for (var i = Object.keys(contents.posts).length - 1; i >= 0; i--) {
@@ -969,10 +975,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										case "nav_loc_events":
 											out.html = "<div class=\"side_margin center_text\">";
 											if (contents.events === true){
-												out.html = out.html + "<p class=\"center_text no_interact\">Still loading events...</p><p class=\"center_text\"><a title=\"Try again?\" id=\"events_retry_action\" class=\"no_interact\">Retry</a></p>";
-												add.click.push(["events_retry_action",function(){
-													document.getElementById("nav_loc_events").click();
-												}]);
+												out.html = out.html + "<p class=\"center_text no_interact\">Unable to load upcoming events!</p>";
 											} else {
 												var now = new Date();
 												now = now.getSeconds() + (60 * (now.getMinutes() + (60 * now.getHours())));
@@ -1459,7 +1462,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											host_page("d2a57dc1d883fd21fb9951699df71cc7",false,"1762d64c002e4e329279f20f89c61fa5");
 										}
 										await update_pub().then(async function(e){
-											update_events();
+											await update_events();
 											setInterval(update_events,600000);
 											var valid_setup = true;
 											await firebase.firestore().collection("blog").doc("banner").get().then(async function(banner){
@@ -1506,7 +1509,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 													}
 												});
 												document.getElementById("page_render").classList.remove("loading");
-												load_page();
+												document.getElementById("nav_loc_messages").classList.remove("fadeout","disabled");
+												load_page("nav_loc_events");
 												setInterval(function(){ 
 													refresh(true);
 												},3000);
@@ -1541,6 +1545,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							host_page("d2a57dc1d883fd21fb9951699df71cc7",false,"1762d64c002e4e329279f20f89c61fa5");
 						} else {
 							document.getElementById("page_ref_settings_setup").classList.add("hide");
+							document.getElementById("nav_loc_messages").classList.add("hide");
 						}
 						s_user_button.classList.add("disabled");
 						s_user_button.removeAttribute("title");
