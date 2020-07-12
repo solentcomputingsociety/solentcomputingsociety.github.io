@@ -710,7 +710,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												if (typeof(events[date][time_of_pub]) === "undefined"){
 													events[date][time_of_pub] = [];
 												}
-												events[date][time_of_pub].push(["Society drink up at " + contents.pub.name,"",contents.pub.name,date,"19:00","","","Come along to our weekly pub meetup; this week we will be going to " + contents.pub.name + ", why don't you come along for: a drink, and a catch up!","pub",false]);
+												events[date][time_of_pub].push(["Society drink up at " + contents.pub.name,"",contents.pub.name,date,"19:00","","","🍺\nCome along to our weekly pub meetup; this week we will be going to " + contents.pub.name + ", why don't you come along for: a drink, and a catch up!","pub",false]);
 											}
 											return events;
 										}
@@ -1046,7 +1046,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	shown_end = false;
 																	out.html = out.html + "<span>" + {true:"Ending",false:"Until"}[start_date <= new Date() && time < now] + ": ";
 																	if (end_date != ""){
-																		if (end_date.getTime() > new Date(day).getTime()){
+																		if (end_date.getTime() > new Date(day).getTime() && end_time.getHours() != 12 && end_time.getMinutes() != 0){
 																			out.html = out.html + end_date.getDate() + "/" + (end_date.getMonth() + 1) + "/" + end_date.getFullYear();
 																			if (contents.events[day][time][i][5].length > 0){
 																				out.html = out.html + " at ";
@@ -1059,7 +1059,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																		shown_end = true;
 																	} else if (end_time != ""){
 																		if (contents.events[day][time][i][5].length > 0){
-																			out.html = out.html + ("0"+end_time.getHours()).slice(-2) + ":" + ("0" + end_time.getMinutes()).slice(-2);
+																			if (end_time.getHours() == 0 && end_time.getMinutes() == 0){
+																				out.html = out.html + "Midnight";
+																			} else if (end_time.getHours() == 12 && end_time.getMinutes() == 0){
+																				out.html = out.html + "Noon";
+																			} else {
+																				out.html = out.html + ("0"+end_time.getHours()).slice(-2) + ":" + ("0" + end_time.getMinutes()).slice(-2);
+																			}
 																			shown_end = true;
 																		}
 																	}
@@ -1069,7 +1075,16 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	out.html = out.html + "</span>";
 																} catch (e) {}
 																events_added = true;
-																out.html = out.html + "</div><div class=\"side_margin small_bottom event_description\"><p>" + contents.events[day][time][i][7].replace("\n","</p><p>").replace("<p></p>","") + "</p></div>";
+																out.html = out.html + "</div><div class=\"side_margin small_bottom event_description\"><p>";
+																var description = contents.events[day][time][i][7].split("\n");
+																description.forEach(text => {
+																	out.html = out.html + "<p";
+																	if (text.replace(new RegExp('[\u0000-\u1eeff]', 'g'), '').length === text.replace(new RegExp('[\n\r\s]+|( )+', 'g'), '').length){
+																		out.html = out.html + " class=\"event_emoji_string\"";
+																	}
+																	out.html = out.html + ">" + text + "</p>";
+																});
+																out.html = out.html + "</div>";
 																if (contents.events[day][time][i][1].length > 0){
 																	out.html = out.html + "<p class=\"no_top small_bottom small side_margin\">Find out more: <a href=\"" + contents.events[day][time][i][1] + "\" title=\"Visit " + contents.events[day][time][i][1] + " for more information\" target=\"blank\" class=\"out_link\">" + contents.events[day][time][i][1] + "</a></p>";
 																}
@@ -1510,6 +1525,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												});
 												document.getElementById("page_render").classList.remove("loading");
 												document.getElementById("nav_loc_messages").classList.remove("fadeout","disabled");
+												document.getElementById("nav_loc_messages").setAttribute("title","View the society message board");
 												load_page("nav_loc_events");
 												setInterval(function(){ 
 													refresh(true);

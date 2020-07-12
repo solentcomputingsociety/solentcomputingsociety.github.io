@@ -163,7 +163,7 @@ div#s_banner.clickable {
 }
 div#s_user, div#s_user_icon, div#nav_loc_messages {
 	height: 50px;
-	min-width: 50px;
+	width: 50px;
 	padding: 3.5px;
 	border-radius: 50px;
 	background-color: #fbdddd;
@@ -183,17 +183,20 @@ div#s_user_icon {
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: center;
+	margin: 1.25px 2em 1.25px 1.25px;
 }
 div#s_user > div {
 	display: inline-block;
 }
 div#nav_loc_messages {
-	margin: 1.25px 1em 1.25px 1.25px;
+	margin: 6.25px 0.7em 6.25px 1.25px;
 	background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTBweCIgaGVpZ2h0PSI1MHB4IiB2aWV3Qm94PSIwIDAgNTAgNTAiIHZlcnNpb249IjEuMSI+CjxnIGlkPSJzdXJmYWNlMSI+CjxwYXRoIHN0eWxlPSIgc3Ryb2tlOm5vbmU7ZmlsbC1ydWxlOm5vbnplcm87ZmlsbDojZmZmZmZmO2ZpbGwtb3BhY2l0eToxOyIgZD0iTSA0MyA0Ljc1IEwgMTguMjUgNC43NSBDIDE1Ljc2NTYyNSA0Ljc1IDEzLjc1IDYuNzY1NjI1IDEzLjc1IDkuMjUgTCAxMy43NSAyMi43NSBDIDEzLjc1IDI1LjIzNDM3NSAxNS43NjU2MjUgMjcuMjUgMTguMjUgMjcuMjUgTCAzMS43NSAyNy4yNSBMIDQwLjc1IDM2LjI1IEwgNDAuNzUgMjcuMjUgTCA0MyAyNy4yNSBDIDQ1LjQ4NDM3NSAyNy4yNSA0Ny41IDI1LjIzNDM3NSA0Ny41IDIyLjc1IEwgNDcuNSA5LjI1IEMgNDcuNSA2Ljc2NTYyNSA0NS40ODQzNzUgNC43NSA0MyA0Ljc1IFogTSA0MyA0Ljc1ICIvPgo8cGF0aCBzdHlsZT0iIHN0cm9rZTpub25lO2ZpbGwtcnVsZTpub256ZXJvO2ZpbGw6I2ZmZmZmZjtmaWxsLW9wYWNpdHk6MTsiIGQ9Ik0gMTEuNSAyMi43NSBMIDExLjUgMTMuNzUgTCA3IDEzLjc1IEMgNC41MTU2MjUgMTMuNzUgMi41IDE1Ljc2NTYyNSAyLjUgMTguMjUgTCAyLjUgMzEuNzUgQyAyLjUgMzQuMjM0Mzc1IDQuNTE1NjI1IDM2LjI1IDcgMzYuMjUgTCA3IDQ1LjI1IEwgMTYgMzYuMjUgTCAyNSAzNi4yNSBDIDI3LjQ4NDM3NSAzNi4yNSAyOS41IDM0LjIzNDM3NSAyOS41IDMxLjc1IEwgMjkuNSAyOS41IEwgMTguMjUgMjkuNSBDIDE0LjUyNzM0NCAyOS41IDExLjUgMjYuNDcyNjU2IDExLjUgMjIuNzUgWiBNIDExLjUgMjIuNzUgIi8+CjwvZz4KPC9zdmc+Cg==");
 	background-position: center;
 	background-repeat: no-repeat;
-	background-size: 50px;
+	background-size: 40px;
 	background-color: unset;
+	width: 40px;
+	height: 40px;
 }
 div#nav_loc_messages.disabled {
 	cursor: default;
@@ -677,6 +680,11 @@ h3.event_name {
 div.event_description {
 	text-align: justify;
 }
+p.event_emoji_string {
+	font-size: 40px;
+	text-align: center;
+	margin: 0;
+}
 div#pub_link_event_ref {
 	cursor: pointer;
 }
@@ -1015,7 +1023,7 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 		margin: 10px 2.5%;
 	}
 	iframe#pub_map {
-		max-height: calc(100vh - 112px) !important;
+		max-height: calc(100vh - 365px) !important;
 	}
 }
 @media screen and (max-width: 650px){
