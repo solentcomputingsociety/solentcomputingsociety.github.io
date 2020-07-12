@@ -818,12 +818,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											message_refresh_container.setAttribute("refresh_id",refresh_id);
 										}
 										setTimeout(async function () {
-											try {
-												await load_page("nav_loc_messages","posts_host_container");
-												if (message_refresh_container.getAttribute("refresh_id") == refresh_id){
-													message_refresh_container.classList.remove("loading");
-												}
-											} catch (e) {}
+											if (current_page[0] == "nav_loc_messages"){
+												try {
+													await load_page("nav_loc_messages","posts_host_container");
+													if (message_refresh_container.getAttribute("refresh_id") == refresh_id){
+														message_refresh_container.classList.remove("loading");
+													}
+												} catch (e) {}
+											}
 										},{true:0,false:960}[now]);
 									} catch (e) {}
 								}
@@ -1135,7 +1137,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											var match = false;
 											for (var i = 0; i < contents.users[0].length; i++) {
 												if (contents.users[0][i].id == sub_ref){
-													out.html += "<div id=\"about_me_container\" class=\"loading\" uid=\"" + sub_ref + "\"><div id=\"about_me_side_ref\"><img id=\"about_me_prof_img-" + sub_ref + "\" class=\"about_me_prof_img loading\"><h1 class=\"small_bottom\">" + contents.users[0][i].name + "</h1></div><div id=\"about_me_main_ref\"><p id=\"about_me_loading\"></p></div></div>";
+													out.html += "<div id=\"about_me_container\" class=\"loading side_margin\" uid=\"" + sub_ref + "\"><div id=\"about_me_side_ref\"><img id=\"about_me_prof_img-" + sub_ref + "\" class=\"about_me_prof_img loading\"><h1 class=\"small_bottom\">" + contents.users[0][i].name + "</h1></div><div id=\"about_me_main_ref\"><p id=\"about_me_loading\"></p></div></div>";
 													var loaded = async function(){
 														var uid_ref = user_view_about;
 														for (let i = 0; i < contents.users[0].length; i++) {
@@ -1410,14 +1412,12 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												h = Math.imul(31, h) + s.charCodeAt(i) | 0;
 											return h;
 										}
-										if (page_id!=current_page[0]){
-											if (current_page[1] != hash(out.html)){
-												try {
-													document.getElementById({true:"page_render",false:sub_ref}[sub_ref == false]).innerHTML = out.html;
-													window.scrollTo(0,0);
-												} catch(e) {
-													return;
-												}
+										if (current_page[1] != hash(out.html)){
+											try {
+												document.getElementById({true:"page_render",false:sub_ref}[sub_ref == false]).innerHTML = out.html;
+												window.scrollTo(0,0);
+											} catch(e) {
+												return;
 											}
 										}
 										current_page = [page_id,hash(out.html),out.html];
@@ -1478,7 +1478,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										}
 										await update_pub().then(async function(e){
 											await update_events();
-											setInterval(update_events,600000);
+											setInterval(function(){update_events(),update_pub()},600000);
 											var valid_setup = true;
 											await firebase.firestore().collection("blog").doc("banner").get().then(async function(banner){
 												if (banner.exists){
