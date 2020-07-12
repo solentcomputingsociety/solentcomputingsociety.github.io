@@ -663,6 +663,9 @@ h3.event_name {
 	margin: 0 1.3em 8px;
 	text-align: center;
 }
+div.event_description {
+	text-align: justify;
+}
 div#pub_link_event_ref {
 	cursor: pointer;
 }

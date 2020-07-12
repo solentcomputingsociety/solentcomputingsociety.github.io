@@ -709,7 +709,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												if (typeof(events[date][time_of_pub]) === "undefined"){
 													events[date][time_of_pub] = [];
 												}
-												events[date][time_of_pub].push(["Society drink up at " + contents.pub.name,"",contents.pub.name,date,"19:00","","","This week our weekly pub meetup is at " + contents.pub.name + ", come along for a drink and a catch up!","pub",false]);
+												events[date][time_of_pub].push(["Society drink up at " + contents.pub.name,"",contents.pub.name,date,"19:00","","","Come along to our weekly pub meetup; this week we will be going to " + contents.pub.name + ", why don't you come along for: a drink, and a catch up!","pub",false]);
 											}
 											return events;
 										}
@@ -784,13 +784,16 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														}
 													}
 												}
+												display_rows = add_pub(display_rows);
 												var sorted_display_rows = {};
 												var display_rows_keys = Object.keys(display_rows);
-												display_rows_keys.sort();
+												display_rows_keys.sort(function(a,b){
+													return new Date(a).getTime() - new Date(b).getTime()
+												});
 												for (var i = 0; i < display_rows_keys.length; i++){
 													sorted_display_rows[display_rows_keys[i]] = display_rows[display_rows_keys[i]];
 												}
-												contents.events = add_pub(sorted_display_rows);
+												contents.events = sorted_display_rows;
 											}
 										};
 										request.onerror = function () {
@@ -1023,7 +1026,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																} catch (e) {
 																	end_date = "";
 																}
-																out.html = out.html + "<div id=\"" + {true:"pub_link_event_ref",false:"event_ref_id-e" + (new Date(day).getTime() + time)}[pub] + "\" class=\"event_content_container" + {true:" dynamic_tables",false:""}[navigator.appVersion.indexOf("Chrome") != -1] + " event_type_" + event.split(" ").join("_") + {true:" priority_event",false:""}[priority] + "\"><div><h3 class=\"event_name\">" + contents.events[day][time][i][0] + "</h3><div><div class=\"center_text\"><span>" + {true:"Started",false:"From"}[start_date < new Date(day) || time < now] + ": ";
+																out.html = out.html + "<div id=\"" + {true:"pub_link_event_ref",false:"event_ref_id-e" + (new Date(day).getTime() + time)}[pub] + "\" class=\"event_content_container" + {true:" dynamic_tables",false:""}[navigator.appVersion.indexOf("Chrome") != -1] + " event_type_" + event.split(" ").join("_") + {true:" priority_event",false:""}[priority] + "\"><div><h3 class=\"event_name\">" + contents.events[day][time][i][0] + "</h3><div><div class=\"center_text small\"><span>" + {true:"Started",false:"From"}[start_date <= new Date() && time < now] + ": ";
 																try {
 																	if (start_date < new Date(day)){
 																		out.html = out.html + contents.events[day][time][i][6].getDate() + "/" + (contents.events[day][time][i][6].getMonth() + 1) + "/" + contents.events[day][time][i][6].getFullYear();
@@ -1038,7 +1041,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	}
 																	out.html = out.html + "</span><br>"
 																	shown_end = false;
-																	out.html = out.html + "<span>" + {true:"Ending",false:"Until"}[start_date < new Date(day) || time < now] + ": ";
+																	out.html = out.html + "<span>" + {true:"Ending",false:"Until"}[start_date <= new Date() && time < now] + ": ";
 																	if (end_date != ""){
 																		if (end_date.getTime() > new Date(day).getTime()){
 																			out.html = out.html + end_date.getDate() + "/" + (end_date.getMonth() + 1) + "/" + end_date.getFullYear();
@@ -1063,7 +1066,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	out.html = out.html + "</span>";
 																} catch (e) {}
 																events_added = true;
-																out.html = out.html + "</div><div class=\"side_margin small_bottom\"><p>" + contents.events[day][time][i][7].replace("\n","</p><p>").replace("<p></p>","") + "</p></div>";
+																out.html = out.html + "</div><div class=\"side_margin small_bottom event_description\"><p>" + contents.events[day][time][i][7].replace("\n","</p><p>").replace("<p></p>","") + "</p></div>";
 																if (contents.events[day][time][i][1].length > 0){
 																	out.html = out.html + "<p class=\"no_top small_bottom small side_margin\">Find out more: <a href=\"" + contents.events[day][time][i][1] + "\" title=\"Visit " + contents.events[day][time][i][1] + " for more information\" target=\"blank\" class=\"out_link\">" + contents.events[day][time][i][1] + "</a></p>";
 																}
