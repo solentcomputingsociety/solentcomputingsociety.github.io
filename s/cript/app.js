@@ -1553,31 +1553,44 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																							get_about = true;
 																						}
 																					}
+																					var out_cache = {};
 																					if (get_about){
 																						var content = [];
 																						for (let ii = 0; ii < users.length; ii++) {
-																							await firebase.firestore().collection("users/members/id/" + users[ii].id + "/about/").get().then(async function(about){
-																								var about_docs = about.docs.map( doc => {
-																									var doc_data = doc.data();
-																									doc_data.id = doc.id;
-																									return doc_data;
+																							if (applet_api_cache["users/about"][users[ii].id] === undefined){
+																								await firebase.firestore().collection("users/members/id/" + users[ii].id + "/about/").get().then(async function(about){
+																									var about_docs = about.docs.map( doc => {
+																										var doc_data = doc.data();
+																										doc_data.id = doc.id;
+																										return doc_data;
+																									});
+																									var about = {};
+																									about_docs.forEach(doc => {
+																										about[doc.id] = doc.is;
+																									});
+																									var about_user = {"Subject":about["subject"]||"","Year of study":{true:"",false:about_sections["Year of study"][about["year_of_study"] - 1]}[about["year_of_study"] == 0]||"","Intro":about["intro"]||"","Relationship status":{true:"",false:about_sections["Relationship status"][about["relationship_status"] - 1]}[about["relationship_status"] == 0]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
+																									if (users_all){
+																										apis_value["users/list-all"][ii].about = about_user;
+																									} else {
+																										apis_value["users/list-current"].about = about_user;
+																									}
+																									out_cache[users[ii].id] = about_user;
+																								}).catch(function(error){
+																									reject(error);
 																								});
-																								var about = {};
-																								about_docs.forEach(doc => {
-																									about[doc.id] = doc.is;
-																								});
-																								var about_user = {"Subject":about["subject"]||"","Year of study":{true:"",false:about_sections["Year of study"][about["year_of_study"] - 1]}[about["year_of_study"] == 0]||"","Intro":about["intro"]||"","Relationship status":{true:"",false:about_sections["Relationship status"][about["relationship_status"] - 1]}[about["relationship_status"] == 0]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
-																								if (users_all){
-																									apis_value["users/list-all"][ii].about = about_user;
-																								} else {
-																									apis_value["users/list-current"].about = about_user;
-																								}
-																								content.push(about_user);
-																							}).catch(function(error){
-																								reject(error);
-																							});
+																								continue;
+																							} else if (users_all){
+																								apis_value["users/list-all"][ii].about = applet_api_cache["users/about"][users[ii].id];
+																							} else {
+																								apis_value["users/list-current"].about = applet_api_cache["users/about"][users[ii].id];
+																							}
+																							out_cache[users[ii].id] = applet_api_cache["users/about"][users[ii].id];
 																						}
-																						applet_api_cache["users/about"] = content;
+																						console.log(Object.keys(out_cache).length,out_cache);
+																						if (Object.keys(out_cache).length == 0){
+																							out_cache = false;
+																						}
+																						applet_api_cache["users/about"] = out_cache;
 																					}
 																					break;
 																			}
