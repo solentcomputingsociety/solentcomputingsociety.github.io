@@ -476,11 +476,11 @@ div.members_list.about_me_edit {
 	padding: 0 10px;
 	width: 100%;
 }
-div#about_me_container {
+div#about_me_prof_container {
 	display: grid;
 	grid-template-columns: 33.3333% auto;
 }
-div#about_me_container.error {
+div#about_me_prof_container.error {
 	display: block !important;
 }
 .about_me_prof_img {
@@ -603,7 +603,7 @@ img.loading, span.loading, div#s_user_icon.loading {
 #about_me_loading.error {
 	padding-top: 4em;
 }
-#about_me_loading.error:before, p#failed_loading:before {
+#about_me_loading.error:before, p#failed_loading:before, p#applet_error {
 	padding-top: 3.6em;
 	content: "Failed to load profile information!";
 	background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4IiB3aWR0aD0iNDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGg0OHY0OEgwVjB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTIyIDMwaDR2NGgtNHptMC0xNmg0djEyaC00em0xLjk5LTEwQzEyLjk0IDQgNCAxMi45NSA0IDI0czguOTQgMjAgMTkuOTkgMjBTNDQgMzUuMDUgNDQgMjQgMzUuMDQgNCAyMy45OSA0ek0yNCA0MGMtOC44NCAwLTE2LTcuMTYtMTYtMTZTMTUuMTYgOCAyNCA4czE2IDcuMTYgMTYgMTYtNy4xNiAxNi0xNiAxNnoiIGZpbGw9IiNlODE3MTciLz48L3N2Zz4=");
@@ -614,6 +614,9 @@ img.loading, span.loading, div#s_user_icon.loading {
 }
 p#failed_loading:before {
 	content: "Failed to load content!";
+}
+p#applet_error {
+	content: " ";
 }
 #about_me_container_host {
 	max-width: calc(100% - 20px);
@@ -715,7 +718,7 @@ div.event_daily_container::-webkit-scrollbar-thumb
 div.event_content_container {
 	display: inline-block;
 	flex: 0 0 auto;
-	width: 30%;
+	width: 40ch;
 }
 div.event_content_container > div {
 	min-height: 200px;
@@ -732,7 +735,7 @@ div.event_content_container.dynamic_tables {
 	display: inline-table;
 }
 div.priority_event {
-	width: 45%;
+	width: 65ch;
 }
 div.event_type_standard > div {
 	background-color: #E4D7F5;
@@ -781,6 +784,37 @@ div.event_type_category_c > div {
 }
 div.event_type_category_c.priority_event > div {
 	background-color: #FB4C2F;
+}
+div#applet_listing_container {
+	webkit-column-count: max(2);
+	-webkit-column-gap: 2.5%;
+	-moz-column-count: max(2);
+	-moz-column-gap: 2.5%;
+	column-count: max(2);
+	column-gap: 2.5%;
+	row-gap: 2.5%;
+}
+div.applet_display_option {
+	width: 100%;
+	min-height: 100px;
+	background-repeat: space;
+	border-radius: 2em;
+	margin: 0 0 5%;
+	display: inline-block;
+	color: #FFFFFF;
+}
+div.applet_display_option:not(.open) {
+	cursor: pointer;
+}
+div.applet_display_option > div {
+	padding: 1em;
+}
+iframe.applet_content_iframe {
+	width: 100%;
+	overflow-y: hidden;
+	background-color: #FFFFFF;
+	border-radius: 2em;
+	border: none;
 }
 #pub_map {
 	width: 90%;
@@ -889,7 +923,7 @@ div#banner_side_right {
 	background-color: #ffffff;
 	border-top-left-radius: 2em;
 }
-div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel_error, div.app_nav_padding_smooth, img#settings_ref_content_prof_picture, .error_state_with_animation, div#nav_loc_messages {
+div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel_error, div.app_nav_padding_smooth, img#settings_ref_content_prof_picture, .error_state_with_animation, div#nav_loc_messages, iframe.applet_content_iframe {
 	-webkit-transition: all 300ms ease-in-out;
 	-moz-transition: all 300ms ease-in-out;
 	-o-transition: all 300ms ease-in-out;
@@ -912,7 +946,7 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 	opacity: 1;
 }
 .popup {
-	margin: 70px auto;
+	margin: 23vh auto 70px;
 	padding: 20px;
 	background: #fff;
 	border-radius: 5px;
@@ -926,7 +960,7 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 }
 .popup a#close_popup_dialog {
 	position: absolute;
-	top: 20px;
+	top: 10px;
 	right: 30px;
 	font-size: 30px;
 	font-weight: bold;
@@ -965,11 +999,6 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 	div.members_list.about_me_edit {
 		width: 90%;
 	}
-@media screen and (max-width: 1024px){
-	div.event_content_container {
-		width: 50%;
-	}
-}
 @media screen and (max-width: 812px){
 	div.app_page_contents {
 		display: block;
@@ -1102,6 +1131,11 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 	}
 	a#message_refresh.loading:after {
 		min-width: 142px;
+	}
+	div#applet_listing_container {
+		-webkit-column-count: unset;
+		-moz-column-count: unset;
+		column-count: 1;
 	}
 	#about_me_main_ref > p, #about_me_main_ref > h3 {
 		margin-left: 1em;
