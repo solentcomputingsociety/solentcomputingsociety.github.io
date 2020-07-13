@@ -952,6 +952,12 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									add.typing = [];
 									add.call_back = [];
 									add.change = [];
+									var applet_api_cache = {
+										"users/list-all":false,
+										"users/list-current":false,
+										"users/about":false,
+										"users/profile-picture":false
+									};
 									switch (page_id){
 										case "nav_loc_messages":
 											try {
@@ -1443,15 +1449,16 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	applet_container.appendChild(applet_container_host);
 																	var applet_container_content = applet_container_host.contentWindow.document;
 																	applet_container_content.open();
-																	console.log(contents.applets[i].apis);
 																	const apis = ["users/list-all","users/list-current","users/about","users/profile-picture"];
 																	var valid = [true,0];
 																	for (let ii = 0; ii < contents.applets[i].apis.length; ii++) {
 																		const api = contents.applets[i].apis[ii];
-																		if (apis.indexOf(api) >= 0){
-																			valid[1] += 1;
-																		} else {
-																			valid[0] = false;
+																		valid[1] += 1;
+																		if (api != undefined){
+																			if (apis.indexOf(api) < 0){
+																				valid[1] -= 1;
+																				valid[0] = false;
+																			}
 																		}
 																	}
 																	var load_apis = (apis_required) => new Promise(async function(resolve,reject) {
@@ -1470,31 +1477,42 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																			const api = apis_required[i];
 																			switch (api){
 																				case "users/list-all":
-																					apis_value["users/list-all"] = JSON.parse(JSON.stringify(contents.users[0]));
-																					for (let ii = 0; ii < apis_value["users/list-all"].length; ii++) {
-																						delete apis_value["users/list-all"][ii].photo;
-																						delete apis_value["users/list-all"][ii].photo_large;
+																					if (applet_api_cache["users/list-all"] == false){
+																						apis_value["users/list-all"] = JSON.parse(JSON.stringify(contents.users[0]));
+																						for (let ii = 0; ii < apis_value["users/list-all"].length; ii++) {
+																							delete apis_value["users/list-all"][ii].photo;
+																							delete apis_value["users/list-all"][ii].photo_large;
+																						}
+																						applet_api_cache["users/list-all"] = apis_value["users/list-all"];
+																					} else {
+																						apis_value["users/list-all"] = applet_api_cache["users/list-all"];
 																					}
 																					break;
 																				case "users/list-current":
-																					apis_value["users/list-current"] = JSON.parse(JSON.stringify(contents.users[0]));
-																					var match = false;
-																					for (let ii = 0; ii < apis_value["users/list-current"].length; ii++) {
-																						if(apis_value["users/list-current"][ii].id == firebase.auth().currentUser.uid){
-																							match = true;
-																							apis_value["users/list-current"] = apis_value["users/list-current"][ii];
-																							delete apis_value["users/list-all"].photo;
-																							delete apis_value["users/list-all"].photo_large;
-																							break;
+																					if (applet_api_cache["users/list-current"] == false){
+																						apis_value["users/list-current"] = JSON.parse(JSON.stringify(contents.users[0]));
+																						var match = false;
+																						for (let ii = 0; ii < apis_value["users/list-current"].length; ii++) {
+																							if(apis_value["users/list-current"][ii].id == firebase.auth().currentUser.uid){
+																								match = true;
+																								apis_value["users/list-current"] = apis_value["users/list-current"][ii];
+																								delete apis_value["users/list-all"].photo;
+																								delete apis_value["users/list-all"].photo_large;
+																								break;
+																							}
 																						}
-																					}
-																					if (!match){
-																						apis_value["users/list-current"] = false;
+																						if (!match){
+																							apis_value["users/list-current"] = false;
+																						} else {
+																							applet_api_cache["users/list-current"] = apis_value["users/list-current"];
+																						}
+																					} else {
+																						apis_value["users/list-current"] = applet_api_cache["users/list-current"];
 																					}
 																					break;
 																				case "users/profile-picture":
-																					apis_value["users/profile-picture"] = {};
-																					if (apis_required.indexOf("users/list-all") >= 0){
+																					if (applet_api_cache["users/profile-picture"] == false){
+																						apis_value["users/profile-picture"] = {};
 																						for (let ii = 0; ii < contents.users[0].length; ii++) {
 																							if (typeof(contents.users[0][ii].photo_large) === "undefined"){
 																								if (contents.users[0][ii].photo.length == 0){
@@ -1509,6 +1527,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																							}
 																							apis_value["users/profile-picture"][contents.users[0][ii].id] = [contents.users[0][ii].photo,contents.users[0][ii].photo_large];
 																						}
+																						applet_api_cache["users/profile-picture"] = apis_value["users/profile-picture"];
+																					} else {
+																						apis_value["users/profile-picture"] = applet_api_cache["users/profile-picture"];
 																					}
 																					break;
 																				case "users/about":
@@ -1524,26 +1545,39 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																						users = apis_value["users/list-all"];
 																						users_all = true;
 																					}
-																					for (let ii = 0; ii < users.length; ii++) {
-																						await firebase.firestore().collection("users/members/id/" + users[ii].id + "/about/").get().then(async function(about){
-																							var about_docs = about.docs.map( doc => {
-																								var doc_data = doc.data();
-																								doc_data.id = doc.id;
-																								return doc_data;
+																					var get_about = false;
+																					if (applet_api_cache["users/about"] == false){
+																						get_about = true;
+																					} else {
+																						if (applet_api_cache["users/about"].length < users.length){
+																							get_about = true;
+																						}
+																					}
+																					if (get_about){
+																						var content = [];
+																						for (let ii = 0; ii < users.length; ii++) {
+																							await firebase.firestore().collection("users/members/id/" + users[ii].id + "/about/").get().then(async function(about){
+																								var about_docs = about.docs.map( doc => {
+																									var doc_data = doc.data();
+																									doc_data.id = doc.id;
+																									return doc_data;
+																								});
+																								var about = {};
+																								about_docs.forEach(doc => {
+																									about[doc.id] = doc.is;
+																								});
+																								var about_user = {"Subject":about["subject"]||"","Year of study":{true:"",false:about_sections["Year of study"][about["year_of_study"] - 1]}[about["year_of_study"] == 0]||"","Intro":about["intro"]||"","Relationship status":{true:"",false:about_sections["Relationship status"][about["relationship_status"] - 1]}[about["relationship_status"] == 0]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
+																								if (users_all){
+																									apis_value["users/list-all"][ii].about = about_user;
+																								} else {
+																									apis_value["users/list-current"].about = about_user;
+																								}
+																								content.push(about_user);
+																							}).catch(function(error){
+																								reject(error);
 																							});
-																							var about = {};
-																							about_docs.forEach(doc => {
-																								about[doc.id] = doc.is;
-																							});
-																							var about_user = {"Subject":about["subject"]||"","Year of study":{true:"",false:about_sections["Year of study"][about["year_of_study"] - 1]}[about["year_of_study"] == 0]||"","Intro":about["intro"]||"","Relationship status":{true:"",false:about_sections["Relationship status"][about["relationship_status"] - 1]}[about["relationship_status"] == 0]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
-																							if (users_all){
-																								apis_value["users/list-all"][ii].about = about_user;
-																							} else {
-																								apis_value["users/list-current"].about = about_user;
-																							}
-																						}).catch(function(error){
-																							reject(error);
-																						});
+																						}
+																						applet_api_cache["users/about"] = content;
 																					}
 																					break;
 																			}
@@ -1595,7 +1629,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												}
 											}
 											out.html += "</div>";
-//											alert("Coming soon","Applets are set to be released soon!");
 											break;
 										case "nav_loc_pub":
 											var is_president = contents.users[1].president == firebase.auth().currentUser.uid;
@@ -1781,9 +1814,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												document.getElementById("page_render").classList.remove("loading");
 												document.getElementById("nav_loc_messages").classList.remove("fadeout","disabled");
 												document.getElementById("nav_loc_messages").setAttribute("title","View the society message board");
-												setTimeout(function(){ 
-													list_applets();
-												},3000);
+												list_applets();
 												load_page("nav_loc_events");
 												setInterval(function(){ 
 													refresh(true);
