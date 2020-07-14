@@ -46,6 +46,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			document.getElementById("popup_dialog").classList.remove("active");
 		});
 	});
+	var alert_vibrate = true;
 	function alert(title,content){
 		title = title || "";
 		content = content || "";
@@ -59,6 +60,12 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			document.getElementById("popup_header").innerHTML = title;
 			document.getElementById("popup_content").innerHTML = content.split("\n").join("<br>");
 			document.getElementById("popup_dialog").classList.add("active");
+			if (alert_vibrate){
+				var alert_vibrate = true;
+				try {
+					window.navigator.vibrate(200);
+				} catch (e) {}
+			}
 		}
 	}
 	function img_blob(url,rep_id,return_blob){
@@ -1399,6 +1406,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																					}
 																				}
 																				if (prof_tag !== false) {
+																					alert_vibrate = false;
 																					alert("Discord username:",prof_tag);
 																				}
 																			} catch (e) {}
@@ -1970,6 +1978,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									load_page("nav_loc_pub");
 									break;
 								case "nav_loc_member_about":
+									user_view_about = hash_state_redirect.add;
 									load_page("nav_loc_member_about",hash_state_redirect.add);
 									break;
 								case "menu":
