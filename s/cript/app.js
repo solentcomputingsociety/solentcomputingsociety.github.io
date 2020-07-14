@@ -61,11 +61,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			document.getElementById("popup_content").innerHTML = content.split("\n").join("<br>");
 			document.getElementById("popup_dialog").classList.add("active");
 			if (alert_vibrate){
-				var alert_vibrate = true;
 				try {
 					window.navigator.vibrate(200);
 				} catch (e) {}
 			}
+			alert_vibrate = true;
 		}
 	}
 	function img_blob(url,rep_id,return_blob){
