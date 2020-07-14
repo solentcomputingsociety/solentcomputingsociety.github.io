@@ -497,10 +497,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				if (preload){
 					return;
 				} else if (sub_page_ref_core_loaded == null){
+					var cache_avaliable = true;
 					firebase.firestore().settings({
 						cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
 					});
-					firebase.firestore().enablePersistence();
+					firebase.firestore().enablePersistence().catch(function(error){
+						cache_avaliable = false;
+					});
 					sub_page_ref_core_loaded = false;
 					["/app/img/refresh_loading.gif","/app/img/map_loading.gif"].forEach(function(img){
 						img_blob(img,false,true);
@@ -1000,6 +1003,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						}
 						var pubs_data = [];
 						var user_view_about = -1;
+						var cached_about = [];
 						var load_page = async function(page_id,sub_ref){
 							page_id = page_id || sub_page;
 							sub_ref = sub_ref || false;
@@ -1282,7 +1286,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																document.getElementById("about_me_loading").classList.add("error");
 															}
 														}
+														if (cached_about.indexOf(uid_ref) >= 0 && cache_avaliable){
+															await firebase.firestore().disableNetwork();
+														}
 														await firebase.firestore().collection("users/members/id/" + uid_ref + "/about/").get().then(async function(about){
+															if (cached_about.indexOf(uid_ref) < 0 && cache_avaliable){
+																cached_about.push(uid_ref);
+															}
 															about_docs = about.docs.map( doc => {
 																var doc_data = doc.data();
 																doc_data.id = doc.id;
@@ -1457,6 +1467,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																document.getElementById("about_me_side_ref").outerHTML = "";
 															}
 														});
+														await firebase.firestore().enableNetwork();
 													}
 												}
 											}
@@ -1609,8 +1620,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																							return doc_data;
 																						});
 																						var about = {};
+																						var data = 0;
 																						about_docs.forEach(doc => {
 																							about[doc.id] = doc.is;
+																							data += 1;
 																						});
 																						var about_user = {"Subject":about["subject"]||"","Year of study":{true:"",false:about_sections["Year of study"][about["year_of_study"] - 1]}[about["year_of_study"] == 0]||"","Intro":about["intro"]||"","Relationship status":{true:"",false:about_sections["Relationship status"][about["relationship_status"] - 1]}[about["relationship_status"] == 0]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
 																						if (users_all){
@@ -1619,20 +1632,26 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																							apis_value["users/list-current"].about = about_user;
 																						}
 																						return true;
+
 																					}).catch(function(error){
 																						return false;
 																					});
 																				}
 																				var about_user_success = false;
-																				await firebase.firestore().disableNetwork().then(async function() {
-																					about_user_success = await get_user_data();
-																				});
-																				await firebase.firestore().enableNetwork();
+																				if (cached_about.indexOf(users[ii].id) >= 0 && cache_avaliable){
+																					await firebase.firestore().disableNetwork().then(async function() {
+																						about_user_success = await get_user_data();
+																					});
+																					await firebase.firestore().enableNetwork();
+																				}
 																				if (!about_user_success) {
 																					about_user_success = await get_user_data();
 																					if (about_user_success == false){
 																						reject("Failed to load user data");
 																					}
+																				}
+																				if (cache_avaliable){
+																					cached_about.push(users[ii].id);
 																				}
 																			}
 																			break;
@@ -2636,8 +2655,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										});
 									}).catch(function(){
 										return;
-										document.getElementById("settings_ref_base_forbidden").classList.remove("hide");
-										document.getElementById("delete_account_confirm").classList.remove("hide");
 									});
 								}
 							});
