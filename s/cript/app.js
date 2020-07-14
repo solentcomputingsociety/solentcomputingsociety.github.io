@@ -60,7 +60,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			document.getElementById("popup_header").innerHTML = title;
 			document.getElementById("popup_content").innerHTML = content.split("\n").join("<br>");
 			document.getElementById("popup_dialog").classList.add("active");
-			console.log(alert_vibrate);
 			if (alert_vibrate){
 				try {
 					window.navigator.vibrate(200);
