@@ -1117,7 +1117,7 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 		border-radius: 0px;
 		width: unset;
 	}
-	div#about_me_container{
+	div#about_me_prof_container{
 		display: block;
 	}
 	div#about_me_main_ref {
