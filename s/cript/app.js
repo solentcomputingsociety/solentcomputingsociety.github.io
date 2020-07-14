@@ -497,6 +497,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				if (preload){
 					return;
 				} else if (sub_page_ref_core_loaded == null){
+					firebase.firestore().settings({
+						cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+					});
+					firebase.firestore().enablePersistence();
 					sub_page_ref_core_loaded = false;
 					["/app/img/refresh_loading.gif","/app/img/map_loading.gif"].forEach(function(img){
 						img_blob(img,false,true);
@@ -1012,12 +1016,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							add.typing = [];
 							add.call_back = [];
 							add.change = [];
-							var applet_api_cache = {
-								"users/list-all":false,
-								"users/list-current":false,
-								"users/about":false,
-								"users/profile-picture":false
-							};
 							var hash_ref = "";
 							ignore_hash_change = true;
 							switch (page_id){
@@ -1549,59 +1547,43 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	const api = apis_required[i];
 																	switch (api){
 																		case "users/list-all":
-																			if (applet_api_cache["users/list-all"] == false){
-																				apis_value["users/list-all"] = JSON.parse(JSON.stringify(contents.users[0]));
-																				for (let ii = 0; ii < apis_value["users/list-all"].length; ii++) {
-																					delete apis_value["users/list-all"][ii].photo;
-																					delete apis_value["users/list-all"][ii].photo_large;
-																				}
-																				applet_api_cache["users/list-all"] = apis_value["users/list-all"];
-																			} else {
-																				apis_value["users/list-all"] = applet_api_cache["users/list-all"];
+																			apis_value["users/list-all"] = JSON.parse(JSON.stringify(contents.users[0]));
+																			for (let ii = 0; ii < apis_value["users/list-all"].length; ii++) {
+																				delete apis_value["users/list-all"][ii].photo;
+																				delete apis_value["users/list-all"][ii].photo_large;
 																			}
 																			break;
 																		case "users/list-current":
-																			if (applet_api_cache["users/list-current"] == false){
-																				apis_value["users/list-current"] = JSON.parse(JSON.stringify(contents.users[0]));
-																				var match = false;
-																				for (let ii = 0; ii < apis_value["users/list-current"].length; ii++) {
-																					if(apis_value["users/list-current"][ii].id == firebase.auth().currentUser.uid){
-																						match = true;
-																						apis_value["users/list-current"] = apis_value["users/list-current"][ii];
-																						delete apis_value["users/list-all"].photo;
-																						delete apis_value["users/list-all"].photo_large;
-																						break;
-																					}
+																			apis_value["users/list-current"] = JSON.parse(JSON.stringify(contents.users[0]));
+																			var match = false;
+																			for (let ii = 0; ii < apis_value["users/list-current"].length; ii++) {
+																				if(apis_value["users/list-current"][ii].id == firebase.auth().currentUser.uid){
+																					match = true;
+																					apis_value["users/list-current"] = apis_value["users/list-current"][ii];
+																					delete apis_value["users/list-all"].photo;
+																					delete apis_value["users/list-all"].photo_large;
+																					break;
 																				}
-																				if (!match){
-																					apis_value["users/list-current"] = false;
-																				} else {
-																					applet_api_cache["users/list-current"] = apis_value["users/list-current"];
-																				}
-																			} else {
-																				apis_value["users/list-current"] = applet_api_cache["users/list-current"];
+																			}
+																			if (!match){
+																				apis_value["users/list-current"] = false;
 																			}
 																			break;
 																		case "users/profile-picture":
-																			if (applet_api_cache["users/profile-picture"] == false){
-																				apis_value["users/profile-picture"] = {};
-																				for (let ii = 0; ii < contents.users[0].length; ii++) {
-																					if (typeof(contents.users[0][ii].photo_large) === "undefined"){
-																						if (contents.users[0][ii].photo.length == 0){
-																							contents.users[0][ii].photo_large = (new URL(document.URL)).origin + "/app/img/prof.png";
-																						} else {
-																							contents.users[0][ii].photo_large = await storage_download("profile/"+contents.users[0][ii].id);
-																						}
-																					}
-																					if (contents.users[0][ii].photo == "/app/img/prof.png"){
-																						contents.users[0][ii].photo = (new URL(document.URL)).origin + "/app/img/prof.png";
+																			apis_value["users/profile-picture"] = {};
+																			for (let ii = 0; ii < contents.users[0].length; ii++) {
+																				if (typeof(contents.users[0][ii].photo_large) === "undefined"){
+																					if (contents.users[0][ii].photo.length == 0){
 																						contents.users[0][ii].photo_large = (new URL(document.URL)).origin + "/app/img/prof.png";
+																					} else {
+																						contents.users[0][ii].photo_large = await storage_download("profile/"+contents.users[0][ii].id);
 																					}
-																					apis_value["users/profile-picture"][contents.users[0][ii].id] = [contents.users[0][ii].photo,contents.users[0][ii].photo_large];
 																				}
-																				applet_api_cache["users/profile-picture"] = apis_value["users/profile-picture"];
-																			} else {
-																				apis_value["users/profile-picture"] = applet_api_cache["users/profile-picture"];
+																				if (contents.users[0][ii].photo == "/app/img/prof.png"){
+																					contents.users[0][ii].photo = (new URL(document.URL)).origin + "/app/img/prof.png";
+																					contents.users[0][ii].photo_large = (new URL(document.URL)).origin + "/app/img/prof.png";
+																				}
+																				apis_value["users/profile-picture"][contents.users[0][ii].id] = [contents.users[0][ii].photo,contents.users[0][ii].photo_large];
 																			}
 																			break;
 																		case "users/about":
@@ -1617,51 +1599,41 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																				users = apis_value["users/list-all"];
 																				users_all = true;
 																			}
-																			var get_about = false;
-																			if (applet_api_cache["users/about"] == false){
-																				get_about = true;
-																			} else {
-																				if (applet_api_cache["users/about"].length < users.length){
-																					get_about = true;
-																				}
-																			}
-																			var out_cache = {};
-																			if (get_about){
-																				var content = [];
-																				for (let ii = 0; ii < users.length; ii++) {
-																					if (applet_api_cache["users/about"][users[ii].id] === undefined){
-																						await firebase.firestore().collection("users/members/id/" + users[ii].id + "/about/").get().then(async function(about){
-																							var about_docs = about.docs.map( doc => {
-																								var doc_data = doc.data();
-																								doc_data.id = doc.id;
-																								return doc_data;
-																							});
-																							var about = {};
-																							about_docs.forEach(doc => {
-																								about[doc.id] = doc.is;
-																							});
-																							var about_user = {"Subject":about["subject"]||"","Year of study":{true:"",false:about_sections["Year of study"][about["year_of_study"] - 1]}[about["year_of_study"] == 0]||"","Intro":about["intro"]||"","Relationship status":{true:"",false:about_sections["Relationship status"][about["relationship_status"] - 1]}[about["relationship_status"] == 0]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
-																							if (users_all){
-																								apis_value["users/list-all"][ii].about = about_user;
-																							} else {
-																								apis_value["users/list-current"].about = about_user;
-																							}
-																							out_cache[users[ii].id] = about_user;
-																						}).catch(function(error){
-																							reject(error);
+																			var content = [];
+																			for (let ii = 0; ii < users.length; ii++) {
+																				var get_user_data = async function(){
+																					return await firebase.firestore().collection("users/members/id/" + users[ii].id + "/about/").get().then(async function(about){
+																						var about_docs = about.docs.map( doc => {
+																							var doc_data = doc.data();
+																							doc_data.id = doc.id;
+																							return doc_data;
 																						});
-																						continue;
-																					} else if (users_all){
-																						apis_value["users/list-all"][ii].about = applet_api_cache["users/about"][users[ii].id];
-																					} else {
-																						apis_value["users/list-current"].about = applet_api_cache["users/about"][users[ii].id];
+																						var about = {};
+																						about_docs.forEach(doc => {
+																							about[doc.id] = doc.is;
+																						});
+																						var about_user = {"Subject":about["subject"]||"","Year of study":{true:"",false:about_sections["Year of study"][about["year_of_study"] - 1]}[about["year_of_study"] == 0]||"","Intro":about["intro"]||"","Relationship status":{true:"",false:about_sections["Relationship status"][about["relationship_status"] - 1]}[about["relationship_status"] == 0]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
+																						if (users_all){
+																							apis_value["users/list-all"][ii].about = about_user;
+																						} else {
+																							apis_value["users/list-current"].about = about_user;
+																						}
+																						return true;
+																					}).catch(function(error){
+																						return false;
+																					});
+																				}
+																				var about_user_success = false;
+																				await firebase.firestore().disableNetwork().then(async function() {
+																					about_user_success = await get_user_data();
+																				});
+																				await firebase.firestore().enableNetwork();
+																				if (!about_user_success) {
+																					about_user_success = await get_user_data();
+																					if (about_user_success == false){
+																						reject("Failed to load user data");
 																					}
-																					out_cache[users[ii].id] = applet_api_cache["users/about"][users[ii].id];
 																				}
-																				if (Object.keys(out_cache).length == 0){
-																					out_cache = false;
-																				}
-																				applet_api_cache["users/about"] = out_cache;
 																			}
 																			break;
 																	}
