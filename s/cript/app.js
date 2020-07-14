@@ -60,6 +60,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			document.getElementById("popup_header").innerHTML = title;
 			document.getElementById("popup_content").innerHTML = content.split("\n").join("<br>");
 			document.getElementById("popup_dialog").classList.add("active");
+			console.log(alert_vibrate);
 			if (alert_vibrate){
 				try {
 					window.navigator.vibrate(200);
@@ -1504,7 +1505,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										});
 									} else {
 										for (let i = 0; i < contents.applets.length; i++) {
-											out.html += "<div class=\"applet_display_option\" id=\"applet_ref_" + contents.applets[i].id + "\" appid=\"" + contents.applets[i].id + "\" style=\"background: linear-gradient(0deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0." + {true:"4",false:"2"}[contents.applets[i].background.startsWith("url")] + ")), " + contents.applets[i].background + ";\"><div><h3>" + contents.applets[i].name + "</h3><p class=\"no_top\">" + contents.applets[i].description.split("\n").join("</p><p class=\"no_top\">") + "</p><div id=\"applet_content_container_" + contents.applets[i].id + "\"></div></div></div>";
+											out.html += "<div class=\"applet_display_option\" id=\"applet_ref_" + contents.applets[i].id + "\" appid=\"" + contents.applets[i].id + "\" style=\"background: linear-gradient(0deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0." + {true:"4",false:"2"}[contents.applets[i].background.startsWith("url")] + ")), " + contents.applets[i].background + ";\"><div><h3 class=\"applet_header_name\">" + contents.applets[i].name + "</h3><p class=\"no_top\">" + contents.applets[i].description.split("\n").join("</p><p class=\"no_top\">") + "</p><div id=\"applet_content_container_" + contents.applets[i].id + "\"></div></div></div>";
 											add.click.push(["applet_ref_" + contents.applets[i].id ,function(e){
 												var parent_check = 5;
 												var reference_check = e.target;

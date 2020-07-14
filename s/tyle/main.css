@@ -809,6 +809,10 @@ div.applet_display_option:not(.open) {
 div.applet_display_option > div {
 	padding: 1em;
 }
+h3.applet_header_name {
+	font-size: 3ch;
+	margin: 3px 0 6px;
+}
 iframe.applet_content_iframe {
 	width: 100%;
 	overflow-y: hidden;
