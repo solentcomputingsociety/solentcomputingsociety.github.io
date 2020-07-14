@@ -1098,6 +1098,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									break;
 								case "nav_loc_events":
 									hash_ref = "events";
+									document.title = "Events | Solent Computing Society";
 									out.html = "<div class=\"side_margin center_text\">";
 									if (contents.events === true){
 										out.html += "<p class=\"center_text no_interact\">Unable to load upcoming events!</p>";
@@ -1235,6 +1236,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									break;
 								case "nav_loc_members":
 									hash_ref = "members";
+									document.title = "Members | Solent Computing Society";
 									out.html = "";
 									for (var i = 0; i < contents.users[0].length; i++) {
 										out.html += "<div class=\"members_list\" id=\"view_prof_" + contents.users[0][i].id + "\" uid=\"" + contents.users[0][i].id + "\" title=\"View " + contents.users[0][i].name + "'s profile\"><table><tr><td width=\"50px\" valign=\"middle\"><img class=\"members_list_img_s loading\" id=\"" + contents.users[0][i].id + "_r-img\"></td><td valign=\"middle\"><span class=\"members_list_name\">" + contents.users[0][i].name + "</span></td></tr></table></div>";
@@ -1262,6 +1264,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									var match = false;
 									for (var i = 0; i < contents.users[0].length; i++) {
 										if (contents.users[0][i].id == sub_ref){
+											document.title = contents.users[0][i].name + "'s profile | Solent Computing Society";
 											out.html += "<div id=\"about_me_prof_container\" class=\"loading side_margin\" uid=\"" + sub_ref + "\"><div id=\"about_me_side_ref\"><img id=\"about_me_prof_img-" + sub_ref + "\" class=\"about_me_prof_img loading\"><h1 class=\"small_bottom\">" + contents.users[0][i].name + "</h1></div><div id=\"about_me_main_ref\"><p id=\"about_me_loading\"></p></div></div>";
 											var loaded = async function(){
 												var uid_ref = user_view_about;
@@ -1468,6 +1471,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									sub_ref = false;
 									break;
 								case "nav_loc_applets":
+									document.title = "Applets | Solent Computing Society";
 									hash_ref = "applets";
 									out.html = "<div class=\"side_margin\" id=\"applet_listing_container\">";
 									if (typeof(contents.applets) === "number"){
@@ -1704,6 +1708,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									break;
 								case "nav_loc_pub":
 									hash_ref = "pub";
+									document.title = "Weekly pub | Solent Computing Society";
 									var is_president = contents.users[1].president == firebase.auth().currentUser.uid;
 									out.html = "<div class=\"side_margin\"><p class=\"center_text\">";
 									if (is_president) {
@@ -1777,6 +1782,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								if (current_page[1] != hash(out.html)){
 									window.location.hash = hash_ref;
 									try {
+										if (page_id == "nav_loc_messages"){
+											document.title = "Messages | Solent Computing Society";
+										}
 										document.getElementById({true:"page_render",false:sub_ref}[sub_ref == false]).innerHTML = out.html;
 										window.scrollTo(0,0);
 									} catch(e) {
