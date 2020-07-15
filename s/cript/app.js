@@ -1383,14 +1383,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																		about_panel_out += "<div><h3 class=\"center_text small_bottom\">Studying:</h3><p class=\"center_text\">" + about_me["Subject"];
 																		if (about_me["Year of study"] > 0){
 																			about_panel_out += " - " + about_sections["Year of study"][about_me["Year of study"] - 1];
-																			if (about_sections["Year of study"] != 6){
+																			if ([5,6].indexOf(about_me["Year of study"]) < 0){
 																				about_panel_out += " year";
 																			}
 																		}																			
 																		about_panel_out += "</p>";
 																	} else if (about_me["Year of study"] > 0){
 																		about_panel_out += "<div><h3 class=\"center_text small_bottom\">Year of study:</h3><p class=\"center_text\">" + about_sections["Year of study"][about_me["Year of study"] - 1];
-																		if (about_sections["Year of study"] != 6){
+																		if ([5,6].indexOf(about_me["Year of study"]) < 0){
 																			about_panel_out += " year";
 																		}
 																		about_panel_out += "</p>";
@@ -2432,75 +2432,75 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											if (element_type != "select"){
 												if (value.trim().length > 0){
 													if (about_me_element_id == "Facebook"){
-														if (/^[a-z\d.]{5,}$/.test(value) == false){
+														if (value.match(/^[a-zA-Z\d.]{5,}$/g) !== [value]){
 															alert("Error","Invalid format for a Facebook username!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Twitter"){
-														if(/^@?(\w){1,15}$/.test(value) == false){
+														if(value.match(/^@?(\w){1,15}$/g) !== [value]){
 															alert("Error","Invalid format for a Twitter username!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Instagram"){
-														if(/^([a-z0-9._])+$/.test(value) == false){
+														if(value.match(/^([a-z0-9._])+$/g) !== [value]){
 															alert("Error","Invalid format for a Twitter username!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Snapchat"){
-														if(/^[a-zA-Z][\w-_.]{1,13}[\w]$/.test(value) == false){
+														if(value.match(/^[a-zA-Z][\w-_.]{1,13}[\w]$/g) !== [value]){
 															alert("Error","Invalid format for a Snapchat username!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Youtube"){
-														if(/(?:(?:http|https):\/\/|)(?:www\.|)youtube\.com\/(channel|user)\/([A-Z][a-zA-Z0-9\-_]{1,})/.test(value) == false){
+														if(value.match(/(?:(?:http|https):\/\/)(?:www\.|)youtube\.com\/(channel\/|user)([a-zA-Z0-9\-_]{1,})/g) !== [value]){
 															alert("Error","Invalid Youtube channel URL!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Discord"){
-														if(/^((.+?)#\d{4})/.test(value) == false){
+														if(value.match(/^((.+?)#\d{4})/g) !== [value]){
 															alert("Error","Invalid Discord username tag (<code>username#number</code>)!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "GitHub"){
-														if(/([a-z0-9](?:-?[a-z0-9]){0,38})$/.test(value) == false){
+														if(value.match(/([a-zA-Z0-9](?:-?[a-zA-Z0-9]){0,38})$/g) !== [value]){
 															alert("Error","Invalid GitHub username!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "LinkedIn"){
 														value = value.toLowerCase();
-														if(/http(s)?:\/\/([\w]+\.)?linkedin\.com\/in\/[A-z0-9_-]+\/?/.test(value) == false){
-															alert("Error","Invalid LinkedIn URL!<p>Format accepted is: <code>https://www.linkedin.com/in/username</code></p>");
+														if(value.match(/http(s)?:\/\/([\w]+\.)?linkedin\.com\/in\/[A-z0-9_-]+\/?/g) !== [value]){
+															alert("Error","Invalid LinkedIn URL!</p><p>Format accepted is: <code>https://www.linkedin.com/in/username</code></p>");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Dev Community"){
-														if(/^(\w){1,15}$/.test(value) == false && /^[a-zA-Z][\w-_.]{1,13}[\w]$/.test(value) == false){
+														if(value.match(/^(\w){1,15}$/.test(value) == false && /^[a-zA-Z][\w-_.]{1,13}[\w]$/g) !== [value]){
 															alert("Error","Invalid Dev Community profile username!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Phone number") {
-														if(/^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \/]?)?((?:\(?\d{1,}\)?[\-\.\ \/]?){0,})$/.test(value) == false){
+														if(value.match(/^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \/]?)?((?:\(?\d{1,}\)?[\-\.\ \/]?){0,})$/g) !== [value]){
 															alert("Error","Invalid phone number format!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Email address") {
-														if(/^\w+([\.-]?\w+)*@\\w+([\.-]?\\w+)*(\.\w{2,3})+$/.test(value) == false){
+														if(value.match(/^\w+([\.-]?\w+)*@\\w+([\.-]?\\w+)*(\.\w{2,3})+$/g) !== [value]){
 															alert("Error","Invalid email address format!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Website") {
-														if(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/.test(value) == false){
-															alert("Error","Invalid website URL!");
+														if(value.match(/(https?:\/\/)([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/g) !== [value]){
+															alert("Error","Invalid website URL!<p>Format accepted is: <code>http(s)://domain/path</code></p>");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
