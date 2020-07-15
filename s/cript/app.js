@@ -1157,8 +1157,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														var event = contents.events[day][time][i][8].toLowerCase();
 														var pub = (event == "pub");
 														var start_date = contents.events[day][time][i][3];
-														var end_time = new Date(JSON.parse(JSON.stringify(contents.events[day][time][i][6]))); // to prevent reference changes
-														var end_date = contents.events[day][time][i][6];
+														var end_date = new Date(contents.events[day][time][i][6].getTime());
+														var end_time = new Date(contents.events[day][time][i][6].getTime());
 														try {
 															end_date.setHours(0,0,0,0);
 														} catch (e) {
