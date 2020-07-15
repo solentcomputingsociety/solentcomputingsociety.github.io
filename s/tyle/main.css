@@ -557,6 +557,11 @@ img.loading, span.loading, div#s_user_icon.loading {
 	background-size: cover;
 	border-radius: 7px;
 }
+#social_icon_website {
+	height: 28px !important;
+	width: 28px !important;
+	border: 1px solid #808080;
+}
 #social_icon_facebook {
 	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAMAAAAM7l6QAAAAb1BMVEVCZ7L///9EabNDZ7L5+v1Ha7Q7YbD9/f5VdrouV6q8yeQ9Y7AyWqw2Xq7U3e40XK3r7/eEnM1Lb7bw8/nm6/Xf5fLb4vDJ1Om/zOWmt9qUqdR4ksh2kshwjcVlhMFZebxRc7i2xOGMo9AqU6gaR6I3JksYAAAArUlEQVQoz+WQyRaDIAxFSRDQMqg4VevU4f+/sWmPO8BlN70bFveE5D32azh+4AmLTJbGGB33XOp1rut6T/h8bBVkcCsxMqv9AEplDcykI0yQqeS09g4UdFP9yGO79d4oaBdbRi/nMqd/r0YIyp3Sl0KwOKcaUR86UiraCigToehZLIb6QEG1yjPttkDLoXc9qca5bvRBcG7ME+m0+8sWloUIwbZvLV4gO6/lr/UbK8sJeC8oxiwAAAAASUVORK5CYII=");
 }
