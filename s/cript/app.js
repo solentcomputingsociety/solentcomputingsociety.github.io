@@ -2432,74 +2432,74 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											if (element_type != "select"){
 												if (value.trim().length > 0){
 													if (about_me_element_id == "Facebook"){
-														if (value.match(/^[a-zA-Z\d.]{5,}$/g) !== [value]){
+														if (value.match(/^[a-zA-Z\d.]{5,}$/g) != value){
 															alert("Error","Invalid format for a Facebook username!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Twitter"){
-														if(value.match(/^@?(\w){1,15}$/g) !== [value]){
+														if(value.match(/^@?(\w){1,15}$/g) != value){
 															alert("Error","Invalid format for a Twitter username!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Instagram"){
-														if(value.match(/^([a-z0-9._])+$/g) !== [value]){
+														if(value.match(/^([a-z0-9._])+$/g) != value){
 															alert("Error","Invalid format for a Twitter username!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Snapchat"){
-														if(value.match(/^[a-zA-Z][\w-_.]{1,13}[\w]$/g) !== [value]){
+														if(value.match(/^[a-zA-Z][\w-_.]{1,13}[\w]$/g) != value){
 															alert("Error","Invalid format for a Snapchat username!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Youtube"){
-														if(value.match(/(?:(?:http|https):\/\/)(?:www\.|)youtube\.com\/(channel\/|user)([a-zA-Z0-9\-_]{1,})/g) !== [value]){
+														if(value.match(/(?:(?:http|https):\/\/)(?:www\.|)youtube\.com\/(channel\/|user)([a-zA-Z0-9\-_]{1,})/g) != value){
 															alert("Error","Invalid Youtube channel URL!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Discord"){
-														if(value.match(/^((.+?)#\d{4})/g) !== [value]){
+														if(value.match(/^((.+?)#\d{4})/g) != value){
 															alert("Error","Invalid Discord username tag (<code>username#number</code>)!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "GitHub"){
-														if(value.match(/([a-zA-Z0-9](?:-?[a-zA-Z0-9]){0,38})$/g) !== [value]){
+														if(value.match(/([a-zA-Z0-9](?:-?[a-zA-Z0-9]){0,38})$/g) != value){
 															alert("Error","Invalid GitHub username!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "LinkedIn"){
 														value = value.toLowerCase();
-														if(value.match(/http(s)?:\/\/([\w]+\.)?linkedin\.com\/in\/[A-z0-9_-]+\/?/g) !== [value]){
+														if(value.match(/http(s)?:\/\/([\w]+\.)?linkedin\.com\/in\/[A-z0-9_-]+\/?/g) != value){
 															alert("Error","Invalid LinkedIn URL!</p><p>Format accepted is: <code>https://www.linkedin.com/in/username</code></p>");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Dev Community"){
-														if(value.match(/^(\w){1,15}$/.test(value) == false && /^[a-zA-Z][\w-_.]{1,13}[\w]$/g) !== [value]){
+														if(value.match(/^(\w){1,15}$/.test(value) == false && /^[a-zA-Z][\w-_.]{1,13}[\w]$/g) != value){
 															alert("Error","Invalid Dev Community profile username!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Phone number") {
-														if(value.match(/^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \/]?)?((?:\(?\d{1,}\)?[\-\.\ \/]?){0,})$/g) !== [value]){
+														if(value.match(/^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \/]?)?((?:\(?\d{1,}\)?[\-\.\ \/]?){0,})$/g) != value){
 															alert("Error","Invalid phone number format!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Email address") {
-														if(value.match(/^\w+([\.-]?\w+)*@\\w+([\.-]?\\w+)*(\.\w{2,3})+$/g) !== [value]){
+														if(value.match(/^\w+([\.-]?\w+)*@\\w+([\.-]?\\w+)*(\.\w{2,3})+$/g) != value){
 															alert("Error","Invalid email address format!");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
 														}
 													} else if (about_me_element_id == "Website") {
-														if(value.match(/(https?:\/\/)([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/g) !== [value]){
+														if(value.match(/(https?:\/\/)([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/g) != value){
 															alert("Error","Invalid website URL!<p>Format accepted is: <code>http(s)://domain/path</code></p>");
 															document.getElementById(element).removeAttribute("disabled");
 															return;
