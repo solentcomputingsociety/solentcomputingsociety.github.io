@@ -125,7 +125,116 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		}
 	};
 	var about_sections = {
-		"Subject": 0,
+		"Subject": [
+			"Acoustic And Audio Engineering",
+			"Accountancy And Finance",
+			"Adventure And Outdoor Management (Accelerated)",
+			"Adventure And Outdoor Management",
+			"Applied Human Nutrition",
+			"Animation",
+			"Adult Nursing Practice",
+			"Acting And Performance",
+			"Architectural Design And Technology",
+			"Architectural Design And Visualisation",
+			"Applied Sport Science",
+			"Beauty Promotion",
+			"Business Information Technology",
+			"Body Art",
+			"Biomedical Science",
+			"Business Management",
+			"Computer Games (Art)",
+			"Computer Games (Design)",
+			"Computer Generated Imagery",
+			"Computer Games (Software Development)",
+			"Computing",
+			"Construction Management",
+			"Criminology",
+			"Cyber Security Management",
+			"Computer Systems And Networks Engineering",
+			"Digital Design And Web Development",
+			"Digital Animation",
+			"Digital Music",
+			"Electronic Engineering",
+			"Engineering Design And Manufacture",
+			"English And Creative Writing",
+			"English And Film",
+			"English And Media",
+			"Event Management",
+			"Fashion Buying And Merchandising",
+			"Fashion Journalism",
+			"Fashion Management With Marketing",
+			"Fashion Photography",
+			"Fitness And Personal Training",
+			"Fashion",
+			"Festival Management",
+			"Fashion Graphics",
+			"Film",
+			"Fine Art",
+			"Film Production",
+			"Fitness Management",
+			"Film And Television",
+			"Fashion Media",
+			"Football Business Management",
+			"Football Studies",
+			"Fashion Promotion And Communication",
+			"Fashion Styling And Creative Direction",
+			"Future Transport Engineering",
+			"Film Visual Effects",
+			"Graphic Design",
+			"Health, Nutrition And Exercise Science",
+			"Illustration",
+			"International Airline And Airport Management",
+			"Interior Design",
+			"Interior Design Decoration",
+			"International Travel & Tourism Management",
+			"Journalism",
+			"Live Event Technology",
+			"Law",
+			"Make-Up And Hair Design",
+			"Marketing",
+			"Media Engineering",
+			"Mechanical Engineering",
+			"Media Production",
+			"Maritime Business",
+			"Musical Theatre",
+			"Music Business",
+			"Marketing With Advertising",
+			"Marketing With Sport",
+			"Psychology (Child Development And Education)",
+			"Psychology (Counselling And Mental Health)",
+			"Psychology (Forensic And Psychopathology)",
+			"Photography",
+			"Physical Education",
+			"Popular Music Performance And Production",
+			"Popular Music Production",
+			"Popular Music Performance",
+			"Post Production For Film And Television",
+			"Public Relations And Communications Management",
+			"Product Design",
+			"Psychology",
+			"Renewable Energy Engineering",
+			"Sport Coaching And Sport Development",
+			"Software Engineering",
+			"Sport And Exercise Psychology",
+			"Shipping And Port Management",
+			"Sociology",
+			"Social Work",
+			"Sport And Exercise Therapy",
+			"Sport Management",
+			"Sports Journalism",
+			"Sport Performance Coaching",
+			"Television Production",
+			"Yacht Design And Production",
+			"Yacht And Powercraft Design",
+			"Football Science",
+			"Mental Health And Psychological Wellbeing"
+			/*
+				WARNING!
+
+				Any changes made to list of subjects should be appended and never removed or inserted wherever (even if it is not alphabetical) - Always append to the list!
+
+			*/
+		],
 		"Year of study": ["Foundation", "1st", "2nd", "3rd", "4th", "Placement year", "Masters"],
 		"Intro": 1,
 		"Relationship status": ["Single", "In a relationship", "Open to offers", "😏", "🍆", "🍑", "Married", "It's complicated", "You be you", "Love struck", "Single and ready to mingle", "HMU", "Bored", "Waiting..."],
@@ -508,9 +617,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					["/app/img/refresh_loading.gif","/app/img/map_loading.gif"].forEach(function(img){
 						img_blob(img,false,true);
 					});
-					document.getElementById("s_user").addEventListener("click",function(){
-						window.location.hash = "menu";
-						settings();
+					document.getElementById("s_user").addEventListener("click",function(e){
+						if (!document.getElementById("s_user").classList.contains("disabled")){
+							window.location.hash = "menu";
+							settings();
+						}
 					});
 					document.getElementById("s_banner").addEventListener("click",function(){
 						if (document.body.getBoundingClientRect().top < -3){
@@ -1379,8 +1490,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	if (about_me["Intro"].length > 0){
 																		about_panel_out += "<p class=\"center_text small_bottom\">" + about_me["Intro"].replace('<','&lt;').replace('>','&gt;') + "</p>";
 																	}
-																	if (about_me["Subject"].length > 0){
-																		about_panel_out += "<div><h3 class=\"center_text small_bottom\">Studying:</h3><p class=\"center_text\">" + about_me["Subject"];
+																	if (about_me["Subject"] > 0){
+																		about_panel_out += "<div><h3 class=\"center_text small_bottom\">Studying:</h3><p class=\"center_text\">" + about_sections["Subject"][about_me["Subject"] - 1];
 																		if (about_me["Year of study"] > 0){
 																			about_panel_out += " - " + about_sections["Year of study"][about_me["Year of study"] - 1];
 																			if ([5,6].indexOf(about_me["Year of study"]) < 0){
@@ -1625,7 +1736,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																							about[doc.id] = doc.is;
 																							data += 1;
 																						});
-																						var about_user = {"Subject":about["subject"]||"","Year of study":{true:"",false:about_sections["Year of study"][about["year_of_study"] - 1]}[about["year_of_study"] == 0]||"","Intro":about["intro"]||"","Relationship status":{true:"",false:about_sections["Relationship status"][about["relationship_status"] - 1]}[about["relationship_status"] == 0]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
+																						var about_user = {"Subject":about_sections["Subject"][about["subject"] - 1]||"","Year of study":{true:"",false:about_sections["Year of study"][about["year_of_study"] - 1]}[about["year_of_study"] == 0]||"","Intro":about["intro"]||"","Relationship status":{true:"",false:about_sections["Relationship status"][about["relationship_status"] - 1]}[about["relationship_status"] == 0]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
 																						if (users_all){
 																							apis_value["users/list-all"][ii].about = about_user;
 																						} else {
@@ -1944,6 +2055,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							});
 						}, 100);
 						window.onhashchange = function(){
+							if (ignore_hash_change){
+								ignore_hash_change = false;
+								return;
+							}
 							var hash_state_redirect = hash_state_check();
 							document.getElementById("page_menu").classList.add("hide");
 							document.getElementById("page_app").classList.remove("hide");
@@ -2010,6 +2125,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						document.getElementById("page_ref_title").innerHTML = "Menu";
 					};
 					var base_settings_page = async function(){
+						ignore_hash_change = true;
 						window.location.hash = "settings/profile";
 						document.title = "Settings | Solent Computing Society";
 						document.getElementById("page_ref_menu_contents").classList.add("hide");
@@ -2017,7 +2133,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						document.getElementById("page_ref_settings_content").classList.remove("hide");
 						document.getElementById("page_ref_settings_setup").classList.add("hide");
 						document.getElementById("page_ref_settings_forbidden").classList.add("hide");
-						document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><div class=\"small_spacer\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Go to more settings\" id=\"settings_ref_more\">More settings</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go Back To Menu</a></p><br>";
+						document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><div class=\"small_spacer\"></div><p class=\"side_margin margin_top center_text\"><a id=\"menu_settings_about\" title=\"Update your 'about me' page\">About me</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Go to more settings\" id=\"settings_ref_more\">More settings</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go Back To Menu</a></p><br>";
+						document.getElementById("menu_settings_about").addEventListener("click",about_page);
 						document.getElementById("page_ref_title").innerHTML = "Settings";
 						await firebase.firestore().collection("users/members/id").doc(firebase.auth().currentUser.uid).get().then(async function(user){
 							if(!user.exists){
@@ -2292,6 +2409,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					};
 	
 					var about_page = async function(){
+						ignore_hash_change = true;
 						window.location.hash = "settings/about";
 						document.title = "About me | Solent Computing Society";
 						document.getElementById("page_ref_menu_contents").classList.add("hide");
@@ -2299,9 +2417,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						document.getElementById("page_ref_settings_content").classList.remove("hide");
 						document.getElementById("page_ref_settings_setup").classList.add("hide");
 						document.getElementById("page_ref_settings_forbidden").classList.add("hide");
-						document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go Back To Menu</a></p><br>";
+						document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Back to settings\" id=\"settings_ref_back\">Go Back To Settings</a></p><br>";
 						document.getElementById("page_ref_title").innerHTML = "About me";
-						document.getElementById("settings_ref_back").addEventListener("click",main_menu);
+						document.getElementById("settings_ref_back").addEventListener("click",base_settings_page);
 						await firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/about/").get().then(async function(about){
 							var about_docs = about.docs.map( doc => {
 								var doc_data = doc.data();
@@ -2313,6 +2431,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								about[doc.id] = doc.is;
 							});
 							var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||"","Intro":about["intro"]||"","Relationship status":about["relationship_status"]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
+							var computing_subjects = [20,23,88,24,16,17,18,19];
 							try {
 								document.getElementById("settings_loading_statement").remove();
 							} catch (e) {}
@@ -2363,17 +2482,42 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								} else {
 									about_me_container_content += "<select id=\"about_me_select_" + about_topic.split(" ").join("_") + "\">";
 									var about_section = about_sections[about_topic];
+									var list = [];
+									if (about_topic == "Subject"){
+										for (let i = 0; i < computing_subjects.length; i++) {
+											list.push([about_section[computing_subjects[i]],computing_subjects[i]]);
+										}
+									}
 									for (let i = 0; i <= about_section.length; i++) {
-										var value = about_section[i - 1];
+										var already_listed = false;
+										for (let ii = 0; ii < list.length; ii++) {
+											if(list[ii][1] == i){
+												already_listed = true;
+												break;
+											}
+										}
+										if (already_listed){
+											continue;
+										} else {
+											list.push([about_section[i],i]);
+										}
+									}
+									for (let i = 0; i < list.length; i++) {
+										var value;
+										var value_id = 0;
+										if (i > 0){
+											value = list[i - 1][0];
+											value_id = list[i - 1][1] + 1;
+										}
 										about_me_container_content += "<option";
-										if (i == about_me[about_topic] || (value == "" && typeof about_me[about_topic] === "undefined")){
+										if (value_id == about_me[about_topic] || (value == "" && typeof about_me[about_topic] === "undefined")){
 											about_me_container_content += " selected=\"selected\"";
 										}
 										if (i == 0) {
 											about_me_container_content += " disabled";
 											value = "Not selected";
 										}
-										about_me_container_content += " value=\"" + i + "\">" + value + "</option>";
+										about_me_container_content += " value=\"" + value_id + "\">" + value + "</option>";
 									}
 									about_me_container_content += "</select>";
 								}
@@ -2397,7 +2541,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											var value = document.getElementById(element).value;
 											if (e.target.classList.length == 1 && e.target.classList.item(0) == "about_me_removal") {
 												if (element_type == "select") {
-													value = 0;
+													value = "0";
 												} else {
 													value = "";
 												}
@@ -2506,7 +2650,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														}
 													}
 												}
-											} else if (["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14"].indexOf(value) >= 0){
+											} else if (value.match(/^[0-9]\d*$/)){
 												value = parseInt(value);
 											}
 											firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/about/").doc(about_me_element_id.toLowerCase()).set({
@@ -2541,8 +2685,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										alert("An unexpected error occured!");
 									}
 								});
-								if ([0,2,3,4].indexOf(about_sections[about_topic]) >= 0)
-								{
+								if ([0,2,3,4].indexOf(about_sections[about_topic]) >= 0){
 									document.getElementById("about_me_input_" + about_topic.split(" ").join("_")).addEventListener("input",function(e){
 										var about_me_element_id = e.target.getAttribute("id").replace("about_me_input_","");
 										document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("disabled");
@@ -2605,7 +2748,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						});
 					};
 					document.getElementById("menu_settings").addEventListener("click",base_settings_page);
-					document.getElementById("menu_settings_about").addEventListener("click",about_page);
 					document.getElementById("settings_ref_base").addEventListener("click",base_settings_page);
 					document.getElementById("settings_ref_forbidden").addEventListener("click",function(){
 						window.scroll(0,0);
