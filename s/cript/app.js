@@ -257,7 +257,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		"Youtube": 0,
 	};
 	var initial_setup = false;
-	var setup = false;
+	var setup = 0;
 	var sub_page_ref_core_loaded = null;
 	var host_page = async function(page,preload,sub_page_ref){
 		page = page || false;
@@ -567,7 +567,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										if (!user.emailVerified){
 											location.assign("/error/auth_verification");
 										} else if(!overide_redirect) {
-											location.assign("app/start.html");
+											location.assign("/app/start.html");
 										}
 									}
 								} else {
@@ -676,9 +676,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				var current_page = [null,null];
 				var ignore_hash_change = false;
 				function hash_state_check() {
-					const false_hash = {lp:false,main:false};
+					const false_hash = {lp:false,main:false,ignore:false};
 					if (ignore_hash_change){
 						ignore_hash_change = false;
+						false_hash.ignore = true;
 						return false_hash;
 					}
 					var hash = window.location.hash.substring(1).split("/");
@@ -746,16 +747,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					try {
 						var page_width = document.documentElement.clientWidth;
 						var devisable = 15;
-						if (page_width < 950) {
-							devisable = 20;
-						}
 						if (page_width <= 950) {
 							devisable = 20;
 						}
 						if (page_width <= 812){
 							devisable = 0;
 						} else {
-							devisable = Math.floor((page_width/100)*devisable) + 1;
+							devisable = Math.floor((page_width/100)*devisable);
 						}
 						document.getElementById("events_page_container").style.maxWidth = (page_width-devisable) + "px";
 					} catch (e){}
@@ -1359,10 +1357,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														});
 														out.html += "</div>";
 														if (contents.events[day][time][i][1].length > 0){
-															out.html += "<p class=\"no_top small_bottom small side_margin\">Find out more: <a href=\"" + contents.events[day][time][i][1] + "\" title=\"Visit " + contents.events[day][time][i][1] + " for more information\" target=\"blank\" class=\"out_link\">" + contents.events[day][time][i][1] + "</a></p>";
+															out.html += "<p class=\"no_top small_bottom small side_margin center_text\">Find out more: <a href=\"" + contents.events[day][time][i][1] + "\" title=\"Visit " + contents.events[day][time][i][1] + " for more information\" target=\"blank\" class=\"out_link\">" + contents.events[day][time][i][1] + "</a></p>";
 														}
 														if (contents.events[day][time][i][2].length > 0){
-															out.html += "<p class=\"no_top small_bottom small side_margin event_location\">Location: " + contents.events[day][time][i][2] + "</p>";
+															out.html += "<p class=\"no_top small_bottom small side_margin center_text\">Location: " + contents.events[day][time][i][2] + "</p>";
 														}
 														out.html += "</div></div></div>";
 														if (pub){
@@ -1818,9 +1816,21 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																						});
 																						var about_user = {"Subject":about_sections["Subject"][about["subject"] - 1]||"","Year of study":{true:"",false:about_sections["Year of study"][about["year_of_study"] - 1]}[about["year_of_study"] == 0]||"","Intro":about["intro"]||"","Relationship status":{true:"",false:about_sections["Relationship status"][about["relationship_status"] - 1]}[about["relationship_status"] == 0]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
 																						if (users_all){
-																							apis_value["users/list-all"][ii].about = about_user;
+																							var about_content;
+																							if (typeof(apis_value["users/list-all"][ii].about) === "undefined"){
+																								about_content = {};
+																							} else {
+																								about_content = apis_value["users/list-all"][ii].about;
+																							}
+																							apis_value["users/list-all"][ii].about = {...about_content,...apis_value};
 																						} else {
-																							apis_value["users/list-current"].about = about_user;
+																							var about_content;
+																							if (typeof(apis_value["users/list-current"][ii].about) === "undefined"){
+																								about_content = {};
+																							} else {
+																								about_content = apis_value["users/list-current"][ii].about;
+																							}
+																							apis_value["users/list-current"].about = {...about_content,...apis_value};
 																						}
 																						return true;
 
@@ -2029,13 +2039,17 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								var user_set_up = -1;
 								for (var i = contents.users[0].length - 1; i >= 0; i--) {
 									if (contents.users[0][i].id == firebase.auth().currentUser.uid) {
-										user_set_up = i;
-										break;
+										try {
+											if (contents.users[0][i].name.trim().length > 0){
+												user_set_up = i;
+												break;
+											}
+										} catch (e) {}
 									}
 								}
 								if (user_set_up == -1 || contents.users[0][i].name == ""){
-									setup = true;
-									settings();
+									setup = 1;
+									window.location.hash = "setup";
 								}
 								await update_pub().then(async function(e){
 									await update_events();
@@ -2135,11 +2149,21 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							});
 						}, 100);
 						window.onhashchange = function(){
-							if (ignore_hash_change){
+							var hash_state_redirect = hash_state_check();
+							if (setup == 1){
+								if (hash_state_redirect.lp != "settings" && hash_state_redirect.lp != "menu" && hash_state_redirect.lp != false) {
+									settings();
+								}
+								return;
+							} else if (setup == 2) {
+								alert("Account setup","You must at least enter your name to complete setup!");
+								settings("profile");
+								return;
+							}
+							if (hash_state_redirect.ignore){
 								ignore_hash_change = false;
 								return;
 							}
-							var hash_state_redirect = hash_state_check();
 							document.getElementById("page_menu").classList.add("hide");
 							document.getElementById("page_app").classList.remove("hide");
 							document.getElementById("s_user").classList.remove("disabled");
@@ -2189,13 +2213,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				});
 				function settings(settings_page_ref){
 					settings_page_ref = settings_page_ref || "menu";
-					if(setup){
-						document.getElementById("page_ref_menu_contents").classList.add("hide");
-						document.getElementById("page_ref_title").innerHTML = "Account setup";
-						document.getElementById("menu_settings_ok").addEventListener("click",base_settings_page);
-					} else {
-						document.getElementById("page_ref_settings_setup").classList.add("hide");
-					}
 					s_user_button.classList.add("disabled");
 					s_user_button.removeAttribute("title");
 					document.getElementById("nav_loc_messages").classList.add("hide");
@@ -2203,14 +2220,20 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					document.getElementById("page_app").classList.add("hide");
 					
 					var main_menu = function(){
-						window.location.hash = "menu";
-						document.title = "Menu | Solent Computing Society";
-						document.getElementById("page_ref_menu_contents").classList.remove("hide");
-						document.getElementById("page_ref_settings_content").classList.add("hide");
-						document.getElementById("page_ref_settings_forbidden").classList.add("hide");
-						document.getElementById("page_ref_title").innerHTML = "Menu";
+						try {
+							ignore_hash_change = true;
+							window.location.hash = "menu";
+							document.title = "Menu | Solent Computing Society";
+							document.getElementById("page_ref_menu_contents").classList.remove("hide");
+							document.getElementById("page_ref_settings_content").classList.add("hide");
+							document.getElementById("page_ref_settings_forbidden").classList.add("hide");
+							document.getElementById("page_ref_title").innerHTML = "Menu";
+						} catch (e) {}
 					};
 					var base_settings_page = async function(){
+						if (setup == 1){
+							setup = 2;
+						}
 						ignore_hash_change = true;
 						window.location.hash = "settings/profile";
 						document.title = "Settings | Solent Computing Society";
@@ -2374,6 +2397,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										}).then(function(){
 											settings_ref_content_prof_name_value.classList.remove("loading");
 											settings_ref_content_prof_name_value.disabled = false;
+											setup = 4;
 										}).catch(function(){
 											settings_ref_content_prof_name_value.disabled = false;
 										});
@@ -3119,6 +3143,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						default:
 							base_settings_page();
 							break;
+					}
+					if(setup == 1){
+						document.getElementById("page_ref_menu_contents").classList.add("hide");
+						document.getElementById("page_ref_settings_setup").classList.remove("hide");
+						document.getElementById("page_ref_title").innerHTML = "Account setup";
+						document.getElementById("menu_settings_ok").addEventListener("click",base_settings_page);
+					} else {
+						document.getElementById("page_ref_settings_setup").classList.add("hide");
 					}
 				}
 				break;
