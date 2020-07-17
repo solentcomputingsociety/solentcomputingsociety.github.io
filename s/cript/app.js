@@ -2156,7 +2156,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												load_page("nav_loc_pub");
 												break;
 											case "nav_loc_member_about":
+												user_view_about = hash_state_redirect.add;
 												load_page("nav_loc_member_about",hash_state_redirect.add);
+												break;
+											case "menu":
+												settings();
+												break;
+											case "settings":
+												settings(hash_state_redirect.add);
 												break;
 											default:
 												if (document.getElementById("page_menu").classList.contains("hide") && !document.getElementById("page_app").classList.contains("hide")){
