@@ -742,6 +742,25 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						s_banner_button.removeAttribute("title");
 					}
 				}
+				function event_resize(){
+					try {
+						var page_width = document.documentElement.clientWidth;
+						var devisable = 15;
+						if (page_width < 950) {
+							devisable = 20;
+						}
+						if (page_width <= 950) {
+							devisable = 20;
+						}
+						if (page_width <= 812){
+							devisable = 0;
+						} else {
+							devisable = Math.floor((page_width/100)*devisable) + 1;
+						}
+						document.getElementById("events_page_container").style.maxWidth = (page_width-devisable) + "px";
+					} catch (e){}
+				}
+				new ResizeObserver(event_resize).observe(document.body);
 				firebase.auth().onAuthStateChanged(function(user) {
 					if (user) {
 						var sub_pages = ["nav_loc_messages","nav_loc_events","nav_loc_members","nav_loc_pub","nav_loc_applets"];
@@ -1241,7 +1260,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												if (Object.keys(contents.events[day]).length > 0){
 													show_date = [show_date.getDate(),show_date.getMonth(),show_date.getFullYear(),]
 													show_date[3] = show_date[0] % 100;
-													out.html += "<div><h4 class=\"event_date\">" + {true:"Today",false:show_date[0] + (ordinal[(show_date[3] - 20) % 10] || ordinal[show_date[1]] || ordinal[0]) + " of " + months[show_date[1]] + ", " + show_date[2]}[event_date.valueOf() <= date_check.valueOf()] + ":</h4><div><div class=\"event_daily_container\"><div class=\"event_content_container spacer_left desktop_only\"></div>";
+													out.html += "<div><h4 class=\"event_date\">" + {true:"Today",false:show_date[0] + (ordinal[(show_date[3] - 20) % 10] || ordinal[show_date[1]] || ordinal[0]) + " of " + months[show_date[1]] + ", " + show_date[2]}[event_date.valueOf() <= date_check.valueOf()] + ":</h4><div><div class=\"event_daily_container\"><div class=\"event_content_container spacer_padder desktop_only\"></div>";
 													for (var time in contents.events[day]){
 														for (var i = 0; i < contents.events[day][time].length; i++){
 															if (contents.events[day][time][i][9]){
@@ -1271,8 +1290,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														var pub = (event == "pub");
 														var start_date = contents.events[day][time][i][3];
 														var end_date;
+														var end_time;
 														if (contents.events[day][time][i][6] !== "") {
 															end_date = new Date(contents.events[day][time][i][6].getTime());
+															end_time = new Date(contents.events[day][time][i][6].getTime());
 														} else {
 															end_date = new Date(day);
 														}
@@ -1350,7 +1371,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															}]);
 														}
 													}
-													out.html += "</div></div></div>";
+													out.html += "<div class=\"event_content_container spacer_padder small desktop_only\"></div></div></div></div>";
 												}
 											} catch (e) {}
 										}
@@ -1359,6 +1380,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										}
 									}
 									out.html += "</div></div>";
+									add.call_back.push(event_resize);
 									break;
 								case "nav_loc_members":
 									hash_ref = "members";

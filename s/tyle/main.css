@@ -719,18 +719,21 @@ div.event_daily_container::-webkit-scrollbar-thumb
 div.event_content_container {
 	display: inline-block;
 	flex: 0 0 auto;
-	width: 40ch;
+	width: 34ch;
+	margin-right: 2em;
 }
 div.event_content_container > div {
 	min-height: 200px;
 	border-radius: 3em;
-	margin: 0 3em 0 0;
 	padding: 10px 20px;
 }
-div.event_content_container.spacer_left {
+div.event_content_container.spacer_padder {
 	width: 2em !important;
 	padding: 0;
 	margin: 0;
+}
+div.event_content_container.spacer_padder.small {
+	width: 1px !important;
 }
 div.event_content_container.dynamic_tables {
 	display: inline-table;
@@ -1000,7 +1003,6 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 		width: 20vw;
 	}
 	div.app_contents, div#banner_container {
-		width: 76vw;
 	}
 	div.members_list.about_me_edit {
 		width: 90%;
