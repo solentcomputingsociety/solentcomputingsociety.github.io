@@ -1718,15 +1718,12 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	delete apis_required[user_referece_api];
 																	apis_required.unshift("users/list-all");
 																}
-																console.log(apis_required);
 																for (let i = 0; i < apis_required.length; i++) {
 																	if (typeof(apis_required[i]) === "undefined"){
 																		continue;
 																	}
-																	console.log(apis_required[i]);
-																	console.log(apis_required[i].startsWith("user/about-"))
-																	const api = {true:"users/about",false:apis_required[i]}[apis_required[i].startsWith("user/about/")];
-																	const prerequisite = {true:apis_required[i].substring(11),false:null}[apis_required[i].startsWith("user/about/")];
+																	const api = {true:"users/about",false:apis_required[i]}[apis_required[i].startsWith("users/about/")];
+																	const prerequisite = {true:apis_required[i].substring(12),false:null}[apis_required[i].startsWith("users/about/")];
 																	switch (api){
 																		case "users/list-all":
 																			apis_value["users/list-all"] = JSON.parse(JSON.stringify(contents.users[0]));
@@ -1789,14 +1786,15 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																			for (let ii = 0; ii < users.length; ii++) {
 																				var get_user_data = async function(){
 																					return await firebase.firestore().collection("users/members/id/" + users[ii].id + "/about/").doc(prerequisite).get().then(async function(doc){
+																						var about = {};
 																						if (doc.exists){
 																							doc = doc.data();
 																							if (prerequisite == "course"){
-																								about["Subject"] = doc.subject || "";
-																								about["Year of study"] = doc.year || "";
+																								about["Subject"] = {true:about_sections["Subject"][doc.subject - 1],false:""}[doc.subject > 0] || "";
+																								about["Year of study"] = {true:about_sections["Year of study"][doc.year - 1],false:""}[doc.year > 0] || "";
 																							} else if (prerequisite == "intro"){
 																								about["Intro"] = doc.bio || "";
-																								about["Relationship status"] = doc.relationship_status || "";
+																								about["Relationship status"] = {true:about_sections["Relationship status"][doc.relationship_status - 1],false:""}[doc.relationship_status > 0] || "";
 																							} else if (prerequisite == "favourite_things"){
 																								about["Favourite food"] = doc.food || "";
 																								about["Favourite drink"] = doc.drink || "";
@@ -1845,8 +1843,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																								about["GitHub"] = "";
 																							}
 																						}
-																						var about = {};
-																						
 																						if (users_all){
 																							var about_content;
 																							if (typeof(apis_value["users/list-all"][ii].about) === "undefined"){
@@ -1854,7 +1850,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																							} else {
 																								about_content = apis_value["users/list-all"][ii].about;
 																							}
-																							apis_value["users/list-all"][ii].about = {...about_content,...apis_value};
+																							apis_value["users/list-all"][ii].about = {...about_content,...about};
 																						} else {
 																							var about_content;
 																							if (typeof(apis_value["users/list-current"][ii].about) === "undefined"){
@@ -1862,7 +1858,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																							} else {
 																								about_content = apis_value["users/list-current"][ii].about;
 																							}
-																							apis_value["users/list-current"].about = {...about_content,...about_user};
+																							apis_value["users/list-current"].about = {...about_content,...about};
 																						}
 																						return true;
 
