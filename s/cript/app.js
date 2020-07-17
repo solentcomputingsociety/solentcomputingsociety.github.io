@@ -1341,7 +1341,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															out.html += "<p class=\"no_top small_bottom small side_margin\">Find out more: <a href=\"" + contents.events[day][time][i][1] + "\" title=\"Visit " + contents.events[day][time][i][1] + " for more information\" target=\"blank\" class=\"out_link\">" + contents.events[day][time][i][1] + "</a></p>";
 														}
 														if (contents.events[day][time][i][2].length > 0){
-															out.html += "<p class=\"no_top small_bottom small side_margin\">Location: " + contents.events[day][time][i][2] + "</p>";
+															out.html += "<p class=\"no_top small_bottom small side_margin event_location\">Location: " + contents.events[day][time][i][2] + "</p>";
 														}
 														out.html += "</div></div></div>";
 														if (pub){

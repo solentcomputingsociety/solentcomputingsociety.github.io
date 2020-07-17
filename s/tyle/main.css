@@ -686,6 +686,9 @@ p.event_emoji_string {
 	text-align: center;
 	margin: 0;
 }
+p.event_location {
+	text-align: center;
+}
 div#pub_link_event_ref {
 	cursor: pointer;
 }
