@@ -284,47 +284,47 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						location.assign("/error/auth_verification");
 						return;
 					}
-				}
-				var s_user_button = document.getElementById("s_user");
-				if (typeof(s_user_button) !== "undefined" && s_user_button != null){
-					(async function(){
-						var prof_pre_loader = new Image();
-						prof_pre_loader.crossOrigin = 'Anonymous';
-						await firebase.firestore().collection("users/members/id").doc(firebase.auth().currentUser.uid).get().then(async function(user){
-							var photo = "/app/img/prof.png";
-							var name = "";
-							if (user.exists){
-								user = user.data();
-								if (!(typeof user.photo === "undefined" || user.photo.trim().length == 0)){
-									photo = await storage_download("profile/"+user.photo+"_50x50");
+					var s_user_button = document.getElementById("s_user");
+					if (typeof(s_user_button) !== "undefined" && s_user_button != null){
+						(async function(){
+							var prof_pre_loader = new Image();
+							prof_pre_loader.crossOrigin = 'Anonymous';
+							await firebase.firestore().collection("users/members/id").doc(firebase.auth().currentUser.uid).get().then(async function(user){
+								var photo = "/app/img/prof.png";
+								var name = "";
+								if (user.exists){
+									user = user.data();
+									if (!(typeof user.photo === "undefined" || user.photo.trim().length == 0)){
+										photo = await storage_download("profile/"+user.photo+"_50x50");
+									}
+									try {
+										name = user.name;
+									} catch (e) {}
 								}
-								try {
-									name = user.name;
-								} catch (e) {}
-							}
-							prof_pre_loader.src = img_blob(photo,false,true);
-						}).catch(function(error){
-							prof_pre_loader.src = img_blob("/app/img/prof.png",null,true);
-						});
-						prof_pre_loader.onload = function(){
-							if (typeof(Storage) !== "undefined") {
-								var prof_pre_canvas = document.createElement("canvas");
-								prof_pre_canvas.width = 50;
-								prof_pre_canvas.height = 50;
-								var prof_pre_canvas_render = prof_pre_canvas.getContext("2d");
-								prof_pre_canvas_render.drawImage(prof_pre_loader, 0, 0, 50, 50);
-								var prof_image_base64 = prof_pre_canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
-								if (localStorage.profile_image == prof_image_base64){
-									u_user_icon.classList.remove("loading");
-									return;
-								} else {
-									localStorage.profile_image = prof_image_base64;
+								prof_pre_loader.src = img_blob(photo,false,true);
+							}).catch(function(error){
+								prof_pre_loader.src = img_blob("/app/img/prof.png",null,true);
+							});
+							prof_pre_loader.onload = function(){
+								if (typeof(Storage) !== "undefined") {
+									var prof_pre_canvas = document.createElement("canvas");
+									prof_pre_canvas.width = 50;
+									prof_pre_canvas.height = 50;
+									var prof_pre_canvas_render = prof_pre_canvas.getContext("2d");
+									prof_pre_canvas_render.drawImage(prof_pre_loader, 0, 0, 50, 50);
+									var prof_image_base64 = prof_pre_canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
+									if (localStorage.profile_image == prof_image_base64){
+										u_user_icon.classList.remove("loading");
+										return;
+									} else {
+										localStorage.profile_image = prof_image_base64;
+									}
 								}
-							}
-							u_user_icon.style.backgroundImage = "url(\""+ prof_pre_loader.getAttribute("src") + "\")";
-							u_user_icon.classList.remove("loading");
-						};
-					})();
+								u_user_icon.style.backgroundImage = "url(\""+ prof_pre_loader.getAttribute("src") + "\")";
+								u_user_icon.classList.remove("loading");
+							};
+						})();
+					}
 				}
 			});
 			if (!verified) {
@@ -617,11 +617,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					["/app/img/refresh_loading.gif","/app/img/map_loading.gif"].forEach(function(img){
 						img_blob(img,false,true);
 					});
-					document.getElementById("s_user").addEventListener("click",function(e){
-						if (!document.getElementById("s_user").classList.contains("disabled")){
-							window.location.hash = "menu";
-							settings();
-						}
+					firebase.auth().onAuthStateChanged(async function(user) {
+						document.getElementById("s_user").addEventListener("click",function(e){
+							if (!document.getElementById("s_user").classList.contains("disabled")){
+								window.location.hash = "menu";
+								settings();
+							}
+						});
 					});
 					document.getElementById("s_banner").addEventListener("click",function(){
 						if (document.body.getBoundingClientRect().top < -3){
@@ -1268,8 +1270,12 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														var event = contents.events[day][time][i][8].toLowerCase();
 														var pub = (event == "pub");
 														var start_date = contents.events[day][time][i][3];
-														var end_date = new Date(contents.events[day][time][i][6].getTime());
-														var end_time = new Date(contents.events[day][time][i][6].getTime());
+														var end_date;
+														if (contents.events[day][time][i][6] !== "") {
+															end_date = new Date(contents.events[day][time][i][6].getTime());
+														} else {
+															end_date = new Date(day);
+														}
 														try {
 															end_date.setHours(0,0,0,0);
 														} catch (e) {
@@ -1411,7 +1417,34 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															});
 															var about = {};
 															about_docs.forEach(doc => {
-																about[doc.id] = doc.is;
+																if (doc.id == "course"){
+																	about["subject"] = doc.subject;
+																	about["year_of_study"] = doc.year;
+																} else if (doc.id == "intro"){
+																	about["intro"] = doc.bio;
+																	about["relationship_status"] = doc.relationship_status;
+																} else if (doc.id == "favourite_things"){
+																	about["favourite_food"] = doc.food;
+																	about["favourite_drink"] = doc.drink;
+																	about["favourite_lecturer"] = doc.lecturer;
+																	about["favourite_film"] = doc.film;
+																	about["favourite_tv_show"] = doc.tv_show;
+																} else if (doc.id == "social"){
+																	about["email_address"] = doc.email_address;
+																	about["phone_number"] = doc.phone_number;
+																	about["website"] = doc.website;
+																	about["facebook"] = doc.facebook;
+																	about["twitter"] = doc.twitter;
+																	about["instagram"] = doc.instagram;
+																	about["snapchat"] = doc.snapchat;
+																	about["linkedin"] = doc.linkedIn;
+																	about["dev_community"] = doc.dev_community;
+																	about["discord"] = doc.discord;
+																	about["youtube"] = doc.youtube;
+																	about["github"] = doc.github;
+																} else {
+																	about[doc.id] = doc.is;
+																}
 															});
 															var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||0,"Intro":about["intro"]||"","Relationship status":about["relationship_status"]||0,"Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Discord":about["discord"]||"","Youtube":about["youtube"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
 															try {
@@ -1731,10 +1764,35 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																							return doc_data;
 																						});
 																						var about = {};
-																						var data = 0;
 																						about_docs.forEach(doc => {
-																							about[doc.id] = doc.is;
-																							data += 1;
+																							if (doc.id == "course"){
+																								about["subject"] = doc.subject;
+																								about["year_of_study"] = doc.year;
+																							} else if (doc.id == "intro"){
+																								about["intro"] = doc.bio;
+																								about["relationship_status"] = doc.relationship_status;
+																							} else if (doc.id == "favourite_things"){
+																								about["favourite_food"] = doc.food;
+																								about["favourite_drink"] = doc.drink;
+																								about["favourite_lecturer"] = doc.lecturer;
+																								about["favourite_film"] = doc.film;
+																								about["favourite_tv_show"] = doc.tv_show;
+																							} else if (doc.id == "social"){
+																								about["email_address"] = doc.email_address;
+																								about["phone_number"] = doc.phone_number;
+																								about["website"] = doc.website;
+																								about["facebook"] = doc.facebook;
+																								about["twitter"] = doc.twitter;
+																								about["instagram"] = doc.instagram;
+																								about["snapchat"] = doc.snapchat;
+																								about["linkedin"] = doc.linkedIn;
+																								about["dev_community"] = doc.dev_community;
+																								about["discord"] = doc.discord;
+																								about["youtube"] = doc.youtube;
+																								about["github"] = doc.github;
+																							} else {
+																								about[doc.id] = doc.is;
+																							}
 																						});
 																						var about_user = {"Subject":about_sections["Subject"][about["subject"] - 1]||"","Year of study":{true:"",false:about_sections["Year of study"][about["year_of_study"] - 1]}[about["year_of_study"] == 0]||"","Intro":about["intro"]||"","Relationship status":{true:"",false:about_sections["Relationship status"][about["relationship_status"] - 1]}[about["relationship_status"] == 0]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
 																						if (users_all){
@@ -2097,6 +2155,12 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									load_page("nav_loc_events");
 							}
 						};
+						window.addEventListener("beforeunload", function(event) {
+							var hash_state = hash_state_check();
+							if (hash_state.lp == "settings" && hash_state.add == "about"){
+								event.returnValue =	"You may have some unsaved changes, are you sure you want to exit?";
+							}
+						});
 					} else {
 						location.assign("/login");
 					}
@@ -2133,7 +2197,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						document.getElementById("page_ref_settings_content").classList.remove("hide");
 						document.getElementById("page_ref_settings_setup").classList.add("hide");
 						document.getElementById("page_ref_settings_forbidden").classList.add("hide");
-						document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><div class=\"small_spacer\"></div><p class=\"side_margin margin_top center_text\"><a id=\"menu_settings_about\" title=\"Update your 'about me' page\">About me</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Go to more settings\" id=\"settings_ref_more\">More settings</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go Back To Menu</a></p><br>";
+						document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><div class=\"small_spacer\"></div><p class=\"side_margin margin_top center_text\"><a id=\"menu_settings_about\" title=\"Update your 'about me' page\">About me</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Go to more settings\" id=\"settings_ref_more\">More settings</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go back to menu</a></p><br>";
 						document.getElementById("menu_settings_about").addEventListener("click",about_page);
 						document.getElementById("page_ref_title").innerHTML = "Settings";
 						await firebase.firestore().collection("users/members/id").doc(firebase.auth().currentUser.uid).get().then(async function(user){
@@ -2417,7 +2481,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						document.getElementById("page_ref_settings_content").classList.remove("hide");
 						document.getElementById("page_ref_settings_setup").classList.add("hide");
 						document.getElementById("page_ref_settings_forbidden").classList.add("hide");
-						document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Back to settings\" id=\"settings_ref_back\">Go Back To Settings</a></p><br>";
+						document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Back to settings\" id=\"settings_ref_back\">Go back to main settings</a></p><br>";
 						document.getElementById("page_ref_title").innerHTML = "About me";
 						document.getElementById("settings_ref_back").addEventListener("click",base_settings_page);
 						await firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/about/").get().then(async function(about){
@@ -2428,45 +2492,54 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							});
 							var about = {};
 							about_docs.forEach(doc => {
-								about[doc.id] = doc.is;
+								if (doc.id == "course"){
+									about["subject"] = doc.subject;
+									about["year_of_study"] = doc.year;
+								} else if (doc.id == "intro"){
+									about["intro"] = doc.bio;
+									about["relationship_status"] = doc.relationship_status;
+								} else if (doc.id == "favourite_things"){
+									about["favourite_food"] = doc.food;
+									about["favourite_drink"] = doc.drink;
+									about["favourite_lecturer"] = doc.lecturer;
+									about["favourite_film"] = doc.film;
+									about["favourite_tv_show"] = doc.tv_show;
+								} else if (doc.id == "social"){
+									about["email_address"] = doc.email_address;
+									about["phone_number"] = doc.phone_number;
+									about["website"] = doc.website;
+									about["facebook"] = doc.facebook;
+									about["twitter"] = doc.twitter;
+									about["instagram"] = doc.instagram;
+									about["snapchat"] = doc.snapchat;
+									about["linkedin"] = doc.linkedin;
+									about["dev_community"] = doc.dev_community;
+									about["discord"] = doc.discord;
+									about["youtube"] = doc.youtube;
+									about["github"] = doc.github;
+								} else {
+									about[doc.id] = doc.is;
+								}
 							});
 							var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||"","Intro":about["intro"]||"","Relationship status":about["relationship_status"]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
 							var computing_subjects = [20,23,88,24,16,17,18,19];
 							try {
 								document.getElementById("settings_loading_statement").remove();
 							} catch (e) {}
-							document.getElementById("setting_ref_content").innerHTML = "<p class=\"side_margin margin_top center_text\">This information will be publicly viewable to all members of the Solect Computing Society!</p><div class=\"members_list about_me_edit margin_top\"><table id=\"about_me_container_host\"><tbody id=\"about_me_container\"></tbody></table><br></div>";
-							var about_me_container_content = "";
-							for (var about_topic in about_sections) {
-								var about_topic_header = about_topic;
-								if (about_topic_header == "Website"){
-									about_topic_header = "Website URL";
-								} else if (about_topic_header == "Facebook"){
-									about_topic_header = "Facebook username";
-								} else if (about_topic_header == "Dev Community"){
-									about_topic_header = "Dev Community username";
-								} else if (about_topic_header == "GitHub"){
-									about_topic_header = "GitHub username";
-								} else if (about_topic_header == "LinkedIn"){
-									about_topic_header = "LinkedIn account URL";
-								} else if (about_topic_header == "Twitter"){
-									about_topic_header = "Twitter username";
-								} else if (about_topic_header == "Snapchat"){
-									about_topic_header = "Snapchat username";
-								} else if (about_topic_header == "Instagram"){
-									about_topic_header = "Instagram username";
-								} else if (about_topic_header == "Discord"){
-									about_topic_header = "Discord username#number";
-								} else if (about_topic_header == "Youtube"){
-									about_topic_header = "Youtube account URL";
-								}
-								about_me_container_content += "<tr><td><table><tbody><tr><td class=\"about_me_header\"><h4 class=\"no_bottom\">" + about_topic_header + ":</h4></td><td class=\"about_me_subject_removal_container\"><span class=\"about_me_removal";
+							document.getElementById("setting_ref_content").innerHTML = "<p class=\"side_margin margin_top center_text\">This information will be publicly viewable to all members of the Solect Computing Society!</p><div class=\"side_margin about_me_edit margin_top\" id=\"about_me_container\"><br></div>";
+							var render_action_button = function(about_topic){
+								var about_me_action = "";
+								about_me_action += "<span class=\"about_me_removal";
 								if (typeof about_me[about_topic] === "undefined"){
-									about_me_container_content += " disabled";
+									about_me_action += " disabled";
 								} else if (about_me[about_topic].length == 0) {
-									about_me_container_content += " disabled";
+									about_me_action += " disabled";
 								}
-								about_me_container_content += "\" id=\"about_me_removal_" + about_topic.split(" ").join("_") + "\" title=\"Delete " + about_topic.toLowerCase() + "\"></span></td></tr></tbody></table></td></tr><tr><td><div class=\"input_container_about\">";
+								about_me_action += "\" id=\"about_me_save_" + about_topic.split(" ").join("_") + "\" title=\"Delete " + about_topic.toLowerCase() + "\"></span>";
+								return about_me_action;
+							}
+							var render_content = function(about_topic) {
+								var about_me_container_content = "";
 								if ([0,2,3,4].indexOf(about_sections[about_topic]) >= 0) {
 									about_me_container_content += "<input type=\"text\" id=\"about_me_input_" + about_topic.split(" ").join("_") + "\" value=\"" + (about_me[about_topic] || "").split("\"").join("\\\"") +"\"";
 									if (about_sections[about_topic] == 2){
@@ -2505,6 +2578,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									for (let i = 0; i < list.length; i++) {
 										var value;
 										var value_id = 0;
+										var selected = false;
 										if (i > 0){
 											value = list[i - 1][0];
 											value_id = list[i - 1][1] + 1;
@@ -2512,222 +2586,433 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										about_me_container_content += "<option";
 										if (value_id == about_me[about_topic] || (value == "" && typeof about_me[about_topic] === "undefined")){
 											about_me_container_content += " selected=\"selected\"";
+											selected = true;
 										}
 										if (i == 0) {
-											about_me_container_content += " disabled";
-											value = "Not selected";
+											if (selected){
+												about_me_container_content += " disabled";
+												value = "Not selected";
+											} else {
+												value = "Hide this option?";
+											}
 										}
 										about_me_container_content += " value=\"" + value_id + "\">" + value + "</option>";
 									}
 									about_me_container_content += "</select>";
 								}
-								about_me_container_content += "</div></td></tr>";
+								return about_me_container_content;
 							}
-							document.getElementById("about_me_container").innerHTML = about_me_container_content + "<br>";
-							for (var about_topic in about_sections) {
-								document.getElementById("about_me_removal_"+about_topic.split(" ").join("_")).addEventListener("click",function(e){
-									var about_me_element_id = e.target.getAttribute("id").replace("about_me_removal_","");
+							var about_me_page_render = "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">My course</h2><p class=\"side_margin center_text\">This section is for you to tell other society members what course your are studying, as well as your year of study. If your course isn't listed, please tell us as soon as possible.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Subject:</h4><div class=\"input_container_about\">" + render_content("Subject") + "</div><h4 class=\"small_bottom\">Subject:</h4><div class=\"input_container_about\">" + render_content("Year of study") + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_course\"></div></div></div></div>";
+							about_me_page_render += "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">Intro</h2><p class=\"side_margin center_text\">Here you can tell other society members something about you. It's always good for someone to know a little bit about you, why not help them out by giving them something to start with.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Bio:</h4><div class=\"input_container_about\">" + render_content("Intro") + "</div><h4 class=\"small_bottom\">Relationship status:</h4><div class=\"input_container_about\">" + render_content("Relationship status") + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_intro\"></div></div></div></div>";
+							about_me_page_render += "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">Favourite things</h2><p class=\"side_margin center_text\">This section is for you to tell other society members what your favourite things are. Think of this section as an aid to get conversations started with other society members, based on their favourite things.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Favourite food:</h4><div class=\"input_container_about\">" + render_content("Favourite food") + "</div><h4 class=\"small_bottom\">Favourite drink:</h4><div class=\"input_container_about\">" + render_content("Favourite drink") + "</div><h4 class=\"small_bottom\">Favourite lecturer:</h4><div class=\"input_container_about\">" + render_content("Favourite lecturer") + "</div><h4 class=\"small_bottom\">Favourite film:</h4><div class=\"input_container_about\">" + render_content("Favourite film") + "</div><h4 class=\"small_bottom\">Favourite TV show:</h4><div class=\"input_container_about\">" + render_content("Favourite TV show") + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_favourite_things\"></div></div></div></div>";
+							about_me_page_render += "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">Contact</h2><p class=\"side_margin center_text\">Help other society members find you on other platforms, by providing them with your social media accounts; or alternatively your direct contact details.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Phone number:</h4><div class=\"input_container_about\">" + render_content("Phone number") + "</div><h4 class=\"small_bottom\">Email address:</h4><div class=\"input_container_about\">" + render_content("Email address") + "</div><h4 class=\"small_bottom\">Website URL:</h4><div class=\"input_container_about\">" + render_content("Website") + "</div><h4 class=\"small_bottom\">Facebook username:</h4><div class=\"input_container_about\">" + render_content("Facebook") + "</div><h4 class=\"small_bottom\">Twitter username:</h4><div class=\"input_container_about\">" + render_content("Twitter") + "</div><h4 class=\"small_bottom\">Snapchat username:</h4><div class=\"input_container_about\">" + render_content("Snapchat") + "</div><h4 class=\"small_bottom\">Instagram username:</h4><div class=\"input_container_about\">" + render_content("Instagram") + "</div><h4 class=\"small_bottom\">GitHub username:</h4><div class=\"input_container_about\">" + render_content("GitHub") + "</div><h4 class=\"small_bottom\">Dev Community username:</h4><div class=\"input_container_about\">" + render_content("Dev Community") + "</div><h4 class=\"small_bottom\">Discord username#number:</h4><div class=\"input_container_about\">" + render_content("Discord") + "</div><h4 class=\"small_bottom\">LinkedIn account URL:</h4><div class=\"input_container_about\">" + render_content("LinkedIn") + "</div><h4 class=\"small_bottom\">Youtube account URL:</h4><div class=\"input_container_about\">" + render_content("Youtube") + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_socials\"></div></div></div></div>";
+							document.getElementById("about_me_container").innerHTML = about_me_page_render;
+							["course","intro","favourite_things","socials"].forEach(function(about_topic) {
+								document.getElementById("about_me_category_update_"+about_topic).addEventListener("click",function(e){
+									if (e.target.classList.contains("disabled")){
+										return false;
+									}
+									var about_me_element_id = e.target.getAttribute("id").replace("about_me_category_update_","");
 									var invalid = true;
 									var iteration = 0;
-									["input","select","textarea"].forEach(element => {
-										iteration += 1;
-										var element_type = element;
-										element = "about_me_" + element + "_" + about_me_element_id;
-										if (document.getElementById(element) != null)			
-										{
-											invalid = false;
-											document.getElementById(element).setAttribute("disabled","disabled");
-											var iteration_rel = iteration;
-											var value = document.getElementById(element).value;
-											if (e.target.classList.length == 1 && e.target.classList.item(0) == "about_me_removal") {
-												if (element_type == "select") {
-													value = "0";
-												} else {
-													value = "";
+									var set_value = {};
+									var element_contexts = [];
+									var element_ids = [];
+									var update_disable = [];
+									var out_values = {};
+									if (about_me_element_id == "course"){
+										element_ids.push("Year_of_study");
+										element_ids.push("Subject");
+									} else if (about_me_element_id == "intro"){
+										element_ids.push("Intro");
+										element_ids.push("Relationship_status");
+									} else if (about_me_element_id == "favourite_things") {
+										element_ids.push("Favourite_food");
+										element_ids.push("Favourite_drink");
+										element_ids.push("Favourite_lecturer");
+										element_ids.push("Favourite_film");
+										element_ids.push("Favourite_TV_show");
+									} else {
+										element_ids.push("Phone_number");
+										element_ids.push("Email_address");
+										element_ids.push("Website");
+										element_ids.push("Facebook");
+										element_ids.push("Twitter");
+										element_ids.push("Snapchat");
+										element_ids.push("Instagram");
+										element_ids.push("GitHub");
+										element_ids.push("Dev_Community");
+										element_ids.push("Discord");
+										element_ids.push("LinkedIn");
+										element_ids.push("Youtube");
+									}
+									var enable_fields = function(){
+										update_disable.forEach(element => {
+											document.getElementById(element).removeAttribute("disabled");
+										});
+									}
+									while (element_ids.length > 0){
+										var element_types = ["input","select","textarea"];
+										var about_me_element_id = element_ids[0];
+										for (let i = 0; i < element_types.length; i++) {
+											var element = element_types[i];	
+											iteration += 1;
+											var element_type = element;
+											element = "about_me_" + element + "_" + about_me_element_id;
+											if (document.getElementById(element) != null){
+												update_disable.push(element);
+												invalid = false;
+												document.getElementById(element).setAttribute("disabled","disabled");
+												var iteration_rel = iteration;
+												var value = document.getElementById(element).value;
+												var max_length = 1024;
+												var min_length = 0;
+												if (about_me_element_id == "Facebook"){
+													max_length = 50;
+												} else if (about_me_element_id == "Twitter"){
+													max_length = 15;
+												} else if (about_me_element_id == "Instagram"){
+													max_length = 30;
+												} else if (about_me_element_id == "Snapchat"){
+													max_length = 15;
+													min_length = 3;
+												} else if (about_me_element_id == "Discord"){
+													max_length = 32;
+													min_length = 1;
+												} else if (about_me_element_id == "GitHub"){
+													max_length = 39;
+													min_length = 1;
+												} else if (about_me_element_id == "LinkedIn"){
+													max_length = 58;
+												} else if (about_me_element_id == "Dev_Community"){
+													max_length = 39;
+													min_length = 1;
+												} else if (about_me_element_id == "Email_address") {
+													max_length = 320;
+												} else if (about_me_element_id == "Phone_number") {
+													max_length = 15;
 												}
-											}
-											var max_length = 1024;
-											if (about_me_element_id == "Facebook"){
-												max_length = 50;
-											} else if (about_me_element_id == "Twitter"){
-												max_length = 15;
-											} else if (about_me_element_id == "Instagram"){
-												max_length = 30;
-											} else if (about_me_element_id == "Snapchat"){
-												max_length = 15;
-											} else if (about_me_element_id == "Discord"){
-												max_length = 32;
-											} else if (about_me_element_id == "GitHub"){
-												max_length = 39;
-											} else if (about_me_element_id == "LinkedIn"){
-												max_length = 58;
-											} else if (about_me_element_id == "Dev Community"){
-												max_length = 39;
-											} else if (about_me_element_id == "Email address") {
-												max_length = 320;
-											} else if (about_me_element_id == "Email address") {
-												max_length = 15;
-											}
-											if (value.length > max_length){
-												alert("Unable to update your " + about_me_element_id.split("_").join(" "),"Max length is " + max_length + " characters - you can't get around this!");
-												document.getElementById(element).removeAttribute("disabled");
-												return;
-											}
-											if (element_type != "select"){
-												if (value.trim().length > 0){
-													if (about_me_element_id == "Facebook"){
-														if (value.match(/^[a-zA-Z\d.]{5,}$/g) != value){
-															alert("Error","Invalid format for a Facebook username!");
-															document.getElementById(element).removeAttribute("disabled");
-															return;
-														}
-													} else if (about_me_element_id == "Twitter"){
-														if(value.match(/^@?(\w){1,15}$/g) != value){
-															alert("Error","Invalid format for a Twitter username!");
-															document.getElementById(element).removeAttribute("disabled");
-															return;
-														}
-													} else if (about_me_element_id == "Instagram"){
-														if(value.match(/^([a-z0-9._])+$/g) != value){
-															alert("Error","Invalid format for a Twitter username!");
-															document.getElementById(element).removeAttribute("disabled");
-															return;
-														}
-													} else if (about_me_element_id == "Snapchat"){
-														if(value.match(/^[a-zA-Z][\w-_.]{1,13}[\w]$/g) != value){
-															alert("Error","Invalid format for a Snapchat username!");
-															document.getElementById(element).removeAttribute("disabled");
-															return;
-														}
-													} else if (about_me_element_id == "Youtube"){
-														if(value.match(/(?:(?:http|https):\/\/)(?:www\.|)youtube\.com\/(channel\/|user)([a-zA-Z0-9\-_]{1,})/g) != value){
-															alert("Error","Invalid Youtube channel URL!");
-															document.getElementById(element).removeAttribute("disabled");
-															return;
-														}
-													} else if (about_me_element_id == "Discord"){
-														if(value.match(/^((.+?)#\d{4})/g) != value){
-															alert("Error","Invalid Discord username tag (<code>username#number</code>)!");
-															document.getElementById(element).removeAttribute("disabled");
-															return;
-														}
-													} else if (about_me_element_id == "GitHub"){
-														if(value.match(/([a-zA-Z0-9](?:-?[a-zA-Z0-9]){0,38})$/g) != value){
-															alert("Error","Invalid GitHub username!");
-															document.getElementById(element).removeAttribute("disabled");
-															return;
-														}
-													} else if (about_me_element_id == "LinkedIn"){
-														value = value.toLowerCase();
-														if(value.match(/http(s)?:\/\/([\w]+\.)?linkedin\.com\/in\/[A-z0-9_-]+\/?/g) != value){
-															alert("Error","Invalid LinkedIn URL!</p><p>Format accepted is: <code>https://www.linkedin.com/in/username</code></p>");
-															document.getElementById(element).removeAttribute("disabled");
-															return;
-														}
-													} else if (about_me_element_id == "Dev Community"){
-														if(value.match(/^(\w){1,15}$/.test(value) == false && /^[a-zA-Z][\w-_.]{1,13}[\w]$/g) != value){
-															alert("Error","Invalid Dev Community profile username!");
-															document.getElementById(element).removeAttribute("disabled");
-															return;
-														}
-													} else if (about_me_element_id == "Phone number") {
-														if(value.match(/^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \/]?)?((?:\(?\d{1,}\)?[\-\.\ \/]?){0,})$/g) != value){
-															alert("Error","Invalid phone number format!");
-															document.getElementById(element).removeAttribute("disabled");
-															return;
-														}
-													} else if (about_me_element_id == "Email address") {
-														if(value.match(/^\w+([\.-]?\w+)*@\\w+([\.-]?\\w+)*(\.\w{2,3})+$/g) != value){
-															alert("Error","Invalid email address format!");
-															document.getElementById(element).removeAttribute("disabled");
-															return;
-														}
-													} else if (about_me_element_id == "Website") {
-														if(value.match(/(https?:\/\/)([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/g) != value){
-															alert("Error","Invalid website URL!<p>Format accepted is: <code>http(s)://domain/path</code></p>");
-															document.getElementById(element).removeAttribute("disabled");
-															return;
+												if (value.length > max_length){
+													alert("Unable to update your " + about_me_element_id.split("_").join(" "),"maximum length for " + about_me_element_id.split("_").join(" ") + " is " + max_length + " characters&nbsp;-&nbsp;you can't get around this!");
+													document.getElementById(element).removeAttribute("disabled");
+													enable_fields();
+													return;
+												} else if (value.length != 0 && value.length <= min_length){
+													alert("Unable to update your " + about_me_element_id.split("_").join(" "),"Minimum length for a " + about_me_element_id.split("_").join(" ") + " username is " + min_length + " character" + {true:"s",false:""}[min_length > 1] + "&nbsp;-&nbsp;you can't get around this!");
+													document.getElementById(element).removeAttribute("disabled");
+													enable_fields();
+													return;
+												}
+												if (element_type != "select"){
+													if (value.trim().length > 0){
+														if (about_me_element_id == "Facebook"){
+															if (value.match(/^[a-zA-Z\d.]{5,}$/g) != value){
+																alert("Error","Invalid format for a Facebook username!");
+																document.getElementById(element).removeAttribute("disabled");
+																enable_fields();
+																return;
+															}
+														} else if (about_me_element_id == "Twitter"){
+															if(value.match(/^@?(\w){1,15}$/g) != value){
+																alert("Error","Invalid format for a Twitter username!");
+																document.getElementById(element).removeAttribute("disabled");
+																enable_fields();
+																return;
+															}
+														} else if (about_me_element_id == "Instagram"){
+															if(value.match(/^([a-z0-9._])+$/g) != value){
+																alert("Error","Invalid format for a Twitter username!");
+																document.getElementById(element).removeAttribute("disabled");
+																enable_fields();
+																return;
+															}
+														} else if (about_me_element_id == "Snapchat"){
+															if(value.match(/^[a-zA-Z][\w-_.]{1,13}[\w]$/g) != value){
+																alert("Error","Invalid format for a Snapchat username!");
+																document.getElementById(element).removeAttribute("disabled");
+																enable_fields();
+																return;
+															}
+														} else if (about_me_element_id == "Youtube"){
+															if(value.match(/(?:(?:http|https):\/\/)(?:www\.|)youtube\.com\/(channel\/|user)([a-zA-Z0-9\-_]{1,})/g) != value){
+																alert("Error","Invalid Youtube channel URL!");
+																document.getElementById(element).removeAttribute("disabled");
+																enable_fields();
+																return;
+															}
+														} else if (about_me_element_id == "Discord"){
+															if(value.match(/^((.+?)#\d{4})/g) != value){
+																alert("Error","Invalid Discord username tag (<code>username#number</code>)!");
+																document.getElementById(element).removeAttribute("disabled");
+																enable_fields();
+																return;
+															}
+														} else if (about_me_element_id == "GitHub"){
+															if(value.match(/([a-zA-Z0-9](?:-?[a-zA-Z0-9]){0,38})$/g) != value){
+																alert("Error","Invalid GitHub username!");
+																document.getElementById(element).removeAttribute("disabled");
+																enable_fields();
+																return;
+															}
+														} else if (about_me_element_id == "LinkedIn"){
+															value = value.toLowerCase();
+															if(value.match(/http(s)?:\/\/([\w]+\.)?linkedin\.com\/in\/[A-z0-9_-]+\/?/g) != value){
+																alert("Error","Invalid LinkedIn URL!</p><p>Format accepted is: <code>https://www.linkedin.com/in/username</code></p>");
+																document.getElementById(element).removeAttribute("disabled");
+																enable_fields();
+																return;
+															}
+														} else if (about_me_element_id == "Dev Community"){
+															if(value.match(/^(\w){1,15}$/.test(value) == false && /^[a-zA-Z][\w-_.]{1,13}[\w]$/g) != value){
+																alert("Error","Invalid Dev Community profile username!");
+																document.getElementById(element).removeAttribute("disabled");
+																enable_fields();
+																return;
+															}
+														} else if (about_me_element_id == "Phone number") {
+															if(value.match(/^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \/]?)?((?:\(?\d{1,}\)?[\-\.\ \/]?){0,})$/g) != value){
+																alert("Error","Invalid phone number format!");
+																document.getElementById(element).removeAttribute("disabled");
+																enable_fields();
+																return;
+															}
+														} else if (about_me_element_id == "Email address") {
+															if(value.match(/^\w+([\.-]?\w+)*@\\w+([\.-]?\\w+)*(\.\w{2,3})+$/g) != value){
+																alert("Error","Invalid email address format!");
+																document.getElementById(element).removeAttribute("disabled");
+																enable_fields();
+																return;
+															}
+														} else if (about_me_element_id == "Website") {
+															if(value.match(/(https?:\/\/)([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/g) != value){
+																alert("Error","Invalid website URL!<p>Format accepted is: <code>http(s)://domain/path</code></p>");
+																document.getElementById(element).removeAttribute("disabled");
+																enable_fields();
+																return;
+															}
 														}
 													}
+												} else if (value.match(/^[0-9]\d*$/)){
+													value = parseInt(value);
 												}
-											} else if (value.match(/^[0-9]\d*$/)){
-												value = parseInt(value);
+												out_values[element] = value;
+												switch(about_me_element_id){
+													case "Subject":
+														set_value.subject = value;
+														break;
+													case "Year_of_study":
+														set_value.year = value;
+														break;
+													case "Intro":
+														set_value.bio = value;
+														break;
+													case "Relationship_status":
+														set_value.relationship_status = value;
+														break;
+													case "Favourite_food":
+														set_value.food = value;
+														break;
+													case "Favourite_drink":
+														set_value.drink = value;
+														break;
+													case "Favourite_lecturer":
+														set_value.lecturer = value;
+														break;
+													case "Favourite_film":
+														set_value.film = value;
+														break;
+													case "Favourite_TV_show":
+														set_value.tv_show = value;
+														break;
+													case "Phone_number":
+														set_value.phone_number = value;
+														break;
+													case "Email_address":
+														set_value.email_address = value;
+														break;
+													case "Website":
+														set_value.website = value;
+														break;
+													case "Facebook":
+														set_value.facebook = value;
+														break;
+													case "Twitter":
+														set_value.twitter = value;
+														break;
+													case "Snapchat":
+														set_value.snapchat = value;
+														break;
+													case "Instagram":
+														set_value.instagram = value;
+														break;
+													case "GitHub":
+														set_value.github = value;
+														break;
+													case "Dev_Community":
+														set_value.dev_community = value;
+														break;
+													case "Discord":
+														set_value.discord = value;
+														break;
+													case "LinkedIn":
+														set_value.linkedin = value;
+														break;
+													case "Youtube":
+														set_value.youtube = value;
+														break;
+													default:
+														set_value.is = value;
+												}
+												break;
 											}
-											firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/about/").doc(about_me_element_id.toLowerCase()).set({
-												is: value
-											}).then(async function() {
-												e.target.classList.remove("approve");
-												if (iteration_rel == 2){
-													for(var i, j = 0; i = document.getElementById(element).options[j]; j++) {
-														if (j.toString() == value.toString()){
-															i.setAttribute("selected","selected");
-														} else {
-															i.removeAttribute("selected");
-														}
+										}
+										element_ids.shift();
+									}
+									e.target.classList.add("disabled");
+									if (["Subject","Year_of_study"].indexOf(about_me_element_id) >= 0){
+										about_me_element_id = "course";
+									} else if (["Intro","Relationship_status"].indexOf(about_me_element_id) >= 0){
+										about_me_element_id = "intro";
+									} else if (["Favourite_food","Favourite_drink","Favourite_lecturer","Favourite_film","Favourite_TV_show"].indexOf(about_me_element_id) >= 0){
+										about_me_element_id = "favourite_things";
+									} else if (["Phone_number","Email_address","Website","Facebook","Twitter","Snapchat","Instagram","GitHub","Dev_Community","Discord","LinkedIn","Youtube"].indexOf(about_me_element_id) >= 0){
+										about_me_element_id = "social";
+									} else {
+										return false;
+									}
+									e.target.setAttribute("value","Saving");
+									firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/about/").doc(about_me_element_id.toLowerCase()).set(set_value).then(async function() {
+										e.target.classList.remove("disabled");
+										await update_disable.forEach(element => {
+											value = out_values[element];
+											if (element.startsWith("about_me_select_")){
+												for(var i, j = 0; i = document.getElementById(element).options[j]; j++) {
+													if (i.getAttribute("value").toString() == value.toString()){
+														i.setAttribute("selected","selected");
+													} else {
+														i.removeAttribute("selected");
 													}
-													document.getElementById(element).value = value;
-												} else {
-													document.getElementById(element).setAttribute("value",value);
+												}
+												document.getElementById(element).value = value;
+												var event = document.createEvent('Event');
+												event.initEvent('change', true, true);
+												document.getElementById(element).value = value;
+												document.getElementById(element).dispatchEvent(event);
+											} else {
+												document.getElementById(element).setAttribute("value",value);
+												["input","onpropertychange"].forEach(function(event_type){
 													var event = document.createEvent('Event');
-													event.initEvent('input', true, true);
+													event.initEvent(event_type, true, true);
 													document.getElementById(element).value = value;
 													document.getElementById(element).dispatchEvent(event);
-												}
-												document.getElementById(element).removeAttribute("disabled");
-											}).catch(function(error){
-												document.getElementById(element).removeAttribute("disabled");
-												alert("Error","Unable to update your " + about_me_element_id.split("_").join(" ") + "!\n"+error.message);
-											});
-											return true;
-										}
+												});
+											}
+											document.getElementById(element).removeAttribute("disabled");
+										});
+										e.target.setAttribute("value","Saved!");
+										setTimeout(function(){
+											if (e.target.getAttribute("value") == "Saved!"){
+												e.target.setAttribute("value","Save");
+											}
+										},2500);
+									}).catch(function(error){
+										e.target.setAttribute("value","Save");
+										enable_fields();
+										alert("Error","Unable to update your " + about_me_element_id.split("_").join(" ") + "!\n"+error.message);
+										e.target.classList.remove("disabled");
 									});
 									if (invalid){
 										alert("An unexpected error occured!");
 									}
 								});
+							});
+							var save_button_is = function(element_reference){
+								if (["Subject","Year_of_study"].indexOf(element_reference) >= 0){
+									return "about_me_category_update_course";
+								} else if (["Intro","Relationship_status"].indexOf(element_reference) >= 0){
+									return "about_me_category_update_intro";
+								} else if (["Favourite_food","Favourite_drink","Favourite_lecturer","Favourite_film","Favourite_TV_show"].indexOf(element_reference) >= 0){
+									return "about_me_category_update_favourite_things";
+								} else if (["Phone_number","Email_address","Website","Facebook","Twitter","Snapchat","Instagram","GitHub","Dev_Community","Discord","LinkedIn","Youtube"].indexOf(element_reference) >= 0){
+									return "about_me_category_update_socials";
+								} else {
+									return false;
+								}
+							}
+							var save_state_enabled = {};
+							var save_button_enable = function(button,element,enable){
+								if (!(button in save_state_enabled)){
+									save_state_enabled[button] = {};
+								}
+								save_state_enabled[button][element] = enable;
+								var valid = false;
+								for(var element_id in save_state_enabled[button]){
+									if (save_state_enabled[button][element_id]){
+										valid = true;
+										break;
+									}
+								}
+								if (valid){
+									document.getElementById(button).classList.remove("disabled");
+									document.getElementById(button).setAttribute("value","Save");
+								} else {
+									document.getElementById(button).classList.add("disabled");
+								}
+							}
+							for (var about_topic in about_sections) {
 								if ([0,2,3,4].indexOf(about_sections[about_topic]) >= 0){
 									document.getElementById("about_me_input_" + about_topic.split(" ").join("_")).addEventListener("input",function(e){
 										var about_me_element_id = e.target.getAttribute("id").replace("about_me_input_","");
-										document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("disabled");
-										if (!(e.target.value.trim().length == 0 || e.target.value == e.target.getAttribute("value"))){
-											document.getElementById("about_me_removal_" + about_me_element_id).classList.add("approve");
-											document.getElementById("about_me_removal_" + about_me_element_id).setAttribute("title","Save changes?");
+										if (e.target.value == e.target.getAttribute("value")){
+											save_button_enable(save_button_is(about_me_element_id),about_me_element_id,false);
+										} else if (e.target.value.trim().length == 0 && e.target.getAttribute("value").trim().length != 0){
+											save_button_enable(save_button_is(about_me_element_id),about_me_element_id,true);
+											// enable button
+										} else if (e.target.value.trim().length > 0){
+											save_button_enable(save_button_is(about_me_element_id),about_me_element_id,true);
+											// enable button
 										} else {
-											if (e.target.getAttribute("value").trim().length == 0){
-												document.getElementById("about_me_removal_" + about_me_element_id).classList.add("disabled");
-											}
-											document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("approve");
-											document.getElementById("about_me_removal_" + about_me_element_id).setAttribute("title","Delete " + about_me_element_id.toLowerCase());
+											save_button_enable(save_button_is(about_me_element_id),about_me_element_id,false);
 										}
 									});
 								} else if (about_sections[about_topic] == 1) {
 									["input","onpropertychange"].forEach(event => {
 										document.getElementById("about_me_textarea_" + about_topic.split(" ").join("_")).addEventListener(event,function(e){
 											var about_me_element_id = e.target.getAttribute("id").replace("about_me_textarea_","");
-											document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("disabled");
-											if (!(e.target.value.trim().length == 0 || e.target.value == e.target.getAttribute("value"))){
-												document.getElementById("about_me_removal_" + about_me_element_id).classList.add("approve");
-												document.getElementById("about_me_removal_" + about_me_element_id).setAttribute("title","Save changes?");
+											if (e.target.value == e.target.getAttribute("value")){
+												save_button_enable(save_button_is(about_me_element_id),about_me_element_id,false);
+											} else if (e.target.value.trim().length == 0 && e.target.getAttribute("value").trim().length != 0){
+												save_button_enable(save_button_is(about_me_element_id),about_me_element_id,true);
+												// enable button
+											} else if (e.target.value.trim().length > 0){
+												save_button_enable(save_button_is(about_me_element_id),about_me_element_id,true);
+												// enable button
 											} else {
-												if (e.target.getAttribute("value").trim().length == 0){
-													document.getElementById("about_me_removal_" + about_me_element_id).classList.add("disabled");
-												}
-												document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("approve");
-												document.getElementById("about_me_removal_" + about_me_element_id).setAttribute("title","Delete " + about_me_element_id.toLowerCase());
+												save_button_enable(save_button_is(about_me_element_id),about_me_element_id,false);
 											}
 										});
 									});
 								} else {
 									document.getElementById("about_me_select_" + about_topic.split(" ").join("_")).addEventListener("change",function(e){
 										var about_me_element_id = e.target.getAttribute("id").replace("about_me_select_","");
-										document.getElementById("about_me_removal_" + about_me_element_id).classList.add("approve");
-										document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("disabled");
+										var disabled = false;
 										for(var i, j = 0; i = e.target.options[j]; j++) {
+											if (j == 0){
+												i.removeAttribute("disabled");
+												i.innerText = "Hide this option?";
+											}
 											if(i.value.toString() == e.target.value.toString()) {
 												if (i.getAttribute("selected") == "selected"){
-													document.getElementById("about_me_removal_" + about_me_element_id).classList.remove("approve");
+													disabled = true;
+													// disable button
 												}
+												break;
 											}
+										}
+										save_button_enable(save_button_is(about_me_element_id),about_me_element_id,!disabled);
+										if (e.target.value.toString() == "0") {
+											e.target.options[0].setAttribute("disabled","disabled");
+											e.target.options[0].innerText = "Not selected";
 										}
 									});
 								}
