@@ -769,22 +769,22 @@ div.event_type_pub > div {
 div.event_type_pub.priority_event > div {
 	background-color: #FAD165;
 }
-div.event_type_category_a > div {
+div.event_type_social > div {
 	background-color: #FCDEE8;
 }
-div.event_type_category_a.priority_event > div {
+div.event_type_social.priority_event > div {
 	background-color: #F691B3;
 }
-div.event_type_category_b > div {
+div.event_type_events > div {
 	background-color: #FFE6C7;
 }
-div.event_type_category_b.priority_event > div {
+div.event_type_events.priority_event > div {
 	background-color: #FFAD47;
 }
-div.event_type_category_c > div {
+div.event_type_other > div {
 	background-color: #F6C5BE;
 }
-div.event_type_category_c.priority_event > div {
+div.event_type_other.priority_event > div {
 	background-color: #FB4C2F;
 }
 div#applet_listing_container {
