@@ -5,6 +5,7 @@
 html, body {
 	margin: 0;
 	overscroll-behavior: contain;
+	overflow-x: hidden;
 }
 .hide {
 	display: none !important;
