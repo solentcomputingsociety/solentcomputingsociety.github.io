@@ -2196,13 +2196,15 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								settings("profile");
 								return;
 							}
+							if (hash_state_redirect.main){
+								document.getElementById("page_menu").classList.add("hide");
+								document.getElementById("page_app").classList.remove("hide");
+								document.getElementById("s_user").classList.remove("disabled");
+							}
 							if (hash_state_redirect.ignore){
 								ignore_hash_change = false;
 								return;
 							}
-							document.getElementById("page_menu").classList.add("hide");
-							document.getElementById("page_app").classList.remove("hide");
-							document.getElementById("s_user").classList.remove("disabled");
 							document.getElementById("s_user").setAttribute("title","Manage your profile");
 							if (document.getElementById("nav_loc_messages").classList.contains("hide")){
 								document.getElementById("nav_loc_messages").classList.remove("hide");
@@ -2264,6 +2266,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							document.getElementById("page_ref_settings_content").classList.add("hide");
 							document.getElementById("page_ref_settings_forbidden").classList.add("hide");
 							document.getElementById("page_ref_title").innerHTML = "Menu";
+							ignore_hash_change = false;
 						} catch (e) {}
 					};
 					var base_settings_page = async function(){
@@ -2281,6 +2284,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><div class=\"small_spacer\"></div><p class=\"side_margin margin_top center_text\"><a id=\"menu_settings_about\" title=\"Update your 'about me' page\">About me</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Go to more settings\" id=\"settings_ref_more\">More settings</a></p><p class=\"side_margin margin_top center_text\"><a title=\"Back to menu settings\" id=\"settings_ref_back\">Go back to menu</a></p><br>";
 						document.getElementById("menu_settings_about").addEventListener("click",about_page);
 						document.getElementById("page_ref_title").innerHTML = "Settings";
+						ignore_hash_change = false;
 						await firebase.firestore().collection("users/members/id").doc(firebase.auth().currentUser.uid).get().then(async function(user){
 							if(!user.exists){
 								user.name = "";
@@ -2566,6 +2570,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Back to settings\" id=\"settings_ref_back\">Go back to main settings</a></p><br>";
 						document.getElementById("page_ref_title").innerHTML = "About me";
 						document.getElementById("settings_ref_back").addEventListener("click",base_settings_page);
+						ignore_hash_change = false;
 						await firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/about/").get().then(async function(about){
 							var about_docs = about.docs.map( doc => {
 								var doc_data = doc.data();
