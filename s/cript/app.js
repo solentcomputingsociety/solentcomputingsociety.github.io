@@ -967,11 +967,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 													} else {
 														end_date = 0;
 													}
-													if (end_date == 0){
-														end_date = date;
-														end_date.setDate(end_date.getDate()+1);
-														end_date.setHours(0,0,0,0);
-													} else if(rows[i][5].length > 0) {
+													if (end_date == 0 && date != 0){
+														end_date = new Date(date.getTime());
+													}
+													try {
 														var end_time = rows[i][5].split(':');
 														if (end_time.length > 0){
 															end_date.setHours(end_time[0]);
@@ -982,6 +981,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														if (end_time.length > 2){
 															end_date.setSeconds(end_time[2]);
 														}
+													} catch (e) {
+														console.error(e);
+														end_date = new Date(date.getTime());
+														end_date.setDate(end_date.getDate()+1);
+														end_date.setHours(0,0,0,0);
 													}
 													rows[i][6] = end_date;
 													var current_date = new Date();
@@ -1316,6 +1320,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														if (contents.events[day][time][i][6] !== "") {
 															end_date = new Date(contents.events[day][time][i][6].getTime());
 															end_time = new Date(contents.events[day][time][i][6].getTime());
+															console.log(end_time,contents.events[day][time][i]);
 														} else {
 															end_date = new Date(day);
 														}
@@ -1342,7 +1347,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															out.html += "<span>" + {true:"Ending",false:"Until"}[start_date <= new Date() && time < now] + ": ";
 															if (end_date != ""){
 																if (end_date.getTime() > new Date(day).getTime() && end_time.getHours() != 12 && end_time.getMinutes() != 0){
-																	out.html += end_date.getDate() + "/" + (end_date.getMonth() + 1) + "/" + end_date.getFullYear();
+																	out.html += ("0" + end_date.getDate()).slice(-2) + "/" + ("0" + (end_date.getMonth() + 1)).slice(-2) + "/" + end_date.getFullYear();
 																	if (contents.events[day][time][i][5].length > 0){
 																		out.html += " at ";
 																	}
