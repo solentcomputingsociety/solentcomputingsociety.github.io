@@ -611,7 +611,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					firebase.firestore().settings({
 						cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
 					});
-					firebase.firestore().enablePersistence().catch(function(error){
+					firebase.firestore().enablePersistence({synchronizeTabs:true}).catch(function(error){
 						cache_avaliable = false;
 					});
 					var notification_state = 0;
