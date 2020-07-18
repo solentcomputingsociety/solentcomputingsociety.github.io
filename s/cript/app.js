@@ -982,7 +982,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															end_date.setSeconds(end_time[2]);
 														}
 													} catch (e) {
-														console.error(e);
 														end_date = new Date(date.getTime());
 														end_date.setDate(end_date.getDate()+1);
 														end_date.setHours(0,0,0,0);
@@ -1320,7 +1319,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														if (contents.events[day][time][i][6] !== "") {
 															end_date = new Date(contents.events[day][time][i][6].getTime());
 															end_time = new Date(contents.events[day][time][i][6].getTime());
-															console.log(end_time,contents.events[day][time][i]);
 														} else {
 															end_date = new Date(day);
 														}
@@ -1329,10 +1327,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														} catch (e) {
 															end_date = "";
 														}
-														out.html += "<div id=\"" + {true:"pub_link_event_ref",false:"event_ref_id-e" + (new Date(day).getTime() + time)}[pub] + "\" class=\"event_content_container" + {true:" dynamic_tables",false:""}[navigator.appVersion.indexOf("Chrome") != -1] + " event_type_" + event.split(" ").join("_") + {true:" priority_event",false:""}[priority] + "\"><div><h3 class=\"event_name\">" + contents.events[day][time][i][0] + "</h3><div><div class=\"center_text small\"><span>" + {true:"Started",false:"From"}[start_date <= new Date() && time < now] + ": ";
+														out.html += "<div id=\"" + {true:"pub_link_event_ref",false:"event_ref_id-e" + (new Date(day).getTime() + time)}[pub] + "\" class=\"event_content_container" + {true:" dynamic_tables",false:""}[navigator.appVersion.indexOf("Chrome") != -1] + " event_type_" + event.split(" ").join("_") + {true:" priority_event",false:""}[priority] + "\"><div><h3 class=\"event_name\">" + contents.events[day][time][i][0] + "</h3><div><div class=\"center_text small\"><span>" + {true:"Started",false:"From"}[start_date <= new Date() || (start_date == new Date() && time < now)] + ": ";
 														try {
 															if (start_date < new Date(day)){
-																out.html += contents.events[day][time][i][6].getDate() + "/" + (contents.events[day][time][i][6].getMonth() + 1) + "/" + contents.events[day][time][i][6].getFullYear();
+																out.html += ("0" + contents.events[day][time][i][3].getDate()).slice(-2) + "/" + ("0" + (contents.events[day][time][i][3].getMonth() + 1)).slice(-2) + "/" + contents.events[day][time][i][3].getFullYear();
 															}
 															if (contents.events[day][time][i][4].length > 0){
 																if (start_date < new Date(day)){
