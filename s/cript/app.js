@@ -618,7 +618,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					const messaging = firebase.messaging();
 					messaging.usePublicVapidKey("BKAhDaPyPBFZtwQq9w7RKRbKjFbAwLfCYL2I-dprXCNyqhWPSHuiszuFuCwt0OwgmGUKGVe0G6963qruCz2cfSc");
 					messaging.requestPermission().then(function(){
-						console.log(messaging.getToken());
+						return messaging.getToken();
+					}).then(function(token){
+						console.log(token);
 						notification_state = 1;
 					}).catch(function(error){
 						console.error(error.code);
