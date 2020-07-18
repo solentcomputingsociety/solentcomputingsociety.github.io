@@ -10,6 +10,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 	if (page_ref == "d2a57dc1d883fd21fb9951699df71cc7"){
 		scripts.push("https://www.gstatic.com/firebasejs/7.15.0/firebase-database.js");
 		scripts.push("https://www.gstatic.com/firebasejs/7.15.0/firebase-storage.js");
+		scripts.push("https://www.gstatic.com/firebasejs/7.15.0/firebase-messaging.js");
 	}
 	var load_remains = scripts.length;
 	for (var i = 0; i < scripts.length; i++) {
@@ -612,6 +613,27 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					});
 					firebase.firestore().enablePersistence().catch(function(error){
 						cache_avaliable = false;
+					});
+					var notification_state = 0;
+					const messaging = firebase.messaging();
+					messaging.usePublicVapidKey("BKAhDaPyPBFZtwQq9w7RKRbKjFbAwLfCYL2I-dprXCNyqhWPSHuiszuFuCwt0OwgmGUKGVe0G6963qruCz2cfSc");
+					messaging.requestPermission().then(function(){
+						console.log(messaging.getToken());
+						notification_state = 1;
+					}).catch(function(error){
+						console.error(error.code);
+						if (error.code == "messaging/permission-blocked"){
+							notification_state = -1;
+						} else {
+							notification_state = -2;
+						}
+					});
+					messaging.onMessage(function(payload){
+						var title = payload.data.title || "Notification";
+						var content = payload.data.content || "";
+						if (content.trim().length > 0){
+							alert(title,content);
+						}
 					});
 					sub_page_ref_core_loaded = false;
 					["/app/img/refresh_loading.gif","/app/img/map_loading.gif"].forEach(function(img){
