@@ -912,7 +912,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							});
 						});
 						var update_events = () => new Promise(function(resolve, reject){
-							var url = "https://sheets.googleapis.com/v4/spreadsheets/1n8XteyNorvi8FFpsaUGdya2Tiqpxa1Rx6yisywyMTCc/values/Events?key=AIzaSyADMO1Aa_JhGr3yxi_KzrDZMWfYXhICuV8";
+							var url = "https://sheets.googleapis.com/v4/spreadsheets/1n8XteyNorvi8FFpsaUGdya2Tiqpxa1Rx6yisywyMTCc/values/Events?key=AIzaSyBCvNB0vOm2GDbF_IrId2w-lvkbSh0PX4Y";
 							try {
 								function add_pub(events){
 									event = events || [];
