@@ -235,9 +235,44 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 
 			*/
 		],
-		"Year of study": ["Foundation", "1st", "2nd", "3rd", "4th", "Placement year", "Masters"],
+		"Year of study": [
+			"Foundation",
+			"1st",
+			"2nd",
+			"3rd",
+			"4th",
+			"Placement year",
+			"Masters"
+			/*
+				WARNING!
+
+				Any changes made to list of subjects should be appended and never removed or inserted wherever (even if it is not alphabetical) - Always append to the list!
+
+			*/
+		],
 		"Intro": 1,
-		"Relationship status": ["Single", "In a relationship", "Open to offers", "😏", "🍆", "🍑", "Married", "It's complicated", "You be you", "Love struck", "Single and ready to mingle", "HMU", "Bored", "Waiting..."],
+		"Relationship status": [
+			"Single",
+			"In a relationship",
+			"Open to offers",
+			"😏",
+			"🍆",
+			"🍑",
+			"Married",
+			"It's complicated",
+			"You be you",
+			"Love struck",
+			"Single and ready to mingle",
+			"HMU",
+			"Bored",
+			"Waiting..."
+			/*
+				WARNING!
+
+				Any changes made to list of subjects should be appended and never removed or inserted wherever (even if it is not alphabetical) - Always append to the list!
+
+			*/
+		],
 		"Favourite lecturer": 0,
 		"Favourite food": 0,
 		"Favourite drink": 0,
