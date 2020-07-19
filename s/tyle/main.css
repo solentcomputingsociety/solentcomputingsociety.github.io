@@ -737,7 +737,7 @@ div.event_content_container.dynamic_tables {
 	display: inline-table;
 }
 div.priority_event {
-	width: 65ch;
+	width: 54ch;
 }
 div.event_type_standard > div {
 	background-color: #E4D7F5;
@@ -745,10 +745,10 @@ div.event_type_standard > div {
 div.event_type_standard.priority_event > div {
 	background-color: #A479E2;
 }
-div.event_type_hackathon > div {
+div.event_type_competition > div {
 	background-color: #C9DAF8;
 }
-div.event_type_hackathon.priority_event > div {
+div.event_type_competition.priority_event > div {
 	background-color: #4A86E8;
 }
 div.event_type_talks > div {
