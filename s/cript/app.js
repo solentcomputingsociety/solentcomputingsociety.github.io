@@ -732,6 +732,12 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							return {lp:"nav_loc_applets",main:true};
 						case "pub":
 							return {lp:"nav_loc_pub",main:true};
+						case "controls":
+							if (hash.length == 2){
+								user_view_about = hash[1];
+								return {lp:"nav_loc_controls",add:hash[1],main:true};
+							}
+							return {lp:"nav_loc_controls",main:true};
 						case "profile":
 							if (hash.length == 2){
 								user_view_about = hash[1];
@@ -796,7 +802,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				new ResizeObserver(event_resize).observe(document.body);
 				firebase.auth().onAuthStateChanged(function(user) {
 					if (user) {
-						var sub_pages = ["nav_loc_messages","nav_loc_events","nav_loc_members","nav_loc_pub","nav_loc_applets"];
+						var sub_pages = ["nav_loc_messages","nav_loc_events","nav_loc_members","nav_loc_applets"];
 						var sub_page = sub_pages[0];
 						var contents = {posts:{},users:[],events:true,pub:"tbc",applets:-1};
 						sub_page_link_generation = 0;
@@ -857,9 +863,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									return doc_data;
 								});
 								var positions = {"events_organiser":null,"president":null,"social_secretary":null,"treasurer":null,"vice-president":null,data:null};
-								positions.data = await firebase.firestore().collection("users").doc("positions").get();
+								await firebase.firestore().collection("users").doc("positions").get().then(function(positions_data){
+									positions.data = positions_data.data();
+								});
 								try {
-									positions.data = positions.data.data();
 									for (var positional_role in positions.data){
 										if (positions.data[positional_role] != ""){
 											positions[positional_role] = positions.data[positional_role];
@@ -1172,14 +1179,25 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						var pubs_data = [];
 						var user_view_about = -1;
 						var cached_about = [];
+						var valid_setup = false;
 						var load_page = async function(page_id,sub_ref){
+							if (!valid_setup){
+								return;
+							}
 							page_id = page_id || sub_page;
 							sub_ref = sub_ref || false;
 							sub_page = page_id;
 							var sub_pages_rel = sub_pages;
+							sub_pages_rel.push("nav_loc_pub");
+							var is_president = contents.users[1].president == firebase.auth().currentUser.uid;
 							sub_pages_rel.push("nav_loc_member_about");
+							if (!is_president && page_id == "nav_loc_controls"){
+								page_id = "nav_loc_events";
+								sub_ref = false;
+							}
 							if (sub_pages_rel.indexOf(page_id) < 0){
-								return;
+								page_id = "nav_loc_events";
+								sub_ref = false;
 							}
 							var out = {html:null};
 							var img = [];
@@ -1662,6 +1680,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																}
 															}
 														}).catch(function(error){
+															return;
 															if (document.getElementById("about_me_container").getAttribute("uid") == uid_ref){
 																document.getElementById("about_me_loading").classList.add("error");
 																document.getElementById("about_me_container").classList.remove("loading")
@@ -1983,7 +2002,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								case "nav_loc_pub":
 									hash_ref = "pub";
 									document.title = "Weekly pub | Solent Computing Society";
-									var is_president = contents.users[1].president == firebase.auth().currentUser.uid;
 									out.html = "<div class=\"side_margin\"><p class=\"center_text\">";
 									if (is_president) {
 										if (pubs_data.length == 0){
@@ -1998,25 +2016,28 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												alert("Error:", "Failed to load pub data!\n" + error.message);
 											});
 										}
-										out.html += "Select pub:</p><div class=\"center_text\"><select id=\"pub_selection\">";
+										out.html += "<div id=\"select_pub_container\"><p class=\"center_text\">Select pub:</p><div class=\"center_text\"><select id=\"pub_selection\">";
 										for (var i = 0; i < pubs_data.length; i++) {
 											out.html += "<option value=\"" + pubs_data[i].id + "\" id=\"" + pubs_data[i].id + "\"" + {true:" selected=\"selected\"",false:""}[contents.pub.id == pubs_data[i].id] + ">" + pubs_data[i].name + "</option>"
 										}
-										out.html += "</select> or <a title=\"Randomly select a pub\" id=\"pub_selection_randomiser\">Randomise</a>.</div>";
+										out.html += "</select> or <a title=\"Randomly select a pub\" id=\"pub_selection_randomiser\">Randomise</a>.</div></div>";
 										var pub_selection_update_func = async function(){
 											var selected_pub = pubs_data[document.getElementById("pub_selection").selectedIndex].id;
 											var publish_date = new Date();
 											if (!(new Date().getDay() == 3 && new Date().getHours() <= 19)){
 												publish_date = publish_date.setDate(publish_date.getDate() + (7 + 3 - publish_date.getDay()) % 7);
 											}
+											document.getElementById("page_render").innerHTML = "<div id=\"loading_progress\"><div id=\"load_spinner\"></div><p class=\"center_text margin_top no_interact\">Updating weekly pub...</p></div>";
 											firebase.firestore().collection("places").doc("pubs").set({
 												date: firebase.firestore.Timestamp.fromDate(new Date(publish_date)),
 												this_week: selected_pub,
 											}).then(async function(){
 												await update_pub();
+												await update_events();
 												load_page("nav_loc_pub");
 											}).catch(function(error){
-												alert("Error:","Failed to load list of pubs!\n" + error.message);
+												alert("Error:","Failed to update weekly pub!\n" + error.message);
+												error_show("failed_weekly_pub");
 											});
 										};
 										add.click.push(["pub_selection_randomiser",function(){
@@ -2042,6 +2063,334 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										out.html += "<p class=\"center_text no_interact\">Unable to load this week's pub!</p></div>";
 									} else {
 										out.html += "<p class=\"center_text no_interact\">This week we will be going to:</p><h2 class=\"center_text\">" + contents.pub.name + "</h2><p class=\"center_text\">" + contents.pub.address + "</p><p class=\"center_text\">" + contents.pub.postcode + "</p></div><iframe src=\"https://maps.google.com/maps?q=" + contents.pub.geo[0] + "," + contents.pub.geo[1] + "&z=18&output=embed\" id=\"pub_map\" frameborder=\"0\" style=\"border:0;background-image:url(\'" + img_blob("/app/img/map_loading.gif",false,true) + "\')\" allowfullscreen=\"\" aria-hidden=\"false\" tabindex=\"0\"></iframe>";
+									}
+									break;
+								case "nav_loc_controls":
+									hash_ref = "controls";
+									if (!is_president){
+										document.title = "Loading... | Solent Computing Society";
+										out.html = "<p class=\"center_text no_interact\">Loading...</p></div>";
+										add.call_back.push(function(){
+											localStorage.removeItem("profile_image");
+											firebase.auth().signOut();
+											location.href = "/login";
+										});
+									} else if (sub_ref != false) {
+										if (sub_ref == "appoint"){
+											hash_ref = "controls/appoint";
+											document.title = "Appoint positions | Solent Computing Society";
+											var appoint_title_default = "Appoint positions";
+											out.html = "<div class=\"side_margin no_interact\"><h2 class=\"center_text\" id=\"appoint_positions_header\">" + appoint_title_default + ":</h2><p class=\"center_text\" id=\"appoint_positions_description\">Appoint new members to society positions.</p><br><div id=\"positions_content_container_edit\">";
+											add.call_back.push(async function(){
+												await update_users().then(function(){
+													var set_selections = JSON.parse(JSON.stringify(contents.users[1]));
+													var selections = "<div class=\"side_margin center_text\" id=\"appoint_category_selection_buttons\"><div class=\"position_selection_button small_bottom\" id=\"position_select_button_president\" title=\"Click to select\"><h4 class=\"no_bottom\">President:</h4><div id=\"president_selection_text_container\">" + {true:(function(){
+														for (let i = 0; i < contents.users[0].length; i++) {
+															if (contents.users[0][i].id == contents.users[1].president){
+																return contents.users[0][i].name;
+															}
+														}
+														return "Click to select";
+													})(),false:"Click to select"}[contents.users[1].president != null] + "</div></div><div class=\"position_selection_button small_bottom\" id=\"position_select_button_vice-president\" title=\"Click to select\"><h4 class=\"no_bottom\">Vice-president:</h4><div id=\"vice-president_selection_text_container\">" + {true:(function(){
+														for (let i = 0; i < contents.users[0].length; i++) {
+															if (contents.users[0][i].id == contents.users[1]["vice-president"]){
+																return contents.users[0][i].name;
+															}
+														}
+														return "Click to select";
+													})(),false:"Click to select"}[contents.users[1].president != null] + "</div></div><div class=\"position_selection_button small_bottom\" id=\"position_select_button_treasurer\" title=\"Click to select\"><h4 class=\"no_bottom\">Treasurer:</h4><div id=\"treasurer_selection_text_container\">" + {true:(function(){
+														for (let i = 0; i < contents.users[0].length; i++) {
+															if (contents.users[0][i].id == contents.users[1].treasurer){
+																return contents.users[0][i].name;
+															}
+														}
+														return "Click to select";
+													})(),false:"Click to select"}[contents.users[1].president != null] + "</div></div><div class=\"position_selection_button small_bottom\" id=\"position_select_button_events_organiser\" title=\"Click to select\"><h4 class=\"no_bottom\">Events organiser:</h4><div id=\"events_organiser_selection_text_container\">" + {true:(function(){
+														for (let i = 0; i < contents.users[0].length; i++) {
+															if (contents.users[0][i].id == contents.users[1].events_organiser){
+																return contents.users[0][i].name;
+															}
+														}
+														return "Click to select";
+													})(),false:"Click to select"}[contents.users[1].president != null] + "</div></div><div class=\"position_selection_button small_bottom\" id=\"position_select_button_social_secretary\" title=\"Click to select\"><h4 class=\"no_bottom\">Social secretary:</h4><div id=\"social_secretary_selection_text_container\">" + {true:(function(){
+														for (let i = 0; i < contents.users[0].length; i++) {
+															if (contents.users[0][i].id == contents.users[1].social_secretary){
+																return contents.users[0][i].name;
+															}
+														}
+														return "Click to select";
+													})(),false:"Click to select"}[contents.users[1].president != null] + "</div></div><br><br><a id=\"save_appointed_positions\" title=\"Click to save the appointed positions\">Save the appointed positions</a></div></div></div>";
+													var user_selection = document.createElement("div");
+													user_selection.setAttribute("id","user_list_container");
+													user_selection.classList.add("hide");
+													contents.users[0].forEach(user => {
+														var user_select = document.createElement("div");
+														user_select.classList.add("small_bottom","user_selection_list_item","no_interact");
+														user_select.innerHTML = "<table uid=\"" + user.id + "\"><tr><td valign=\"middle\" width=\"35px\"><div style=\"background-image: url(\'" + img_blob(user.photo,false,true) + "\');\" class=\"profile_image_select_small\"></div></td><td valign=\"middle\" class=\"profile_name_select_small\">" + user.name + "</td></tr></table>";
+														user_select.addEventListener("click",function(e){
+															if (selection_mode == false){
+																return;
+															}
+															var parent_check = 4;
+															var reference_check = e.target;
+															var user_id = -1;
+															while (parent_check >= 0){
+																if (reference_check.hasAttribute("uid")){
+																	user_id = reference_check.getAttribute("uid");
+																	break;
+																} else {
+																	reference_check = reference_check.parentNode;
+																	parent_check -= 1;
+																	user_id = -1;
+																}
+															}
+															if (user_id == -1){
+																return;
+															} else {
+																for (let i = 0; i < contents.users[0].length; i++) {
+																	if (contents.users[0][i].id == user_id){
+																		if (["president","vice-president","treasurer","events_organiser","social_secretary"].indexOf(selection_mode) >= 0){
+																			set_selections[selection_mode] = user_id;
+																			document.getElementById(selection_mode + "_selection_text_container").innerText = contents.users[0][i].name;
+																			user_selection_display(null,false);
+																		}
+																		return;
+																	}
+																}
+															}
+														});
+														user_selection.appendChild(user_select);
+													});
+													var remove_user = document.createElement("div");
+													remove_user.innerText = "Depose this position?"
+													remove_user.classList.add("small_bottom","user_selection_list_item","no_interact");
+													remove_user.setAttribute("depose","true");
+													remove_user.setAttribute("id","depose_selection");
+													remove_user.addEventListener("click",function(){
+														set_selections[selection_mode] = null;
+														document.getElementById(selection_mode + "_selection_text_container").innerText = "Deposed";
+														user_selection_display(null,false);
+													});
+													user_selection.insertBefore(remove_user,user_selection.firstChild);
+													document.getElementById("positions_content_container_edit").innerHTML = selections;
+													document.getElementById("positions_content_container_edit").appendChild(user_selection);
+													var selection_mode = false;
+													function user_selection_display(category,show){
+														for(var user_iteration=user_selection.firstChild; user_iteration!==null; user_iteration=user_iteration.nextSibling) {
+															user_iteration.classList.remove("hide");
+															if (user_iteration.hasAttribute("depose")){
+																continue;
+															}
+															var uid_selector = user_iteration.firstChild;
+															if (uid_selector.hasAttribute("uid")){
+																["president","vice-president","treasurer","events_organiser","social_secretary"].forEach(function(position){
+																	if(set_selections[position] == uid_selector.getAttribute("uid")){
+																		user_iteration.classList.add("hide");
+																	}
+																});
+															}
+														}
+														if (show){
+															document.getElementById("appoint_positions_header").innerText = category + ":";
+															document.getElementById("appoint_positions_description").classList.add("hide");
+															document.getElementById("appoint_category_selection_buttons").classList.add("hide");
+															document.getElementById("user_list_container").classList.remove("hide");
+															document.getElementById("save_appointed_positions").removeAttribute("confirm");
+															document.getElementById("save_appointed_positions").innerText = "Save the appointed positions";
+														} else {
+															document.getElementById("appoint_positions_header").innerText = appoint_title_default + ":";
+															document.getElementById("appoint_positions_description").classList.remove("hide");
+															document.getElementById("appoint_category_selection_buttons").classList.remove("hide");
+															document.getElementById("user_list_container").classList.add("hide");
+														}
+													}
+
+													document.getElementById("position_select_button_president").addEventListener("click",function(){
+														selection_mode = "president";
+														user_selection_display("Select new President",true);
+													});
+													document.getElementById("position_select_button_vice-president").addEventListener("click",function(){
+														selection_mode = "vice-president";
+														user_selection_display("Select new Vice-President",true);
+													});
+													document.getElementById("position_select_button_treasurer").addEventListener("click",function(){
+														selection_mode = "treasurer";
+														user_selection_display("Select new Treasurer",true);
+													});
+													document.getElementById("position_select_button_events_organiser").addEventListener("click",function(){
+														selection_mode = "events_organiser";
+														user_selection_display("Select new Events Organiser",true);
+													});
+													document.getElementById("position_select_button_social_secretary").addEventListener("click",function(){
+														selection_mode = "social_secretary";
+														user_selection_display("Select new SocialSecretary",true);
+													});
+													document.getElementById("save_appointed_positions").addEventListener("click",function(){
+														var confirmation_button = document.getElementById("save_appointed_positions");
+														if (set_selections["president"] == null){
+															alert("Error","You cannot leave the position of president as \"deposed\".\n\nIf this is due to occurences in voting which had led to the position being open, you are required to remain president (on this service, until you are able to appoint a new president). This service requires a president to be in control at all times!");
+															return;
+														}
+														if (JSON.stringify(contents.users[1]) != JSON.stringify(set_selections)){
+															if (confirmation_button.hasAttribute("confirm")){
+																if (confirmation_button.getAttribute("confirm") == "true"){
+																	document.getElementById("positions_content_container_edit").innerHTML = "<div id=\"loading_progress\" class=\"margin_top\"><div id=\"load_spinner\"></div><p class=\"center_text side_margin no_interact margin_top\">Appointing committee positions...</p></div>";
+																	document.getElementById("appoint_positions_header").classList.add("hide");
+																	document.getElementById("appoint_positions_description").classList.add("hide");
+																	firebase.firestore().collection("users").doc("positions").set(set_selections).then(function(){
+																		if (set_selections.president != firebase.auth().currentUser.uid){
+																			location.reload();
+																		} else {
+																			document.getElementById("appoint_positions_header").classList.remove("hide");
+																			document.getElementById("appoint_positions_description").classList.remove("hide");
+																			load_page("nav_loc_controls","appoint");
+																		}
+																	}).catch(function(error){
+																		alert("Error","Failed to set new appointed roles [ref:&nbsp;positions/" + error.code + "]");
+																		load_page("nav_loc_controls","appoint");
+																	});
+																	return;
+																}
+															}
+															alert("New society roles","President:\n  " + (function(){
+																for (let i = 0; i < contents.users[0].length; i++) {
+																	if (contents.users[0][i].id == set_selections["president"]){
+																		return contents.users[0][i].name;
+																	}
+																}
+															})() + "\n\nVice-president:\n  " + (function(){
+																if (set_selections["vice-president"] == null){
+																	return "Deposed";
+																} else {
+																	return (function(){
+																		for (let i = 0; i < contents.users[0].length; i++) {
+																			if (contents.users[0][i].id == set_selections["vice-president"]){
+																				return contents.users[0][i].name;
+																			}
+																		}
+																	})();
+																}
+															})() + "\n\nTreasurer:\n  " + (function(){
+																if (set_selections["treasurer"] == null){
+																	return "Deposed";
+																} else {
+																	return (function(){
+																		for (let i = 0; i < contents.users[0].length; i++) {
+																			if (contents.users[0][i].id == set_selections["treasurer"]){
+																				return contents.users[0][i].name;
+																			}
+																		}
+																	})();
+																}
+															})() + "\n\nEvents organiser:\n  " + (function(){
+																if (set_selections["events_organiser"] == null){
+																	return "Deposed";
+																} else {
+																	return (function(){
+																		for (let i = 0; i < contents.users[0].length; i++) {
+																			if (contents.users[0][i].id == set_selections["events_organiser"]){
+																				return contents.users[0][i].name;
+																			}
+																		}
+																	})();
+																}
+															})() + "\n\nSocial secretary:\n  " + (function(){
+																if (set_selections["social_secretary"] == null){
+																	return "Deposed";
+																} else {
+																	return (function(){
+																		for (let i = 0; i < contents.users[0].length; i++) {
+																			if (contents.users[0][i].id == set_selections["social_secretary"]){
+																				return contents.users[0][i].name;
+																			}
+																		}
+																	})();
+																}
+															})() + "\n\nIf you are sure you wish to continue with setting the society committee members, please click the button that says \"I confirm that these are the roles that I wish to appoint\" - once you close this dialog!");
+															confirmation_button.setAttribute("confirm","true");
+															confirmation_button.innerText = "I confirm that these are the roles that I wish to appoint";
+														} else {
+															alert("To change the society committe members, you must at least select one different member to be: appointed, or deposed; to a position.")
+														}
+													});
+												}).catch(function(error){
+													alert("Error","Failed to load appointed user data [ref:&nbsp;positions/" + error.code + "]");
+													load_page("nav_loc_controls","appoint");
+													return;
+												});
+											});
+										} else if (sub_ref == "banner"){
+											hash_ref = "controls/banner";
+											document.title = "Banner controls | Solent Computing Society";
+											out.html = "<div class=\"side_margin\"><h2 class=\"center_text no_interact\">Banner controls:</h2><p class=\"center_text no_interact\">Show a banner message to every user whenever they view the society website webapp.</p><div id=\"banner_content_container_edit\">";
+											add.call_back.push(async function(){
+												var banner = false;
+												await firebase.firestore().collection("blog").doc("banner").get().then(function(banner_content){
+													banner_content = banner_content.data();
+													banner = {
+														contents: banner_content.contents,
+														show: banner_content.show,
+													}
+												}).catch(function(error){
+													banner = false;
+													alert("Error","Failed to load banner contents [ref:&nbsp;banner/" + error.code + "]");
+												});
+												if (banner === false){
+													load_page("nav_loc_controls");
+													return;
+												}
+												document.getElementById("banner_content_container_edit").innerHTML = "<div class=\"margin_top\"><textarea placeholder=\"What should the banner message say?\" id=\"banner_message_content\" maxlength=\"512\">" + banner.contents + "</textarea><br><table width=\"100%\"><tr><td align=\"left\"><label for=\"enable_banner\" class=\"no_interact\">Show banner: <input type=\"checkbox\" id=\"enable_banner\"" + {true:" checked=\"checked\"",false:""}[banner.show] + "></label></td><td align=\"right\"><a id=\"banner_set_confirmation\">Click to set banner</a><span id=\"banner_set_loading\" class=\"hide no_interact\">Saving...</span></td></tr></table></div>";
+												document.getElementById("banner_set_confirmation").addEventListener("click",function(e){
+													var banner = {
+														contents: document.getElementById("banner_message_content").value,
+														show: document.getElementById("enable_banner").checked,
+													};
+													if (banner.contents.length > 512) {
+														alert("Error","Banner text has a limit of 512 characters!");
+														return;
+													}
+													e.target.classList.add("hide");
+													document.getElementById("banner_set_loading").classList.remove("hide");
+													document.getElementById("banner_message_content").setAttribute("disabled","disabled");
+													document.getElementById("enable_banner").setAttribute("disabled","disabled");
+													firebase.firestore().collection("blog").doc("banner").set(banner).then(function(){
+														document.getElementById("banner_message_content").removeAttribute("disabled","disabled");
+														document.getElementById("enable_banner").removeAttribute("disabled","disabled");
+														document.getElementById("banner_set_loading").classList.add("hide");
+														e.target.classList.remove("hide");
+														if (banner.show){
+															document.getElementById("banner_container").classList.remove("hide");
+															document.getElementById("banner_contents").innerText = banner.contents;
+														} else {
+															document.getElementById("banner_container").classList.add("hide");
+														}
+													}).catch(function(error){
+														document.getElementById("banner_message_content").removeAttribute("disabled","disabled");
+														document.getElementById("enable_banner").removeAttribute("disabled","disabled");
+														alert("Error","Failed to load banner contents [ref:&nbsp;banner/" + error.code + "]");
+														document.getElementById("banner_set_loading").classList.add("hide");
+														e.target.classList.remove("hide");
+													});
+												});
+											});
+										} else {
+											load_page("nav_loc_controls");
+											return;
+										}
+										out.html += "<div id=\"loading_progress\" class=\"margin_top\"><div id=\"load_spinner\"></div><p class=\"center_text side_margin no_interact margin_top\">Gathering the latest content...</p></div></div></div></div>";
+										sub_ref = false;
+									} else {
+										document.title = "Presidential controls | Solent Computing Society";
+										out.html = "<div class=\"side_margin no_interact\"><h2 class=\"center_text no_interact\">Presidential controls:</h2><p class=\"center_text no_interact\">Make changes and updates for the society by following the hotlinks below:</p><br><p class=\"center_text no_bottom\"><a href=\"https://docs.google.com/spreadsheets/d/1n8XteyNorvi8FFpsaUGdya2Tiqpxa1Rx6yisywyMTCc/edit\" target=\"_blank\" title=\"Open events spreadsheet\">Update events</a></p><br><p class=\"center_text no_bottom\"><a href=\"https://console.firebase.google.com/project/solent-computing-society/authentication/users\" target=\"_blank\" title=\"Manage member list\">Manage members</a></p><br><p class=\"center_text no_bottom\"><a id=\"nav_loc_pub\">Set weekly pub</a></p><br><p class=\"center_text no_bottom\"><a id=\"nav_loc_appoint_position\">Appoint positions</a></p><br><p class=\"center_text no_bottom\"><a id=\"nav_loc_banner\">Banner controls</a></p></div>";
+										add.click.push(["nav_loc_pub",function(){
+											load_page("nav_loc_pub");
+										}]);
+										add.click.push(["nav_loc_appoint_position",function(){
+											load_page("nav_loc_controls","appoint");
+										}]);
+										add.click.push(["nav_loc_banner",function(){
+											load_page("nav_loc_controls","banner");
+										}]);
 									}
 									break;
 							}
@@ -2086,7 +2435,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								document.getElementById("redundant_padding").style.minHeight = (document.getElementById("banner_contents").offsetHeight + 20 - (16 * 4)) + "px";
 							} catch(e){};
 						}
-						var error_show = function(animation_state){
+						var error_show = function(animation_state,state){
+							state = state || "";
+							if (state == ""){
+								state = "failed_loading";
+							}
 							animation_state = animation_state || 0;
 							var page_render = document.getElementById("page_render");
 							switch (animation_state){
@@ -2097,7 +2450,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									page_render.classList.add("fadeout");
 									break;
 								case 2:
-									page_render.innerHTML = "<div class=\"spacer\"></div><p id=\"failed_loading\" class=\"side_padding center_text no_interact\"></p>";
+									page_render.innerHTML = "<div class=\"spacer\"></div><p id=\"" + state + "\" class=\"side_padding center_text no_interact\"></p>";
 									page_render.classList.remove("fadeout");
 									break;
 								case 3:
@@ -2110,6 +2463,20 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						}
 						setTimeout(function () {
 							update_users().then(async function(e){
+								if (contents.users[1].president == firebase.auth().currentUser.uid){
+									sub_pages.push("nav_loc_controls");
+									var li_controls = document.createElement("li");
+									li_controls.setAttribute("id","nav_loc_controls");
+									li_controls.classList.add("disabled");
+									li_controls.innerText = "Controls";
+									li_controls.addEventListener("click",function(e){
+										if (e.target.classList.contains("disabled")){
+											return;
+										}
+										load_page("nav_loc_controls");
+									});
+									document.getElementById("base_nav_container").appendChild(li_controls);
+								}
 								var user_set_up = -1;
 								for (var i = contents.users[0].length - 1; i >= 0; i--) {
 									if (contents.users[0][i].id == firebase.auth().currentUser.uid) {
@@ -2128,34 +2495,32 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								await update_pub().then(async function(e){
 									await update_events();
 									setInterval(function(){update_events(),update_pub()},600000);
-									var valid_setup = true;
 									await firebase.firestore().collection("blog").doc("banner").get().then(async function(banner){
-										if (banner.exists){
-											banner = banner.data();
-											if (banner.show){
-												var banner_contents = document.getElementById("banner_contents");
-												banner_contents.innerHTML = banner.contents;
-												banner_contents.setAttribute("title","Click to dismiss");
-												document.getElementById("banner_main").addEventListener("click",function(){
-													document.getElementById("banner_container").classList.add("hide");
-													document.getElementById("page_render").classList.remove("banner_top");
-													try {
-														document.getElementById("redundant_padding").remove();															
-													} catch (e) {}
-												});
-												document.getElementById("banner_container").classList.remove("hide");
-												document.getElementById("page_render").classList.add("banner_top");
+										banner = banner.data();
+										if (banner.show){
+											var banner_contents = document.getElementById("banner_contents");
+											banner_contents.innerText = banner.contents;
+											banner_contents.setAttribute("title","Click to dismiss");
+											document.getElementById("banner_main").addEventListener("click",function(){
+												document.getElementById("banner_container").classList.add("hide");
+												document.getElementById("page_render").classList.remove("banner_top");
 												try {
 													document.getElementById("redundant_padding").remove();															
 												} catch (e) {}
-												function resize(){
-													try {
-														document.getElementById("redundant_padding").style.minHeight = (document.getElementById("banner_contents").offsetHeight + 20 - (16 * 4)) + "px";
-													} catch(e){};
-												}
-												new ResizeObserver(resize).observe(banner_contents)
+											});
+											document.getElementById("banner_container").classList.remove("hide");
+											document.getElementById("page_render").classList.add("banner_top");
+											try {
+												document.getElementById("redundant_padding").remove();															
+											} catch (e) {}
+											function resize(){
+												try {
+													document.getElementById("redundant_padding").style.minHeight = (document.getElementById("banner_contents").offsetHeight + 20 - (16 * 4)) + "px";
+												} catch(e){};
 											}
+											new ResizeObserver(resize).observe(banner_contents)
 										}
+										valid_setup = true;
 									}).catch(function(error){
 										if (!navigator.onLine){
 											location.href = "offline.html";
@@ -2194,8 +2559,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												load_page("nav_loc_pub");
 												break;
 											case "nav_loc_member_about":
-												user_view_about = hash_state_redirect.add;
 												load_page("nav_loc_member_about",hash_state_redirect.add);
+												break;
+											case "nav_loc_controls":
+												load_page("nav_loc_controls",hash_state_redirect.add);
 												break;
 											case "menu":
 												settings();
@@ -2241,6 +2608,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								settings("profile");
 								return;
 							}
+							if (!valid_setup){
+								return;
+							}
 							if (hash_state_redirect.main){
 								document.getElementById("page_menu").classList.add("hide");
 								document.getElementById("page_app").classList.remove("hide");
@@ -2271,8 +2641,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									load_page("nav_loc_pub");
 									break;
 								case "nav_loc_member_about":
-									user_view_about = hash_state_redirect.add;
 									load_page("nav_loc_member_about",hash_state_redirect.add);
+									break;
+								case "nav_loc_controls":
+									load_page("nav_loc_controls",hash_state_redirect.add);
 									break;
 								case "menu":
 									settings();
@@ -2425,11 +2797,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																var prof_pre_canvas_render = prof_pre_canvas.getContext("2d");
 																prof_pre_canvas_render.drawImage(prof_pre_loader, 0, 0, 50, 50);
 																var prof_image_base64 = prof_pre_canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
-																if (localStorageStorage.profile_image == prof_image_base64){
+																if (localStorage.profile_image == prof_image_base64){
 																	u_user_icon.classList.remove("loading");
 																	return;
 																} else {
-																	localStorageStorage.profile_image = prof_image_base64;
+																	localStorage.profile_image = prof_image_base64;
 																}
 															}
 															try {

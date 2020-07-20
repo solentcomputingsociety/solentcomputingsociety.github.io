@@ -65,7 +65,7 @@ html, body {
 .small {
 	font-size: small;
 }
-.user_reference_link {
+.user_reference_link, label,input[type=checkbox] {
 	cursor: pointer;
 }
 .loading {
@@ -211,7 +211,7 @@ div#s_user.menu * {
 div.input_container, div.input_container_about {
 	text-align: center;
 }
-div.input_container > input, div.input_container_about > input, div.input_container_about > select, div.input_container_about > textarea {
+div.input_container > input, div.input_container_about > input, div.input_container_about > select, div.input_container_about > textarea, textarea#banner_message_content {
 	width: 350px;
 	max-width: 80vw;
 	padding: 1vw 20px !important;
@@ -224,18 +224,42 @@ div.input_container > input, div.input_container_about > input, div.input_contai
 	-moz-box-sizing: content-box;
 	box-sizing: content-box;
 }
-div.input_container_about > input, div.input_container_about > select, div.input_container_about > textarea {
+div.input_container_about > input, div.input_container_about > select, div.input_container_about > textarea, textarea#banner_message_content {
 	box-sizing: border-box;
 	background-color: #FFFFFF;
 	width: 100%;
 	margin: 0 0 0.3em;
 }
-div.input_container_about > textarea {
+div.input_container_about > textarea, textarea#banner_message_content {
 	resize: none;
 	max-width: 100%;
 	min-width: 100%;
 	min-height: 171px;
 	max-height: 171px;
+}
+span#banner_set_loading {
+	cursor: progress;
+}
+div.profile_image_select_small {
+	background-size: 35px 35px;
+	background-repeat: no-repeat;
+	background-position: center;
+	width: 35px;
+	height: 35px;
+	display: inline-block;
+	border-radius: 35px;
+}
+div.position_selection_button {
+	cursor: pointer;
+}
+div.user_selection_list_item {
+	cursor: pointer;
+}
+div#depose_selection {
+	text-align: center;
+}
+td.profile_name_select_small {
+	padding-left: 10px;
 }
 div.input_container > input#login_submit {
 	background-color: #ffe1e1;
@@ -261,6 +285,10 @@ span#user_registration_action, p.cancel_verification {
 }
 input[type=submit]{
 	cursor: pointer;
+}
+div#loading_progress {
+	margin-top: 4em;
+	cursor: progress;
 }
 div#loading_progress > div#load_spinner {
 	border: 4.5px solid gray;
@@ -623,7 +651,7 @@ img.loading, span.loading, div#s_user_icon.loading {
 #about_me_loading.error {
 	padding-top: 4em;
 }
-#about_me_loading.error:before, p#failed_loading:before, p#applet_error {
+#about_me_loading.error:before, p#failed_loading:before, p#applet_error, p#failed_weekly_pub {
 	padding-top: 3.6em;
 	content: "Failed to load profile information!";
 	background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4IiB3aWR0aD0iNDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGg0OHY0OEgwVjB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTIyIDMwaDR2NGgtNHptMC0xNmg0djEyaC00em0xLjk5LTEwQzEyLjk0IDQgNCAxMi45NSA0IDI0czguOTQgMjAgMTkuOTkgMjBTNDQgMzUuMDUgNDQgMjQgMzUuMDQgNCAyMy45OSA0ek0yNCA0MGMtOC44NCAwLTE2LTcuMTYtMTYtMTZTMTUuMTYgOCAyNCA4czE2IDcuMTYgMTYgMTYtNy4xNiAxNi0xNiAxNnoiIGZpbGw9IiNlODE3MTciLz48L3N2Zz4=");
@@ -634,6 +662,9 @@ img.loading, span.loading, div#s_user_icon.loading {
 }
 p#failed_loading:before {
 	content: "Failed to load content!";
+}
+p#failed_weekly_pub:before {
+	content: "Failed to save updates to the weekly pub!";
 }
 p#applet_error {
 	content: " ";
@@ -821,6 +852,9 @@ iframe.applet_content_iframe {
 	background-color: #FFFFFF;
 	border-radius: 2em;
 	border: none;
+}
+div#select_pub_container {
+	margin-bottom: 3em;
 }
 #pub_map {
 	width: 90%;
