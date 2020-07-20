@@ -2160,7 +2160,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										if (!navigator.onLine){
 											location.href = "offline.html";
 										} else {
-											alert("Error","Unable to load content [ref: pub]");
+											alert("Error","Unable to load content [ref: banner]");
 											error_show();
 											valid_setup = false;
 										}
@@ -2216,7 +2216,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									if (!navigator.onLine){
 										location.href = "offline.html";
 									} else {
-										alert("Error","Unable to load content [ref:&nbsp;pub" + error.code + "]");
+										alert("Error","Unable to load content [ref:&nbsp;pub/" + error.code + "]");
 										error_show();
 									}
 								});
@@ -2224,7 +2224,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								if (!navigator.onLine){
 									location.href = "offline.html";
 								} else {
-									alert("Error","Unable to load content [ref:&nbsp;user-" + error.code + "]");
+									alert("Error","Unable to load content [ref:&nbsp;user/" + error.code + "]");
 									error_show();
 								}
 							});
