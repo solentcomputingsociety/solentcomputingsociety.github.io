@@ -449,16 +449,22 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				}
 				break;
 			case "7d2abf2d0fa7c3a0c13236910f30bc43":
-				var login_panel = document.getElementById("login_panel");
-				var load_spinner = document.getElementById("load_spinner");
-				var footer_content = document.getElementById("footer_content");
+				var login_panel;
+				var load_spinner;
+				var footer_content;
 				if (preload){
 					document.addEventListener("DOMContentLoaded", function(event){
+						login_panel = document.getElementById("login_panel");
+						load_spinner = document.getElementById("load_spinner");
+						footer_content = document.getElementById("footer_content");
 						login_panel.classList.add("hide");
 						load_spinner.classList.remove("hide");
 					});
 				} else {
 					var overide_redirect = false;
+					login_panel = document.getElementById("login_panel");
+					load_spinner = document.getElementById("load_spinner");
+					footer_content = document.getElementById("footer_content");
 					firebase.auth().onAuthStateChanged(function(user) {
 						if (user) {
 							footer_content.classList.add("hide");
@@ -527,17 +533,23 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				}
 				break;
 			case "5f4dcc3b5aa765d61d8327deb882cf99":
-				var login_panel = document.getElementById("login_panel");
-				var load_spinner = document.getElementById("load_spinner");
-				var footer_content = document.getElementById("footer_content");
+				var login_panel;
+				var load_spinner;
+				var footer_content;
 				if (preload){
 					document.title = "Loading... | Solent Computing Society";
 					document.addEventListener("DOMContentLoaded", function(event){
+						login_panel = document.getElementById("login_panel");
+						load_spinner = document.getElementById("load_spinner");
+						footer_content = document.getElementById("footer_content");
 						login_panel.classList.add("hide");
 						load_spinner.classList.remove("hide");
 					});
 				} else {
-					firebase.auth().onAuthStateChanged(function(user) {
+					login_panel = document.getElementById("login_panel");
+					load_spinner = document.getElementById("load_spinner");
+					footer_content = document.getElementById("footer_content");
+						firebase.auth().onAuthStateChanged(function(user) {
 						if (user) {
 							footer_content.classList.add("hide");
 							if (!user.emailVerified){
@@ -589,10 +601,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				}
 				break;
 			case "770cd2f0fc573368510bcf08355f9fbc":
-				var login_panel = document.getElementById("login_panel");
-				var load_spinner = document.getElementById("load_spinner");
-				var footer_content = document.getElementById("footer_content");
 				if (!preload){
+					var login_panel = document.getElementById("login_panel");
+					var load_spinner = document.getElementById("load_spinner");
+					var footer_content = document.getElementById("footer_content");
 					var overide_redirect = false;
 					var refresh_state_check = function (){
 						firebase.auth().onAuthStateChanged(function(user) {
