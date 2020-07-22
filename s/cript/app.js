@@ -1447,7 +1447,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														} catch (e) {
 															end_date = "";
 														}
-														out.html += "<div id=\"" + {true:"pub_link_event_ref",false:"event_ref_id-e" + (new Date(day).getTime() + time)}[pub] + "\" class=\"event_content_container" + {true:" dynamic_tables",false:""}[navigator.appVersion.indexOf("Chrome") != -1] + " event_type_" + event.split(" ").join("_") + {true:" priority_event",false:""}[priority] + "\"><div><h3 class=\"event_name\">" + contents.events[day][time][i][0] + "</h3><div><div class=\"center_text small\"><span>" + {true:"Started",false:"From"}[start_date <= new Date() || (start_date == new Date() && time < now)] + ": ";
+														out.html += "<div id=\"" + {true:"pub_link_event_ref",false:"event_ref_id-e" + (new Date(day).getTime() + time)}[pub] + "\" class=\"event_content_container" + {true:" dynamic_tables",false:""}[navigator.appVersion.indexOf("Chrome") != -1] + " event_type_" + event.split(" ").join("_") + {true:" priority_event",false:""}[priority] + "\"><div><h3 class=\"event_name\">" + contents.events[day][time][i][0] + "</h3><div><div class=\"center_text small\"><span>" + {true:"Started",false:"From"}[start_date.getTime() < date_check.getTime() || (start_date.getTime() == date_check.getTime() && parseInt(time) < now)] + ": ";
 														try {
 															if (start_date < new Date(day)){
 																out.html += ("0" + contents.events[day][time][i][3].getDate()).slice(-2) + "/" + ("0" + (contents.events[day][time][i][3].getMonth() + 1)).slice(-2) + "/" + contents.events[day][time][i][3].getFullYear();
