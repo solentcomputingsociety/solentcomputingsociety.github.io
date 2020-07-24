@@ -280,6 +280,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			*/
 		],
 		"Favourite lecturer": 0,
+		"Birthday": 5,
 		"Favourite food": 0,
 		"Favourite drink": 0,
 		"Favourite film": 0,
@@ -753,7 +754,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					firebase.firestore().settings({
 						cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
 					});
-					firebase.firestore().enablePersistence({synchronizeTabs:true}).catch(function(error){
+					firebase.firestore().enablePersistence({synchronizeTabs:false}).catch(function(error){
 						cache_avaliable = false;
 					});
 					sub_page_ref_core_loaded = false;
@@ -1587,13 +1588,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																document.getElementById("about_me_loading").classList.add("error");
 															}
 														}
-														if (cached_about.indexOf(uid_ref) >= 0 && cache_avaliable){
-															await firebase.firestore().disableNetwork();
-														}
+														await firebase.firestore().enableNetwork();
 														await firebase.firestore().collection("users/members/id/" + uid_ref + "/about/").get().then(async function(about){
-															if (cached_about.indexOf(uid_ref) < 0 && cache_avaliable){
-																cached_about.push(uid_ref);
-															}
 															about_docs = about.docs.map( doc => {
 																var doc_data = doc.data();
 																doc_data.id = doc.id;
@@ -1607,6 +1603,11 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																} else if (doc.id == "intro"){
 																	about["intro"] = doc.bio;
 																	about["relationship_status"] = doc.relationship_status;
+																	try {
+																		about["birthday"] = doc.birthday.toDate() || "";
+																	} catch (e) {
+																		about["birthday"] = "";
+																	}
 																} else if (doc.id == "favourite_things"){
 																	about["favourite_food"] = doc.food;
 																	about["favourite_drink"] = doc.drink;
@@ -1631,7 +1632,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	about[doc.id] = doc.is;
 																}
 															});
-															var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||0,"Intro":about["intro"]||"","Relationship status":about["relationship_status"]||0,"Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Favourite game": about["favourite_game"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Discord":about["discord"]||"","Youtube":about["youtube"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
+															var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||0,"Intro":about["intro"]||"","Relationship status":about["relationship_status"]||0,"Birthday": about["birthday"]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Favourite game": about["favourite_game"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Discord":about["discord"]||"","Youtube":about["youtube"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
 															try {
 																var about_me_container = document.getElementById("about_me_prof_container");
 																if (about_me_container.getAttribute("uid") == uid_ref && about_me_container.getAttribute("outputted") != "yes"){
@@ -1753,6 +1754,17 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	if (about_me["Relationship status"] > 0) {
 																		about_panel_out += "<h3>Relationship status:</h3><p>" + about_sections["Relationship status"][about_me["Relationship status"] - 1] + "</p>";
 																	}
+																	if (about_me["Birthday"] !== "") {
+																		about_panel_out += "<h3>Age:</h3><p>";
+																		var date_age = new Date(Date.now() - about_me["Birthday"].getTime());
+																		var is_birthday = "";
+																		if (about_me["Birthday"].getDate() == new Date().getDate()) {
+																			if (about_me["Birthday"].getMonth() == new Date().getMonth()) {
+																				is_birthday = " - Today 🎂";
+																			}
+																		}
+																		about_panel_out += Math.abs(date_age.getUTCFullYear() - 1970).toString() + " year" + {true:"s",false:""}[Math.abs(date_age.getUTCFullYear() - 1970) <= 1] + " old" + is_birthday + "</p>";
+																	}
 																	if (about_me["Favourite lecturer"].trim().length > 0) {
 																		about_panel_out += "<h3>Favourite lecturer:</h3><p>" + about_me["Favourite lecturer"].replace('<','&lt;').replace('>','&gt;') + "</p>";
 																	}
@@ -1786,6 +1798,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	document.getElementById("about_me_side_ref").outerHTML = "";
 																}
 															}
+                                                            cached_about.push(uid_ref+"/course");
+															cached_about.push(uid_ref+"/intro");
+															cached_about.push(uid_ref+"/favourite_things");
+															cached_about.push(uid_ref+"/social");
 														}).catch(function(error){
 															return;
 															if (document.getElementById("about_me_container").getAttribute("uid") == uid_ref){
@@ -1795,7 +1811,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																document.getElementById("about_me_side_ref").outerHTML = "";
 															}
 														});
-														await firebase.firestore().enableNetwork();
 													}
 												}
 											}
@@ -1860,13 +1875,17 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															applet_container_content.open();
 															const apis = ["users/list-all","users/list-current","users/about/intro","users/about/course","users/about/favourite_things","users/about/social","users/profile-picture"];
 															var valid = [true,0];
-															for (let ii = 0; ii < contents.applets[i].apis.length; ii++) {
-																const api = contents.applets[i].apis[ii];
-																valid[1] += 1;
-																if (api != undefined){
+															var api_relative_size = 0;
+															const api_reference_requested = JSON.parse(JSON.stringify(contents.applets[i].apis));
+															for (let ii = 0; ii < api_reference_requested.length; ii++) {
+																const api = api_reference_requested[ii];
+																if (api !== null){
+																	valid[1] += 1;
+																	api_relative_size += 1;
 																	if (apis.indexOf(api) < 0){
 																		valid[1] -= 1;
 																		valid[0] = false;
+																		api_relative_size -= 1;
 																	}
 																}
 															}
@@ -1959,6 +1978,12 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																							} else if (prerequisite == "intro"){
 																								about["Intro"] = doc.bio || "";
 																								about["Relationship status"] = {true:about_sections["Relationship status"][doc.relationship_status - 1],false:""}[doc.relationship_status > 0] || "";
+																								try {
+																									about["birthday"] = doc.birthday.toDate() || "";
+																									about["birthday"] = about["birthday"].getFullYear() + "-" + ("0" + (about["birthday"].getMonth() + 1)).slice(-2) + "-" + ("0" + about["birthday"].getDate()).slice(-2);
+																								} catch (e) {
+																									about["birthday"] = null;
+																								}
 																							} else if (prerequisite == "favourite_things"){
 																								about["Favourite food"] = doc.food || "";
 																								about["Favourite drink"] = doc.drink || "";
@@ -1986,6 +2011,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																							} else if (prerequisite == "intro"){
 																								about["Intro"] = "";
 																								about["Relationship status"] = "";
+																								about["birthday"] = null;
 																							} else if (prerequisite == "favourite_things"){
 																								about["Favourite food"] = "";
 																								about["Favourite drink"] = "";
@@ -2031,20 +2057,23 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																					});
 																				}
 																				var about_user_success = false;
-																				if (cached_about.indexOf(users[ii].id) >= 0 && cache_avaliable){
+																				if (cached_about.indexOf(users[ii].id+"/"+prerequisite) >= 0 && cache_avaliable){
 																					await firebase.firestore().disableNetwork().then(async function() {
 																						about_user_success = await get_user_data();
 																					});
-																					await firebase.firestore().enableNetwork();
 																				}
 																				if (!about_user_success) {
-																					about_user_success = await get_user_data();
-																					if (about_user_success == false){
-																						reject("Failed to load user data");
-																					}
+																					await firebase.firestore().enableNetwork().then(async function(){
+																						about_user_success = await get_user_data();
+																						if (about_user_success == false){
+																							reject("Failed to load user data");
+																						}
+																					});
+																				} else {
+																					await firebase.firestore().enableNetwork();
 																				}
 																				if (cache_avaliable){
-																					cached_about.push(users[ii].id);
+																					cached_about.push(users[ii].id+"/"+prerequisite);
 																				}
 																			}
 																			break;
@@ -2067,7 +2096,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															function error_applet(){
 																return "<html><head><style type=\"text/css\">body{padding:2em 1em;overflow-y:hidden;min-height:170px;background-color:#e3e3e3;background-repeat:no-repeat;background-position:center;background-size:140px;padding:1em;background-image:url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMjY2LjY2bW0iIGhlaWdodD0iMzI3LjU0bW0iIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDI2Ni42NiAzMjcuNTQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6Y2M9Imh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL25zIyIgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogPG1ldGFkYXRhPgogIDxyZGY6UkRGPgogICA8Y2M6V29yayByZGY6YWJvdXQ9IiI+CiAgICA8ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD4KICAgIDxkYzp0eXBlIHJkZjpyZXNvdXJjZT0iaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL1N0aWxsSW1hZ2UiLz4KICAgIDxkYzp0aXRsZS8+CiAgIDwvY2M6V29yaz4KICA8L3JkZjpSREY+CiA8L21ldGFkYXRhPgogPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzMuOTQyLC0yOC4xMDIpIiBmaWxsPSIjZmZmIj4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjEuODExLDI2LjY1NCkiPgogICA8ZyBzdHJva2U9IiMwMDAiPgogICAgPGcgZmlsbD0iI2ZmZiI+CiAgICAgPGVsbGlwc2UgdHJhbnNmb3JtPSJtYXRyaXgoLjk4NDg4IC0uMTczMjUgLjE2MTMzIC45ODY5IDAgMCkiIGN4PSI5MS44NDUiIGN5PSI5OS45NyIgcng9IjYyLjM4OSIgcnk9IjY1LjE4OCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjcuMzkxOCIgc3R5bGU9InBhaW50LW9yZGVyOmZpbGwgbWFya2VycyBzdHJva2UiLz4KICAgICA8Y2lyY2xlIGN4PSI1Ljg2OTciIGN5PSI3OS4xMTkiIHI9IjEzLjkxOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjguMTYzNiIgc3R5bGU9InBhaW50LW9yZGVyOmZpbGwgbWFya2VycyBzdHJva2UiLz4KICAgICA8cGF0aCBkPSJtMjAuMzA2IDgwLjM2OCAyNC4zMzYtMC42MTc4MyIgc3Ryb2tlLXdpZHRoPSI4Ii8+CiAgICAgPHBhdGggZD0ibTE2OS40NyA4MC42NyAyNC4zMzYtMC42MTc4MiIgc3Ryb2tlLXdpZHRoPSI4Ii8+CiAgICAgPGNpcmNsZSBjeD0iMjA1LjI3IiBjeT0iNzkuNzQxIiByPSIxMy45MTgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSI4LjE2MzYiIHN0eWxlPSJwYWludC1vcmRlcjpmaWxsIG1hcmtlcnMgc3Ryb2tlIi8+CiAgICA8L2c+CiAgICA8ZyBzdHJva2UtbGluZWNhcD0icm91bmQiPgogICAgIDxlbGxpcHNlIGN4PSI3Ni4zNDYiIGN5PSI3NC4zNjciIHJ4PSI2LjEyMDgiIHJ5PSI3LjM2NjYiIGZpbGw9IiMwMDAiIHN0cm9rZS13aWR0aD0iOCIgc3R5bGU9InBhaW50LW9yZGVyOmZpbGwgbWFya2VycyBzdHJva2UiLz4KICAgICA8ZWxsaXBzZSBjeD0iMTMzLjUzIiBjeT0iNzQuNjYyIiByeD0iNi4xMjA4IiByeT0iNy4zNjY2IiBmaWxsPSIjMDAwIiBzdHJva2Utd2lkdGg9IjgiIHN0eWxlPSJwYWludC1vcmRlcjpmaWxsIG1hcmtlcnMgc3Ryb2tlIi8+CiAgICAgPHBhdGggZD0ibTk4LjA2IDExOS4wNHM0LjI2MTQtMy41OTc1IDcuODAyOS0zLjYzNGMzLjU0MTYtMC4wMzY2IDYuNzYzMyAzLjY5MzIgNi43NjMzIDMuNjkzMiIgZmlsbD0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2LjQ5MjciLz4KICAgIDwvZz4KICAgPC9nPgogIDwvZz4KICA8ZyB0cmFuc2Zvcm09Im1hdHJpeCgtLjY0Mjc5IC0uNzY2MDQgLS43NjYwNCAuNjQyNzkgMjI0LjQgMTAzLjY1KSIgc3Ryb2tlPSIjMDAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS13aWR0aD0iOCI+CiAgIDxwYXRoIGQ9Im01My40NyAxNzQuMjYtMC4xMTAyOSAyNy4xODNzLTI3LjcwMi03LjcwOTgtMzEuMTE2IDMzLjY1M2MwLjIyNDcyIDEuNDQ4NyAyOS4zOSAyOC4zNCA1Ljg4MjYgMzcuNDg4LTEwLjgtMC42MjczLTguMjg5OS0xOS4xMTQtMTQuNzcxLTE5LjIxMS02LjQ4MTQtMC4wOTY1LTguMDg3My0wLjA5OTItOS43NzQgNS44MjE2cy0yLjI4OTQgMTMuODEtNy41MzM0IDEzLjc4NmMtNS4yNDQtMC4wMjQxLTkuODQwOS0xMS40NDYtOS44MTU0LTE1LjIyNHMxLjU3NjItMTMuNDM0IDEyLjM1OC0yMC4yODZjMC40OTkyMS02LjY5NzEtOC44MjM0LTQ4LjY1NyA1NC44OC02My4yMTF6Ii8+CiAgIDxwYXRoIGQ9Im0yMi4yNDMgMjM1LjFzLTYuMzg2NS0xLjA4NzEtMTAuNzc1LTEuMDg3MWMtNC4zODg4IDAtMTIuODc4IDMuNDYyMS0xMi44NzggMy40NjIxIi8+CiAgIDxwYXRoIGQ9Im0xLjAzOTUgMjEzLjgxIDIxLjY3NiA5LjUxMjIiLz4KICAgPHBhdGggZD0ibTEzLjU5MSAxOTQuMTcgMTUuNDI3IDE2LjQ1OCIvPgogICA8cGF0aCBkPSJtMzEuMjk3IDE4MS43MSA5LjY0NTIgMjAuMyIvPgogIDwvZz4KICA8ZyB0cmFuc2Zvcm09InJvdGF0ZSg5MCw0Ny43ODMsMTc2LjAzKSI+CiAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC01LjEyMDYgLjE3MzU5KSIgZmlsbD0iI2ZmZiI+CiAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLC0xMzMuMzUpIiBzdHJva2U9IiMwMDAiPgogICAgIDxnIGZpbGw9IiNmZmYiPgogICAgICA8cGF0aCBkPSJtNTMuOTA2IDE2NC40LTAuOTIwMzYgNzkuMDM3czEwLjYzMyAzOS42OSA1Mi45NTQgMzkuNDJjNDIuMzIyLTAuMjY5OSA1NC43MTktMzguMDA1IDU0LjcxOS0zOC4wMDVsLTAuNDEzOTktODAuMnoiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSI4Ii8+CiAgICAgIDxwYXRoIGQ9Im01Mi45ODYgMjQzLjQ0IDEwNy42NyAxLjQxNTR2MCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjgiLz4KICAgICAgPHBhdGggZD0ibTYzLjA1IDI2MC42OCA4Ny4xMjgtMC40NjMwNiIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgICAgPC9nPgogICAgIDxnIGZpbGw9IiMwMDAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIzLjE3ODMiPgogICAgICA8Y2lyY2xlIGN4PSI4My4wMjkiIGN5PSIxODguMDIiIHI9IjQuNDEwOSIgc3R5bGU9InBhaW50LW9yZGVyOmZpbGwgbWFya2VycyBzdHJva2UiLz4KICAgICAgPGNpcmNsZSBjeD0iMTA2LjI5IiBjeT0iMTg4LjAyIiByPSI0LjQxMDkiIHN0eWxlPSJwYWludC1vcmRlcjpmaWxsIG1hcmtlcnMgc3Ryb2tlIi8+CiAgICAgIDxjaXJjbGUgY3g9IjEzMC43MSIgY3k9IjE4OC4wMiIgcj0iNC40MTA5IiBzdHlsZT0icGFpbnQtb3JkZXI6ZmlsbCBtYXJrZXJzIHN0cm9rZSIvPgogICAgIDwvZz4KICAgIDwvZz4KICAgPC9nPgogIDwvZz4KICA8ZyB0cmFuc2Zvcm09InJvdGF0ZSgtOTYsMjYuNDQ5LDcyLjgxNykiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjgiPgogICA8cGF0aCBkPSJtNTMuNDcgMTc0LjI2LTAuMTEwMjkgMjcuMTgzcy0yNy43MDItNy43MDk4LTMxLjExNiAzMy42NTNjMC4yMjQ3MiAxLjQ0ODcgMjkuMzkgMjguMzQgNS44ODI2IDM3LjQ4OC0xMC44LTAuNjI3My04LjI4OTktMTkuMTE0LTE0Ljc3MS0xOS4yMTEtNi40ODE0LTAuMDk2NS04LjA4NzMtMC4wOTkyLTkuNzc0IDUuODIxNnMtMi4yODk0IDEzLjgxLTcuNTMzNCAxMy43ODZjLTUuMjQ0LTAuMDI0MS05Ljg0MDktMTEuNDQ2LTkuODE1NC0xNS4yMjRzMS41NzYyLTEzLjQzNCAxMi4zNTgtMjAuMjg2YzAuNDk5MjEtNi42OTcxLTguODIzNC00OC42NTcgNTQuODgtNjMuMjExeiIvPgogICA8cGF0aCBkPSJtMjIuMjQzIDIzNS4xcy02LjM4NjUtMS4wODcxLTEwLjc3NS0xLjA4NzFjLTQuMzg4OCAwLTEyLjg3OCAzLjQ2MjEtMTIuODc4IDMuNDYyMSIvPgogICA8cGF0aCBkPSJtMS4wMzk1IDIxMy44MSAyMS42NzYgOS41MTIyIi8+CiAgIDxwYXRoIGQ9Im0xMy41OTEgMTk0LjE3IDE1LjQyNyAxNi40NTgiLz4KICAgPHBhdGggZD0ibTMxLjI5NyAxODEuNzEgOS42NDUyIDIwLjMiLz4KICA8L2c+CiA8L2c+CiA8ZyBzdHJva2Utd2lkdGg9Ii4yNjQ1OCI+CiAgPHBhdGggZD0ibTY3LjQ4NSAyNzYuMjNoMjUuMTg4djguMzQ4MmgtMTYuMTIxdjEyLjM3OGgxNC42MDl2OC4zNDgyaC0xNC42MDl2MTIuOTU0aDE2LjQwOHY4LjM0ODJoLTI1LjQ3NnoiLz4KICA8cGF0aCBkPSJtMTE1LjI1IDI5OS4xMXEtMS43MjcyLTAuNjQ3Ny0zLjE2NjYtMC42NDc3LTEuOTQzMSAwLTMuMzgyNCAxLjA3OTUtMS4zNjc0IDEuMDc5NS0xLjg3MTEgMy4wMjI2djI0LjAzN2gtOC41NjQxdi0zNS45ODRoNi41NDlsMS4wMDc1IDQuMzE4aDAuMjg3ODdxMC45MzU1Ny0yLjM3NDkgMi42NjI4LTMuNjcwMyAxLjc5OTItMS4zNjc0IDQuMTAyMS0xLjM2NzQgMS43MjcyIDAgMy4zODI0IDAuNzE5Njd6Ii8+CiAgPHBhdGggZD0ibTEzNi4zMyAyOTkuMTFxLTEuNzI3Mi0wLjY0NzctMy4xNjY2LTAuNjQ3Ny0xLjk0MzEgMC0zLjM4MjQgMS4wNzk1LTEuMzY3NCAxLjA3OTUtMS44NzExIDMuMDIyNnYyNC4wMzdoLTguNTY0MXYtMzUuOTg0aDYuNTQ5bDEuMDA3NSA0LjMxOGgwLjI4Nzg3cTAuOTM1NTctMi4zNzQ5IDIuNjYyOC0zLjY3MDMgMS43OTkyLTEuMzY3NCA0LjEwMjEtMS4zNjc0IDEuNzI3MiAwIDMuMzgyNCAwLjcxOTY3eiIvPgogIDxwYXRoIGQ9Im0xMzkuMTQgMzA4LjYxcTAtOS41NzE2IDMuNzQyMy0xNC4yNDkgMy43NDIzLTQuNjc3OSAxMC40MzUtNC42Nzc5IDcuMTk2NyAwIDEwLjcyMyA0Ljc0OTggMy41MjY0IDQuNzQ5OCAzLjUyNjQgMTQuMTc4IDAgOS42NDM2LTMuNzQyMyAxNC4zMjEtMy43NDIzIDQuNjA1OS0xMC41MDcgNC42MDU5LTE0LjE3OCAwLTE0LjE3OC0xOC45Mjd6bTguODUyIDBxMCA1LjM5NzUgMS4yMjM0IDguMzQ4MiAxLjIyMzQgMi45NTA2IDQuMTAyMSAyLjk1MDYgMi43MzQ4IDAgNC4wMzAyLTIuNTE4OCAxLjM2NzQtMi41OTA4IDEuMzY3NC04Ljc4IDAtNS41NDE1LTEuMjIzNC04LjQyMDF0LTQuMTc0MS0yLjg3ODdxLTIuNTE4OCAwLTMuOTU4MiAyLjU5MDgtMS4zNjc0IDIuNTE4OC0xLjM2NzQgOC43MDh6Ii8+CiAgPHBhdGggZD0ibTE4OS40NiAyOTkuMTFxLTEuNzI3Mi0wLjY0NzctMy4xNjY2LTAuNjQ3Ny0xLjk0MzEgMC0zLjM4MjQgMS4wNzk1LTEuMzY3NCAxLjA3OTUtMS44NzExIDMuMDIyNnYyNC4wMzdoLTguNTY0MXYtMzUuOTg0aDYuNTQ5bDEuMDA3NSA0LjMxOGgwLjI4Nzg3cTAuOTM1NTctMi4zNzQ5IDIuNjYyOC0zLjY3MDMgMS43OTkyLTEuMzY3NCA0LjEwMjEtMS4zNjc0IDEuNzI3MiAwIDMuMzgyNCAwLjcxOTY3eiIvPgogIDxwYXRoIGQ9Im0xOTYuNDQgMjc2LjIzaDguODUxOXYyMy42NzdsLTEuNzI3MiAxMS43MzFoLTUuMzk3NWwtMS43MjcyLTExLjczMXptLTAuNzkxNjQgNDUuNjk5cTAtMi42NjI4IDEuMzY3NC00LjAzMDIgMS40MzkzLTEuMzY3NCAzLjc0MjMtMS4zNjc0IDIuNTE4OCAwIDMuODg2MiAxLjM2NzR0MS4zNjc0IDQuMDMwMnEwIDIuNTkwOC0xLjQzOTMgNC4wMzAyLTEuMzY3NCAxLjQzOTMtMy44MTQyIDEuNDM5My0yLjM3NDkgMC0zLjc0MjMtMS40MzkzLTEuMzY3NC0xLjQzOTMtMS4zNjc0LTQuMDMwMnoiLz4KIDwvZz4KPC9zdmc+Cg==)}</style></head><body></body></html>";
 															}
-															if (valid[0] && valid[1] == contents.applets[i].apis.length){
+															if (valid[0] && valid[1] == api_relative_size){
 																if (valid[1] == 0){
 																	applet_container_content.write(standard_applet(false));
 																} else {
@@ -3117,6 +3146,12 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								} else if (doc.id == "intro"){
 									about["intro"] = doc.bio;
 									about["relationship_status"] = doc.relationship_status;
+									try {
+										about["birthday"] = doc.birthday.toDate() || "";
+										about["birthday"] = about["birthday"].getFullYear() + "-" + ("0" + (about["birthday"].getMonth() + 1)).slice(-2) + "-" + ("0" + about["birthday"].getDate()).slice(-2);
+									} catch (e) {
+										about["birthday"] = "";
+									}
 								} else if (doc.id == "favourite_things"){
 									about["favourite_food"] = doc.food;
 									about["favourite_drink"] = doc.drink;
@@ -3141,16 +3176,24 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									about[doc.id] = doc.is;
 								}
 							});
-							var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||"","Intro":about["intro"]||"","Relationship status":about["relationship_status"]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Favourite game": about["favourite_game"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
+							var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||"","Intro":about["intro"]||"","Relationship status":about["relationship_status"]||"","Birthday":about["birthday"]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Favourite game": about["favourite_game"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
 							var computing_subjects = [20,23,88,24,16,17,18,19];
 							try {
 								document.getElementById("settings_loading_statement").remove();
 							} catch (e) {}
 							document.getElementById("setting_ref_content").innerHTML = "<p class=\"side_margin margin_top center_text\">This information will be publicly viewable to all members of the Solect Computing Society!</p><div class=\"side_margin about_me_edit margin_top\" id=\"about_me_container\"><br></div>";
-							var render_content = function(about_topic) {
+							var render_content = function(about_topic,dateMin,dateMax) {
+								dateMin = dateMin || null;
+								dateMax = dateMax || null;
 								var about_me_container_content = "";
-								if ([0,2,3,4].indexOf(about_sections[about_topic]) >= 0) {
-									about_me_container_content += "<input type=\"text\" id=\"about_me_input_" + about_topic.split(" ").join("_") + "\" value=\"" + (about_me[about_topic] || "").split("\"").join("\\\"") +"\"";
+								if ([0,2,3,4,5].indexOf(about_sections[about_topic]) >= 0) {
+									about_me_container_content += "<input type=\"";
+									if (about_sections[about_topic] == 5){
+										about_me_container_content += "date\" min=\"" + dateMin.getFullYear() + "-" + ("0" + (dateMin.getMonth() + 1)).slice(-2) + "-" + ("0" + dateMin.getDate()).slice(-2) + "\" max=\"" + dateMax.getFullYear() + "-" + ("0" + (dateMax.getMonth() + 1)) + "-" + ("0" + dateMax.getDate()).slice(-2);
+									} else {
+										about_me_container_content += "text";
+									}
+									about_me_container_content += "\" id=\"about_me_input_" + about_topic.split(" ").join("_") + "\" value=\"" + (about_me[about_topic] || "").split("\"").join("\\\"") +"\"";
 									if (about_sections[about_topic] == 2){
 										about_me_container_content += "autocomplete=\"url\"";
 									} else if (about_sections[about_topic] == 3){
@@ -3212,7 +3255,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								return about_me_container_content;
 							}
 							var about_me_page_render = "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">My course</h2><p class=\"side_margin center_text\">This section is for you to tell other society members what course your are studying, as well as your year of study. If your course isn't listed, please tell us as soon as possible.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Subject:</h4><div class=\"input_container_about\">" + render_content("Subject") + "</div><h4 class=\"small_bottom\">Subject:</h4><div class=\"input_container_about\">" + render_content("Year of study") + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_course\"></div></div></div></div>";
-							about_me_page_render += "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">Intro</h2><p class=\"side_margin center_text\">Here you can tell other society members something about you. It's always good for someone to know a little bit about you, why not help them out by giving them something to start with.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Bio:</h4><div class=\"input_container_about\">" + render_content("Intro") + "</div><h4 class=\"small_bottom\">Relationship status:</h4><div class=\"input_container_about\">" + render_content("Relationship status") + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_intro\"></div></div></div></div>";
+							about_me_page_render += "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">Intro</h2><p class=\"side_margin center_text\">Here you can tell other society members something about you. It's always good for someone to know a little bit about you, why not help them out by giving them something to start with.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Bio:</h4><div class=\"input_container_about\">" + render_content("Intro") + "</div><h4 class=\"small_bottom\">Relationship status:</h4><div class=\"input_container_about\">" + render_content("Relationship status") + "</div><h4 class=\"small_bottom\">Birthday:</h4><div class=\"input_container_about\">" + render_content("Birthday",(function(){var a = new Date();a.setFullYear(1950);return a})(),(function(){var a = new Date();a.setFullYear(a.getFullYear()-16);return a})()) + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_intro\"></div></div></div></div>";
 							about_me_page_render += "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">Favourite things</h2><p class=\"side_margin center_text\">This section is for you to tell other society members what your favourite things are. Think of this section as an aid to get conversations started with other society members, based on their favourite things.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Favourite food:</h4><div class=\"input_container_about\">" + render_content("Favourite food") + "</div><h4 class=\"small_bottom\">Favourite drink:</h4><div class=\"input_container_about\">" + render_content("Favourite drink") + "</div><h4 class=\"small_bottom\">Favourite lecturer:</h4><div class=\"input_container_about\">" + render_content("Favourite lecturer") + "</div><h4 class=\"small_bottom\">Favourite film:</h4><div class=\"input_container_about\">" + render_content("Favourite film") + "</div><h4 class=\"small_bottom\">Favourite TV show:</h4><div class=\"input_container_about\">" + render_content("Favourite TV show") + "</div><h4 class=\"small_bottom\">Favourite Game:</h4><div class=\"input_container_about\">" + render_content("Favourite game") + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_favourite_things\"></div></div></div></div>";
 							about_me_page_render += "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">Contact</h2><p class=\"side_margin center_text\">Help other society members find you on other platforms, by providing them with your social media accounts; or alternatively your direct contact details.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Phone number:</h4><div class=\"input_container_about\">" + render_content("Phone number") + "</div><h4 class=\"small_bottom\">Email address:</h4><div class=\"input_container_about\">" + render_content("Email address") + "</div><h4 class=\"small_bottom\">Website URL:</h4><div class=\"input_container_about\">" + render_content("Website") + "</div><h4 class=\"small_bottom\">Facebook username:</h4><div class=\"input_container_about\">" + render_content("Facebook") + "</div><h4 class=\"small_bottom\">Twitter username:</h4><div class=\"input_container_about\">" + render_content("Twitter") + "</div><h4 class=\"small_bottom\">Snapchat username:</h4><div class=\"input_container_about\">" + render_content("Snapchat") + "</div><h4 class=\"small_bottom\">Instagram username:</h4><div class=\"input_container_about\">" + render_content("Instagram") + "</div><h4 class=\"small_bottom\">GitHub username:</h4><div class=\"input_container_about\">" + render_content("GitHub") + "</div><h4 class=\"small_bottom\">Dev Community username:</h4><div class=\"input_container_about\">" + render_content("Dev Community") + "</div><h4 class=\"small_bottom\">Discord username#number:</h4><div class=\"input_container_about\">" + render_content("Discord") + "</div><h4 class=\"small_bottom\">LinkedIn account URL:</h4><div class=\"input_container_about\">" + render_content("LinkedIn") + "</div><h4 class=\"small_bottom\">Youtube account URL:</h4><div class=\"input_container_about\">" + render_content("Youtube") + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_socials\"></div></div></div></div>";
 							document.getElementById("about_me_container").innerHTML = about_me_page_render;
@@ -3235,6 +3278,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									} else if (about_me_element_id == "intro"){
 										element_ids.push("Intro");
 										element_ids.push("Relationship_status");
+										element_ids.push("Birthday");
 									} else if (about_me_element_id == "favourite_things") {
 										element_ids.push("Favourite_food");
 										element_ids.push("Favourite_drink");
@@ -3302,16 +3346,34 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												} else if (about_me_element_id == "Phone_number") {
 													max_length = 15;
 												}
-												if (value.length > max_length){
-													alert("Unable to update your " + about_me_element_id.split("_").join(" "),"maximum length for " + about_me_element_id.split("_").join(" ") + " is " + max_length + " characters&nbsp;-&nbsp;you can't get around this!");
-													document.getElementById(element).removeAttribute("disabled");
-													enable_fields();
-													return;
-												} else if (value.length != 0 && value.length <= min_length){
-													alert("Unable to update your " + about_me_element_id.split("_").join(" "),"Minimum length for a " + about_me_element_id.split("_").join(" ") + " username is " + min_length + " character" + {true:"s",false:""}[min_length > 1] + "&nbsp;-&nbsp;you can't get around this!");
-													document.getElementById(element).removeAttribute("disabled");
-													enable_fields();
-													return;
+												if (about_me_element_id == "Birthday"){
+													var time = document.getElementById(element).valueAsDate;
+													time.setHours(0,0,0,0);
+													var today = new Date();
+													today.setHours(0,0,0,0);
+													if (time > today){
+														alert("Unable to update your " + about_me_element_id.split("_").join(" "),"Your birthday cannot be in the future!");
+														enable_fields();
+														return;
+													}
+													today.setFullYear(today.getFullYear() - 16);
+													if (time > today){
+														alert("Unable to update your " + about_me_element_id.split("_").join(" "),"Your too young to offically be a member!");
+														enable_fields();
+														return;
+													}
+												} else {
+													if (value.length > max_length){
+														alert("Unable to update your " + about_me_element_id.split("_").join(" "),"maximum length for " + about_me_element_id.split("_").join(" ") + " is " + max_length + " characters!");
+														document.getElementById(element).removeAttribute("disabled");
+														enable_fields();
+														return;
+													} else if (value.length != 0 && value.length <= min_length){
+														alert("Unable to update your " + about_me_element_id.split("_").join(" "),"Minimum length for a " + about_me_element_id.split("_").join(" ") + " username has not been reached!");
+														document.getElementById(element).removeAttribute("disabled");
+														enable_fields();
+														return;
+													}
 												}
 												if (element_type != "select"){
 													if (value.trim().length > 0){
@@ -3402,8 +3464,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															}
 														}
 													}
-												} else if (value.match(/^[0-9]\d*$/)){
-													value = parseInt(value);
+												} else if (about_me_element_id != "Birthday") {
+													if (value.match(/^[0-9]\d*$/)){
+														value = parseInt(value);
+													}
 												}
 												out_values[element] = value;
 												switch(about_me_element_id){
@@ -3418,6 +3482,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														break;
 													case "Relationship_status":
 														set_value.relationship_status = value;
+														break;
+													case "Birthday":
+														set_value.birthday = document.getElementById(element).valueAsDate;
 														break;
 													case "Favourite_food":
 														set_value.food = value;
@@ -3484,7 +3551,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									e.target.classList.add("disabled");
 									if (["Subject","Year_of_study"].indexOf(about_me_element_id) >= 0){
 										about_me_element_id = "course";
-									} else if (["Intro","Relationship_status"].indexOf(about_me_element_id) >= 0){
+									} else if (["Intro","Relationship_status","Birthday"].indexOf(about_me_element_id) >= 0){
 										about_me_element_id = "intro";
 									} else if (["Favourite_food","Favourite_drink","Favourite_lecturer","Favourite_film","Favourite_TV_show","Favourite_game"].indexOf(about_me_element_id) >= 0){
 										about_me_element_id = "favourite_things";
@@ -3542,7 +3609,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							var save_button_is = function(element_reference){
 								if (["Subject","Year_of_study"].indexOf(element_reference) >= 0){
 									return "about_me_category_update_course";
-								} else if (["Intro","Relationship_status"].indexOf(element_reference) >= 0){
+								} else if (["Intro","Relationship_status","Birthday"].indexOf(element_reference) >= 0){
 									return "about_me_category_update_intro";
 								} else if (["Favourite_food","Favourite_drink","Favourite_lecturer","Favourite_film","Favourite_TV_show","Favourite_game"].indexOf(element_reference) >= 0){
 									return "about_me_category_update_favourite_things";
@@ -3573,7 +3640,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								}
 							}
 							for (var about_topic in about_sections) {
-								if ([0,2,3,4].indexOf(about_sections[about_topic]) >= 0){
+								if ([0,2,3,4,5].indexOf(about_sections[about_topic]) >= 0){
 									document.getElementById("about_me_input_" + about_topic.split(" ").join("_")).addEventListener("input",function(e){
 										var about_me_element_id = e.target.getAttribute("id").replace("about_me_input_","");
 										if (e.target.value == e.target.getAttribute("value")){

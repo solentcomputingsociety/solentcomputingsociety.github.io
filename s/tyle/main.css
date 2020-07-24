@@ -326,6 +326,9 @@ div.base_nav, div.base_nav > ul {
 	margin: 0;
 	height: calc(100vh - 82px);
 }
+div.base_nav > ul {
+	position: fixed;
+}
 div.base_nav > ul > li {
 	list-style-type: none;
 	background-color: #eeeeee;
@@ -1064,6 +1067,7 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 	div.base_nav > ul {
 		text-align: center;
 		padding: 5px 0;
+		position: relative;
 	}
 	div.base_nav {
 		background-color: #ec4848;
