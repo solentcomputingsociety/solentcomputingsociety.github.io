@@ -1763,7 +1763,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																				is_birthday = " - Today 🎂";
 																			}
 																		}
-																		about_panel_out += Math.abs(date_age.getUTCFullYear() - 1970).toString() + " year" + {true:"s",false:""}[Math.abs(date_age.getUTCFullYear() - 1970) <= 1] + " old" + is_birthday + "</p>";
+																		about_panel_out += Math.abs(date_age.getUTCFullYear() - 1970).toString() + " year" + {true:"s",false:""}[Math.abs(date_age.getUTCFullYear() - 1970) > 1] + " old" + is_birthday + "</p>";
 																	}
 																	if (about_me["Favourite lecturer"].trim().length > 0) {
 																		about_panel_out += "<h3>Favourite lecturer:</h3><p>" + about_me["Favourite lecturer"].replace('<','&lt;').replace('>','&gt;') + "</p>";
