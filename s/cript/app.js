@@ -1751,10 +1751,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																		});
 																	}
 																	about_panel_out = "";
-																	if (about_me["Relationship status"] > 0) {
-																		about_panel_out += "<h3>Relationship status:</h3><p>" + about_sections["Relationship status"][about_me["Relationship status"] - 1] + "</p>";
-																	}
-																	if (about_me["Birthday"] !== "") {
+                                                                    if (about_me["Birthday"] !== "") {
 																		about_panel_out += "<h3>Age:</h3><p>";
 																		var date_age = new Date(Date.now() - about_me["Birthday"].getTime());
 																		var is_birthday = "";
@@ -1764,6 +1761,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																			}
 																		}
 																		about_panel_out += Math.abs(date_age.getUTCFullYear() - 1970).toString() + " year" + {true:"s",false:""}[Math.abs(date_age.getUTCFullYear() - 1970) > 1] + " old" + is_birthday + "</p>";
+																	}
+                                                                    if (about_me["Relationship status"] > 0) {
+																		about_panel_out += "<h3>Relationship status:</h3><p>" + about_sections["Relationship status"][about_me["Relationship status"] - 1] + "</p>";
 																	}
 																	if (about_me["Favourite lecturer"].trim().length > 0) {
 																		about_panel_out += "<h3>Favourite lecturer:</h3><p>" + about_me["Favourite lecturer"].replace('<','&lt;').replace('>','&gt;') + "</p>";
