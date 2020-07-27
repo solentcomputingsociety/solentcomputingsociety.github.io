@@ -1921,9 +1921,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																			for (let ii = 0; ii < apis_value["users/list-current"].length; ii++) {
 																				if(apis_value["users/list-current"][ii].id == firebase.auth().currentUser.uid){
 																					match = true;
+																					delete apis_value["users/list-current"][ii].photo;
+																					delete apis_value["users/list-current"][ii].photo_large;
 																					apis_value["users/list-current"] = apis_value["users/list-current"][ii];
-																					delete apis_value["users/list-all"][ii].photo;
-																					delete apis_value["users/list-all"][ii].photo_large;
 																					break;
 																				}
 																			}
