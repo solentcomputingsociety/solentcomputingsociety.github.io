@@ -1092,6 +1092,9 @@ div#welcome_page, div#page_contents, div#b_banner, div#s_banner, div#login_panel
 		padding: 10px;
 		border-radius: 50px;
 	}
+	div.base_nav > ul > li.disabled, div.base_nav > ul > li.disabled:hover {
+		color: #bdbdbd !important;
+	}
 	.members_list {
 		width: 45%;
 		margin: 10px 2.5%;
