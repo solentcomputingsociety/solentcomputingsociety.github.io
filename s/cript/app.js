@@ -999,8 +999,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												if (typeof(response.response) == "object"){
 													if (response.response.length == 2){
 														if (response.response[0] == ";)"){
+															api[0] = null;
+															api[1] = new Date(response.response[1]).getTime();
 															update_api_status = "refreshing";
-															update_api()
+															update_api();
 														} else if (response.response[0] == "Use current"){
 															api_registered = true;
 															api[0] = check_token;
