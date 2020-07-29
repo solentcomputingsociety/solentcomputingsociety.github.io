@@ -956,6 +956,88 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							});
 							posts_base_load = true;
 						});
+						var api = [null,new Date()];
+						var update_api_status = "unknown";
+						var api_registered = false;
+						var update_api = async function(){
+							if (update_api_status != "searching..."){
+								update_api_status = "searching...";
+								var token = null;
+								if (api[0] == null){
+									await firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/private/").doc("api").get().then(async function(doc){
+										if (doc.exists){
+											doc = doc.data();
+											if (typeof(doc.key) !== "undefined") {
+												api_registered = true;
+												token = doc.key;
+											}
+										}
+									}).catch(function(error){});
+								}
+								var check_token = api[0];
+								if (token != null){
+									check_token = token;
+								}
+								if (check_token == null && api_registered == true){
+									alert("Error","An error occurred when configuring your access token, it would appear that it could not be found? This means that some applets may not work properly. Please get in contact with us for assistance [ref:&nbsp;token-refresh/missing]");
+									return;
+								}
+								var xhr = new XMLHttpRequest();
+								xhr.open("POST", "https://script.google.com/macros/s/AKfycbyeLKtJKZ6M3NjQCILJH9MsN3LOp17m5lQw7ehrROIzAvWS_OE/exec", true);
+								xhr.setRequestHeader('Content-Type', 'text/plain');
+								xhr.send(JSON.stringify({
+									uid: firebase.auth().currentUser.uid,
+									token: {true:check_token,false:"new"}[check_token != null],
+									refresh: api_registered
+								}));
+								xhr.onreadystatechange = function() {
+									if (xhr.readyState === 4) {
+										if (xhr.status === 200) {
+											var response = JSON.parse(xhr.responseText);
+											if (response.status == "success"){
+												update_api_status = "valid";
+												if (typeof(response.response) == "object"){
+													if (response.response.length == 2){
+														if (response.response[0] == ";)"){
+															update_api_status = "refreshing";
+															update_api()
+														} else if (response.response[0] == "Use current"){
+															api_registered = true;
+															api[0] = check_token;
+															api[1] = new Date(response.response[1]).getTime();
+															setTimeout(function(){
+																update_api();
+															},((new Date(response.response[1])).getTime() - (new Date()).getTime()));
+														}
+													}
+												}
+											} else if (response.status == "failure"){
+												update_api_status = "invalid";
+												if (typeof(response.response) == "string"){
+													switch(response.response){
+														case "Invalid refresh token":
+															if (check_token == null){
+																alert("Error","Unfortunately we were unable to verify your account's access rights to securely access certain applet data. Please get in contact with us for assistance [ref:&nbsp;token-refresh/" + response.response + "]");
+															}
+															api[0] = null;
+															if (check_token != null){
+																update_api();
+															}
+															break;
+														case "User already registered":
+															alert("Error","Unfortunately an error occurred which will result in some applets not working. Please get in contact with us for assistance [ref:&nbsp;token-refresh/" + response.response + "]");
+															break;
+														default:
+															alert("Error","An error occurred when configuring your access token, this means that some applets may not work properly. Please get in contact with us for assistance [ref:&nbsp;token-refresh/" + response.response + "]");
+													}
+												}
+											}
+										}
+									}
+								};
+							}
+						};
+						update_api();
 						var update_users = () => new Promise(async function(resolve, reject){
 							firebase.firestore().collection("users/members/id").get().then(async function(snapshot){
 								var users = snapshot.docs.map( doc => {
