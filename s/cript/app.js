@@ -2103,6 +2103,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																								about["Favourite lecturer"] = "";
 																								about["Favourite film"] = "";
 																								about["Favourite TV show"] = "";
+																								about["Favourite game"] = "";
 																							} else if (prerequisite == "social"){
 																								about["Email address"] = "";
 																								about["Phone number"] = "";
