@@ -2074,6 +2074,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																								about["Favourite lecturer"] = doc.lecturer || "";
 																								about["Favourite film"] = doc.film || "";
 																								about["Favourite TV show"] = doc.tv_show || "";
+																								about["Favourite game"] = doc.game || "";
 																							} else if (prerequisite == "social"){
 																								about["Email address"] = doc.email_address || "";
 																								about["Phone number"] = doc.phone_number || "";
