@@ -1,4 +1,4 @@
-"use script";
+"use strict";
 console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society members:\n\nThis website was made by the society members, for the society members. It is expected that some of you view this portion of the website, given the fact that you're all students studying a computing based subject; and to that extent, I congratulate you in using your technical initiative to learn more and to view the inner workings of this website. Have fun, engage with others and really do try to make the most of your time with all the members of this society, we're all your friends and are all looking out for one another.\n\nHave fun ;)\n\n\t- Bradley Marshall (@bradley499)\n\t  17/04/2020\n ");
 
 (function(){
@@ -19,7 +19,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 	}
 	var load_remains = scripts.length;
 	for (var i = 0; i < scripts.length; i++) {
-		script = document.createElement("script");
+		var script = document.createElement("script");
 		script.type = "text/javascript";
 		script.src = scripts[i];
 		script.id = "dls" + i;
@@ -377,14 +377,105 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		switch (page) {
 			case "106A6C241B8797F52E1E77317B96A201":
 				if (preload){
+					var sending = false;
 					document.addEventListener("DOMContentLoaded", function(event){
 						document.getElementById("hero_scroll_more").addEventListener("click",function(){
-							window.scroll({behavior:"smooth",left:0,top:window.innerHeight});
+							window.scroll({behavior:"smooth",left:0,top:window.innerHeight - {true:80,false:0}[document.body.clientWidth<=1000]});
 						},false);
-						document.getElementById("user_link_new").addEventListener("click",function(){
-							window.scroll({behavior:"smooth",left:0,top:document.getElementById("registration").offsetTop});registration
+						document.getElementById("user_link_new").addEventListener("click",function(e){
+							window.scroll({behavior:"smooth",left:0,top:document.getElementById("registration").offsetTop - {true:80,false:0}[document.body.clientWidth<=1000]});registration
+						});
+						if (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0)){
+							["user_link_new","user_link"].forEach(button => {
+								button = document.getElementById(button);
+								button.classList.add("touch");
+							});
+						}
+						const default_message_send_text = document.getElementById("contact_submit").value;
+						const inputs = [document.getElementById("contact_email"),document.getElementById("contact_message"),document.getElementById("contact_submit")];
+						for (let i = 0; i < 2; i++) {
+							inputs[i].addEventListener("input",function(){
+								if (document.getElementById("contact_email").value.trim().length > 0 && document.getElementById("contact_message").value.trim().length > 0){
+									inputs[2].removeAttribute("disabled");
+									inputs[2].style.cursor = "pointer";
+								} else {
+									inputs[2].setAttribute("disabled","disabled");
+									inputs[2].style.cursor = "default";
+								}
+							});
+						}
+						inputs[2].setAttribute("disabled","disabled");
+						inputs[2].style.cursor = "default";
+						inputs[2].addEventListener("click",function(e){
+							e.preventDefault();
+							var email = inputs[0].value.trim();
+							var message = inputs[1].value.trim();
+							if (email.length == 0 && message.length == 0){
+								return;
+							}
+							if (email.length == 0){
+								return alert("Error","An email address is required to send us a message.");
+							} else if (email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g) != email){
+								return alert("Error","An invalid email address was provided.");
+							} else if (message.length == 0) {
+								return alert("Error","You message cannot be empty.");
+							}
+							sending = true;
+							document.body.style.cursor = "progress";
+							inputs.forEach(element => {
+								element.setAttribute("disabled","disabled");
+								element.style.cursor = "progress";
+							});
+							e.target.value = "Sending...";
+							var request = new XMLHttpRequest();
+							request.open("POST", "https://script.google.com/macros/s/AKfycbxE2dwJ77xrWgA4qBUS_txCZxhrR2_6U1ZVyZoV407ZgFWxRBV9/exec", true);
+							request.setRequestHeader('Content-Type', 'text/plain');
+							request.onreadystatechange = function() {
+								if (this.status >= 400) {
+									return false;
+								} else if (this.readyState === 4){
+									if (request.status === 200) {
+										JSON.parse(request.responseText)
+										var response = JSON.parse(this.responseText);
+										sending = false;
+										document.body.style.cursor = "";
+										e.target.value = default_message_send_text;
+										inputs.forEach(element => {
+											element.removeAttribute("disabled");
+											element.style.cursor = "";
+										});
+										if (response["status"] == "success"){
+											inputs[0].value = inputs[1].value = "";
+											e.target.setAttribute("disabled","disabled");
+											e.target.style.cursor = "default";
+											alert_vibrate = false;
+											alert("Message sent","Your message has successfully been sent to us, and we should hopefully be in contact with you soon.");
+										} else {
+											try {
+												alert("Failed to send","Unable to send your message due to the following reason:\n" + response["response"]);
+											} catch (e) {
+												alert("Failed to send","An unexpected error has prevented your message from being sent. We apologise for the inconvenience.");
+											}
+										}
+									}
+								}
+							};
+							request.onerror = function () {
+								sending = false;
+							}
+							request.send(JSON.stringify({
+								uid: null,
+								email: email,
+								category: "Public",
+								message: message
+							}));
 						});
 					});
+					window.onbeforeunload = function() { 
+						if (sending){
+							return "Your message is still being sent, are you sure you wish to leave this page. If you do, your message may not be sent!";
+						}
+					};
 				} else {
 					var current_image = null;
 					function carousel(){
@@ -819,6 +910,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 				}
 				var current_page = [null,null];
 				var ignore_hash_change = false;
+				var user_view_about;
 				function hash_state_check() {
 					const false_hash = {lp:false,main:false,ignore:false};
 					if (ignore_hash_change){
@@ -914,7 +1006,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						var sub_pages = ["nav_loc_messages","nav_loc_events","nav_loc_members","nav_loc_applets"];
 						var sub_page = sub_pages[0];
 						var contents = {posts:{},users:[],events:true,pub:"tbc",applets:-1};
-						sub_page_link_generation = 0;
+						var sub_page_link_generation = 0;
 						var posts_base_load = false;
 						sub_pages.forEach(function(nav_id){
 							if (nav_id != "nav_loc_member_about"){
@@ -1688,7 +1780,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														}
 														await firebase.firestore().enableNetwork();
 														await firebase.firestore().collection("users/members/id/" + uid_ref + "/about/").get().then(async function(about){
-															about_docs = about.docs.map( doc => {
+															var about_docs = about.docs.map( doc => {
 																var doc_data = doc.data();
 																doc_data.id = doc.id;
 																return doc_data;
@@ -1889,10 +1981,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	document.getElementById("about_me_main_ref").innerHTML = about_panel_out;
 																}
 															} catch (e) {
-																if (document.getElementById("about_me_container").getAttribute("uid") == uid_ref){
+																if (document.getElementById("about_me_prof_container").getAttribute("uid") == uid_ref){
 																	document.getElementById("about_me_loading").classList.add("error");
-																	document.getElementById("about_me_container").classList.remove("loading")
-																	document.getElementById("about_me_container").classList.add("error");
+																	document.getElementById("about_me_prof_container").classList.remove("loading")
+																	document.getElementById("about_me_prof_container").classList.add("error");
 																	document.getElementById("about_me_side_ref").outerHTML = "";
 																}
 															}
@@ -1901,11 +1993,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															cached_about.push(uid_ref+"/favourite_things");
 															cached_about.push(uid_ref+"/social");
 														}).catch(function(error){
-															return;
-															if (document.getElementById("about_me_container").getAttribute("uid") == uid_ref){
+															if (document.getElementById("about_me_prof_container").getAttribute("uid") == uid_ref){
 																document.getElementById("about_me_loading").classList.add("error");
-																document.getElementById("about_me_container").classList.remove("loading")
-																document.getElementById("about_me_container").classList.add("error");
+																document.getElementById("about_me_prof_container").classList.remove("loading")
+																document.getElementById("about_me_coabout_me_prof_containerntainer").classList.add("error");
 																document.getElementById("about_me_side_ref").outerHTML = "";
 															}
 														});
@@ -2060,6 +2151,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																				reject("Invalid API reference");
 																				return;
 																			}
+																			var users;
 																			if (typeof(apis_value["users/list-all"]) === "undefined"){
 																				if (typeof(apis_value["users/list-current"]) === "undefined"){
 																					reject("[users/about" + {true:"/"+prerequisite,false:""}[prerequisite != null] + "] No user user(s) were requested");
@@ -3590,7 +3682,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																return;
 															}
 														} else if (about_me_element_id == "Email address") {
-															if(value.match(/^\w+([\.-]?\w+)*@\\w+([\.-]?\\w+)*(\.\w{2,3})+$/g) != value){
+															if(value.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g) != value){
 																alert("Error","Invalid email address format!");
 																document.getElementById(element).removeAttribute("disabled");
 																enable_fields();
