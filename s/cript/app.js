@@ -1269,9 +1269,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							} catch (e) {}
 						}
 						var list_applets = function(){
-							var applet_data = (applet_name,applet_id) => new Promise(function(resolve, reject){
+							var applet_data = (applet_name,branch) => new Promise(function(resolve, reject){
 								var request = new XMLHttpRequest();
-								request.open('GET', "https://raw.githubusercontent.com/solentcomputingsociety/" + applet_name + "/master/about.json", true);
+								request.open('GET', "https://raw.githubusercontent.com/solentcomputingsociety/" + applet_name + "/" + branch + "/about.json", true);
 								request.onreadystatechange = function() {
 									if (this.status >= 400) {
 										reject("Failed to load");
@@ -1279,7 +1279,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									} else if (this.readyState === 4) {
 										try {
 											var applet_data_relative = JSON.parse(this.responseText);
-											var applet_data = {host_name:applet_name,name:applet_data_relative["name"],description:applet_data_relative["description"],version:applet_data_relative["version"],author:applet_data_relative["author"],background:{true:"url(\'" + applet_data_relative["background-image"] + "\')",false:"#"+["DDA0DD","E9967A","32CD32","87CEFA","FF6347","5F9EA0"][Math.floor(Math.random() * 6)]}[typeof(applet_data_relative["background-image"]) !== "undefined"],id:applet_id,apis:applet_data_relative["apis"]||[]};
+											var applet_data = {host_name:applet_name,name:applet_data_relative["name"],description:applet_data_relative["description"],version:applet_data_relative["version"],author:applet_data_relative["author"],background:{true:"url(\'" + applet_data_relative["background-image"] + "\')",false:"#"+["DDA0DD","E9967A","32CD32","87CEFA","FF6347","5F9EA0"][Math.floor(Math.random() * 6)]}[typeof(applet_data_relative["background-image"]) !== "undefined"],id:applet_name,apis:applet_data_relative["apis"]||[]};
 											resolve(applet_data);
 										} catch (error) {
 											reject(error);
@@ -1293,18 +1293,20 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							});
 							try {
 								var request = new XMLHttpRequest();
-								request.open('GET', "https://api.github.com/search/repositories?q=user:solentcomputingsociety", true);
+								request.open("GET", "https://script.google.com/macros/s/AKfycby7Tzjkqne6rSz1fcWw6l5tdgqkzis23Z3zAf-EtJbfqQqEUQCm/exec", true);
+								request.setRequestHeader("Content-Type", "text/plain");
 								request.onreadystatechange = async function() {
 									if (this.status >= 400) {
 										load_page("nav_loc_applets");
 										contents.applets = -2;
 										return false;
-									} else if (this.readyState === 4) {
-										var applets = JSON.parse(this.responseText)["items"];
-										for (var i = 0; i < applets.length; i++) {
-											if (applets[i]["id"] != 256980546){
-												if (applets[i]["name"].startsWith("applet-") && applets[i]["name"] != "applet-"){
-													await applet_data(applets[i]["name"],applets[i]["id"]).then(function(data){
+									} else if (this.readyState === 4){
+										if (request.status === 200) {
+											JSON.parse(request.responseText)
+											var applets = JSON.parse(this.responseText);
+											if (applets["status"] == "success"){
+												for (var i = 0; i < applets.response.length; i++) {
+													await applet_data(applets.response[i][0][0],applets.response[i][0][1]).then(function(data){
 														if(typeof(contents.applets) === "number"){
 															contents.applets = [];
 														}
@@ -1315,14 +1317,21 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														}
 													});
 												}
+												if (current_page[0] == "nav_loc_applets"){
+													load_page("nav_loc_applets");
+												}
 											}
-										}
-										if (current_page[0] == "nav_loc_applets"){
-											load_page("nav_loc_applets");
+											return;
+										} else {
+											if (current_page[0] == "nav_loc_applets"){
+												load_page("nav_loc_applets");
+											}
+											contents.events = false;
+											return;
 										}
 									}
 								};
-								request.onerror = function () {
+								request.onerror = function (error) {
 									contents.events = false;
 								}
 								request.send();

@@ -829,6 +829,9 @@ div#applet_listing_container {
 	column-count: max(2);
 	column-gap: 2.5%;
 	row-gap: 2.5%;
+	min-height: 100%;
+	display: flow-root;
+	align-content: stretch;
 }
 div.applet_display_option {
 	width: 100%;
