@@ -248,7 +248,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			"3rd",
 			"4th",
 			"Placement year",
-			"Masters"
+			"Masters",
+			"Alumni"
 			/*
 				WARNING!
 
@@ -1903,14 +1904,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																		about_panel_out += "<div><h3 class=\"center_text small_bottom\">Studying:</h3><p class=\"center_text\">" + about_sections["Subject"][about_me["Subject"] - 1];
 																		if (about_me["Year of study"] > 0){
 																			about_panel_out += " - " + about_sections["Year of study"][about_me["Year of study"] - 1];
-																			if ([5,6].indexOf(about_me["Year of study"]) < 0){
+																			if ([5,6,8].indexOf(about_me["Year of study"]) < 0){
 																				about_panel_out += " year";
 																			}
 																		}																			
 																		about_panel_out += "</p>";
 																	} else if (about_me["Year of study"] > 0){
 																		about_panel_out += "<div><h3 class=\"center_text small_bottom\">Year of study:</h3><p class=\"center_text\">" + about_sections["Year of study"][about_me["Year of study"] - 1];
-																		if ([5,6].indexOf(about_me["Year of study"]) < 0){
+																		if ([5,6,8].indexOf(about_me["Year of study"]) < 0){
 																			about_panel_out += " year";
 																		}
 																		about_panel_out += "</p>";
@@ -2121,6 +2122,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																					delete apis_value["users/list-current"][ii].photo;
 																					delete apis_value["users/list-current"][ii].photo_large;
 																					apis_value["users/list-current"] = apis_value["users/list-current"][ii];
+																					apis_value["users/list-current"]["email"] = firebase.auth().currentUser.email;
 																					break;
 																				}
 																			}
@@ -3487,7 +3489,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								}
 								return about_me_container_content;
 							}
-							var about_me_page_render = "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">My course</h2><p class=\"side_margin center_text\">This section is for you to tell other society members what course your are studying, as well as your year of study. If your course isn't listed, please tell us as soon as possible.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Subject:</h4><div class=\"input_container_about\">" + render_content("Subject") + "</div><h4 class=\"small_bottom\">Subject:</h4><div class=\"input_container_about\">" + render_content("Year of study") + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_course\"></div></div></div></div>";
+							var about_me_page_render = "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">My course</h2><p class=\"side_margin center_text\">This section is for you to tell other society members what course your are studying, as well as your year of study. If your course isn't listed, please tell us as soon as possible.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Subject:</h4><div class=\"input_container_about\">" + render_content("Subject") + "</div><h4 class=\"small_bottom\">Year of study:</h4><div class=\"input_container_about\">" + render_content("Year of study") + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_course\"></div></div></div></div>";
 							about_me_page_render += "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">Intro</h2><p class=\"side_margin center_text\">Here you can tell other society members something about you. It's always good for someone to know a little bit about you, why not help them out by giving them something to start with.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Bio:</h4><div class=\"input_container_about\">" + render_content("Intro") + "</div><h4 class=\"small_bottom\">Relationship status:</h4><div class=\"input_container_about\">" + render_content("Relationship status") + "</div><h4 class=\"small_bottom\">Birthday:</h4><div class=\"input_container_about\">" + render_content("Birthday",(function(){var a = new Date();a.setFullYear(1950);return a})(),(function(){var a = new Date();a.setFullYear(a.getFullYear()-16);return a})()) + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_intro\"></div></div></div></div>";
 							about_me_page_render += "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">Favourite things</h2><p class=\"side_margin center_text\">This section is for you to tell other society members what your favourite things are. Think of this section as an aid to get conversations started with other society members, based on their favourite things.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Favourite food:</h4><div class=\"input_container_about\">" + render_content("Favourite food") + "</div><h4 class=\"small_bottom\">Favourite drink:</h4><div class=\"input_container_about\">" + render_content("Favourite drink") + "</div><h4 class=\"small_bottom\">Favourite lecturer:</h4><div class=\"input_container_about\">" + render_content("Favourite lecturer") + "</div><h4 class=\"small_bottom\">Favourite film:</h4><div class=\"input_container_about\">" + render_content("Favourite film") + "</div><h4 class=\"small_bottom\">Favourite TV show:</h4><div class=\"input_container_about\">" + render_content("Favourite TV show") + "</div><h4 class=\"small_bottom\">Favourite Game:</h4><div class=\"input_container_about\">" + render_content("Favourite game") + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_favourite_things\"></div></div></div></div>";
 							about_me_page_render += "<div class=\"members_list about_me_edit\"><div class=\"vertical_padding\"><h2 class=\"vertical_padding no_margin small_bottom center_text\">Contact</h2><p class=\"side_margin center_text\">Help other society members find you on other platforms, by providing them with your social media accounts; or alternatively your direct contact details.</p><div class=\"side_margin\"><h4 class=\"small_bottom\">Phone number:</h4><div class=\"input_container_about\">" + render_content("Phone number") + "</div><h4 class=\"small_bottom\">Email address:</h4><div class=\"input_container_about\">" + render_content("Email address") + "</div><h4 class=\"small_bottom\">Website URL:</h4><div class=\"input_container_about\">" + render_content("Website") + "</div><h4 class=\"small_bottom\">Facebook username:</h4><div class=\"input_container_about\">" + render_content("Facebook") + "</div><h4 class=\"small_bottom\">Twitter username:</h4><div class=\"input_container_about\">" + render_content("Twitter") + "</div><h4 class=\"small_bottom\">Snapchat username:</h4><div class=\"input_container_about\">" + render_content("Snapchat") + "</div><h4 class=\"small_bottom\">Instagram username:</h4><div class=\"input_container_about\">" + render_content("Instagram") + "</div><h4 class=\"small_bottom\">GitHub username:</h4><div class=\"input_container_about\">" + render_content("GitHub") + "</div><h4 class=\"small_bottom\">Dev Community username:</h4><div class=\"input_container_about\">" + render_content("Dev Community") + "</div><h4 class=\"small_bottom\">Discord username#number:</h4><div class=\"input_container_about\">" + render_content("Discord") + "</div><h4 class=\"small_bottom\">LinkedIn account URL:</h4><div class=\"input_container_about\">" + render_content("LinkedIn") + "</div><h4 class=\"small_bottom\">Youtube account URL:</h4><div class=\"input_container_about\">" + render_content("Youtube") + "</div><div class=\"input_container_about margin_top_small small_bottom\"><input type=\"submit\" value=\"Save\" class=\"about_me_category_update_button disabled\" id=\"about_me_category_update_socials\"></div></div></div></div>";
