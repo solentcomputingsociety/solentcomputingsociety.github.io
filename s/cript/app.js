@@ -302,6 +302,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 	};
 	var initial_setup = false;
 	var setup = 0;
+	var setup_check = false;
 	var sub_page_ref_core_loaded = null;
 	var host_page = async function(page,preload,sub_page_ref){
 		page = page || false;
@@ -1049,93 +1050,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							});
 							posts_base_load = true;
 						});
-						var api = [null,0];
-						var update_api_status = "unknown";
-						var api_registered = false;
-						var update_api = async function(){
-							if (update_api_status != "searching..."){
-								update_api_status = "searching...";
-								var token = null;
-								if (api[0] == null){
-									await firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/private/").doc("api").get().then(async function(doc){
-										if (doc.exists){
-											doc = doc.data();
-											if (typeof(doc.key) !== "undefined") {
-												api_registered = true;
-												token = doc.key;
-											}
-										}
-									}).catch(function(error){});
-								}
-								var check_token = api[0];
-								if (token != null){
-									check_token = token;
-								}
-								if (check_token == null && api_registered == true){
-									alert("Error","An error occurred when configuring your access token, it would appear that it could not be found? This means that some applets may not work properly. Please get in contact with us for assistance [ref:&nbsp;token-refresh/missing]");
-									return;
-								}
-								var xhr = new XMLHttpRequest();
-								xhr.open("POST", "https://script.google.com/macros/s/AKfycbyeLKtJKZ6M3NjQCILJH9MsN3LOp17m5lQw7ehrROIzAvWS_OE/exec", true);
-								xhr.setRequestHeader('Content-Type', 'text/plain');
-								xhr.send(JSON.stringify({
-									uid: firebase.auth().currentUser.uid,
-									token: {true:check_token,false:"new"}[check_token != null],
-									refresh: api_registered
-								}));
-								xhr.onreadystatechange = function() {
-									if (xhr.readyState === 4) {
-										if (xhr.status === 200) {
-											var response = JSON.parse(xhr.responseText);
-											if (response.status == "success"){
-												update_api_status = "valid";
-												if (typeof(response.response) == "object"){
-													if (response.response.length == 2){
-														if (response.response[0] == ";)"){
-															api[0] = null;
-															api[1] = 1;
-															update_api_status = "refreshing";
-															update_api();
-														} else if (response.response[0] == "Use current"){
-															api_registered = true;
-															api[0] = check_token;
-															api[1] = 0;
-															setTimeout(function(){
-																update_api();
-															},((new Date(response.response[1])).getTime() - (new Date()).getTime()));
-														}
-													}
-												}
-											} else if (response.status == "failure"){
-												update_api_status = "invalid";
-												if (typeof(response.response) == "string"){
-													switch(response.response){
-														case "Invalid refresh token":
-															if (check_token == null || api[1] == 5){
-																alert("Error","Unfortunately we were unable to verify your account's access rights to securely access certain applet data. Please get in contact with us for assistance [ref:&nbsp;token-refresh/" + response.response + "]");
-																api[0] = null;
-																return;
-															}
-															api[0] = null;
-															api[1] += 1;
-															if (check_token != null){
-																update_api();
-															}
-															break;
-														case "User already registered":
-															alert("Error","Unfortunately an error occurred which will result in some applets not working. Please get in contact with us for assistance [ref:&nbsp;token-refresh/" + response.response + "]");
-															break;
-														default:
-															alert("Error","An error occurred when configuring your access token, this means that some applets may not work properly. Please get in contact with us for assistance [ref:&nbsp;token-refresh/" + response.response + "]");
-													}
-												}
-											}
-										}
-									}
-								};
-							}
-						};
-						update_api();
 						var update_users = () => new Promise(async function(resolve, reject){
 							firebase.firestore().collection("users/members/id").get().then(async function(snapshot){
 								var users = snapshot.docs.map( doc => {
@@ -2132,19 +2046,46 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																			break;
 																		case "users/profile-picture":
 																			apis_value["users/profile-picture"] = {};
-																			for (let ii = 0; ii < contents.users[0].length; ii++) {
-																				if (typeof(contents.users[0][ii].photo_large) === "undefined"){
-																					if (contents.users[0][ii].photo.length == 0){
+																			if (typeof(apis_value["users/list-all"]) != "undefined"){
+																				for (let ii = 0; ii < contents.users[0].length; ii++) {
+																					if (typeof(contents.users[0][ii].photo_large) === "undefined"){
+																						if (contents.users[0][ii].photo.length == 0){
+																							contents.users[0][ii].photo_large = (new URL(document.URL)).origin + "/app/img/prof.png";
+																						} else {
+																							contents.users[0][ii].photo_large = await storage_download("profile/"+contents.users[0][ii].id);
+																						}
+																					}
+																					if (contents.users[0][ii].photo == "/app/img/prof.png"){
+																						contents.users[0][ii].photo = (new URL(document.URL)).origin + "/app/img/prof.png";
 																						contents.users[0][ii].photo_large = (new URL(document.URL)).origin + "/app/img/prof.png";
-																					} else {
-																						contents.users[0][ii].photo_large = await storage_download("profile/"+contents.users[0][ii].id);
+																					}
+																					apis_value["users/profile-picture"][contents.users[0][ii].id] = [contents.users[0][ii].photo,contents.users[0][ii].photo_large];
+																				}
+																			} else if (typeof(apis_value["users/list-current"]) != "undefined"){
+																				var pictures = [null,null];
+																				for (let ii = 0; ii < contents.users[0].length; ii++) {
+																					if (contents.users[0][ii].id == firebase.auth().currentUser.uid){
+																						if (typeof(contents.users[0][ii].photo_large) === "undefined"){
+																							if (contents.users[0][ii].photo.length == 0){
+																								contents.users[0][ii].photo_large = (new URL(document.URL)).origin + "/app/img/prof.png";
+																							} else {
+																								contents.users[0][ii].photo_large = await storage_download("profile/"+contents.users[0][ii].id);
+																							}
+																						}
+																						if (contents.users[0][ii].photo == "/app/img/prof.png"){
+																							contents.users[0][ii].photo = (new URL(document.URL)).origin + "/app/img/prof.png";
+																							contents.users[0][ii].photo_large = (new URL(document.URL)).origin + "/app/img/prof.png";
+																						}
+																						pictures = [contents.users[0][ii].photo,contents.users[0][ii].photo_large];
 																					}
 																				}
-																				if (contents.users[0][ii].photo == "/app/img/prof.png"){
-																					contents.users[0][ii].photo = (new URL(document.URL)).origin + "/app/img/prof.png";
-																					contents.users[0][ii].photo_large = (new URL(document.URL)).origin + "/app/img/prof.png";
+																				if (pictures[0] == null && pictures[1] == null){
+																					pictures[0] = (new URL(document.URL)).origin + "/app/img/prof.png";
+																					pictures[1] = (new URL(document.URL)).origin + "/app/img/prof.png";
 																				}
-																				apis_value["users/profile-picture"][contents.users[0][ii].id] = [contents.users[0][ii].photo,contents.users[0][ii].photo_large];
+																				apis_value["users/profile-picture"][contents.users[0][ii].id] = pictures;
+																			} else {
+																				reject("[users/profile-picture] No user requests were formed to generate image URIs for");
 																			}
 																			break;
 																		case "users/about":
@@ -2863,6 +2804,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									setup = 1;
 									window.location.hash = "setup";
 								}
+								setup_check = true;
 								await update_pub().then(async function(e){
 									await update_events();
 									setInterval(function(){update_events(),update_pub()},600000);
@@ -3039,6 +2981,106 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						location.assign("/login");
 					}
 				});
+				var api = [null,0];
+				var update_api_status = "unknown";
+				var api_registered = false;
+				var update_api = async function(){
+					if (update_api_status != "searching..."){
+						update_api_status = "searching...";
+						var token = null;
+						if (api[0] == null){
+							await firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/private/").doc("api").get().then(async function(doc){
+								if (doc.exists){
+									doc = doc.data();
+									if (typeof(doc.key) !== "undefined") {
+										api_registered = true;
+										token = doc.key;
+									}
+								}
+							}).catch(function(error){});
+						}
+						var check_token = api[0];
+						if (token != null){
+							check_token = token;
+						}
+						if (check_token == null && api_registered == true){
+							alert("Error","An error occurred when configuring your access token, it would appear that it could not be found? This means that some applets may not work properly. Please get in contact with us for assistance [ref:&nbsp;token-refresh/missing]");
+							return;
+						}
+						var xhr = new XMLHttpRequest();
+						xhr.open("POST", "https://script.google.com/macros/s/AKfycbyeLKtJKZ6M3NjQCILJH9MsN3LOp17m5lQw7ehrROIzAvWS_OE/exec", true);
+						xhr.setRequestHeader('Content-Type', 'text/plain');
+						xhr.send(JSON.stringify({
+							uid: firebase.auth().currentUser.uid,
+							token: {true:check_token,false:"new"}[check_token != null],
+							refresh: api_registered
+						}));
+						xhr.onreadystatechange = function() {
+							if (xhr.readyState === 4) {
+								if (xhr.status === 200) {
+									var response = JSON.parse(xhr.responseText);
+									if (response.status == "success"){
+										update_api_status = "valid";
+										if (typeof(response.response) == "object"){
+											if (response.response.length == 2){
+												if (response.response[0] == ";)"){
+													api[0] = null;
+													api[1] = 1;
+													update_api_status = "refreshing";
+													update_api();
+												} else if (response.response[0] == "Use current"){
+													api_registered = true;
+													api[0] = check_token;
+													api[1] = 0;
+													setTimeout(function(){
+														update_api();
+													},((new Date(response.response[1])).getTime() - (new Date()).getTime()));
+												}
+											}
+										}
+									} else if (response.status == "failure"){
+										update_api_status = "invalid";
+										if (typeof(response.response) == "string"){
+											switch(response.response){
+												case "Invalid refresh token":
+													if (check_token == null || api[1] == 5){
+														alert("Error","Unfortunately we were unable to verify your account's access rights to securely access certain applet data. Please get in contact with us for assistance [ref:&nbsp;token-refresh/" + response.response + "]");
+														api[0] = null;
+														return;
+													}
+													api[0] = null;
+													api[1] += 1;
+													if (check_token != null){
+														update_api();
+													}
+													break;
+												case "User already registered":
+													alert("Error","Unfortunately an error occurred which will result in some applets not working. Please get in contact with us for assistance [ref:&nbsp;token-refresh/" + response.response + "]");
+													break;
+												default:
+													alert("Error","An error occurred when configuring your access token, this means that some applets may not work properly. Please get in contact with us for assistance [ref:&nbsp;token-refresh/" + response.response + "]");
+											}
+										}
+									}
+								}
+							}
+						};
+					}
+				};
+				var update_api_check = function(){
+					if (setup_check){
+						if (setup == 0){
+							firebase.auth().onAuthStateChanged(async function(user) {
+								if (user){
+									update_api();
+								}
+							});
+						}
+					} else {
+						setTimeout(update_api_check, 500);
+					}
+				};
+				update_api_check();
 				function settings(settings_page_ref){
 					settings_page_ref = settings_page_ref || "menu";
 					s_user_button.classList.add("disabled");
@@ -3103,6 +3145,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									name: user.name || "",
 									photo: "",
 								}).then(function(){
+									if (setup != 0){
+										location.reload();
+										return;
+									}
 									user.photo = "";
 									prof_image_preview.style.backgroundImage = "";
 									prof_image_preview.style.border = "1px solid #aaaaaa";
@@ -3154,6 +3200,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														name: user.name,
 														photo: firebase.auth().currentUser.uid,
 													}).then(async function(){
+														if (setup != 0){
+															location.reload();
+															return;					
+														}
 														user.photo = firebase.auth().currentUser.uid;
 														await img_blob(await storage_download("profile/" + firebase.auth().currentUser.uid),"settings_ref_content_prof_picture");
 														prof_image_preview.style.backgroundImage = "";
@@ -3226,6 +3276,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											name: settings_ref_content_prof_name_value.value,
 											photo: user.photo,
 										}).then(function(){
+											if (setup != 0){
+												location.reload();
+												return;		
+											}
 											settings_ref_content_prof_name_value.classList.remove("loading");
 											settings_ref_content_prof_name_value.disabled = false;
 											setup = 4;
