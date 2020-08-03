@@ -274,7 +274,7 @@ div#login_panel_error {
 	margin: 0 auto 1em;
 	text-align: center;
 }
-span#user_registration_action, p.cancel_verification {
+span#user_registration_action, p#cancel_verification {
 	cursor: pointer;
 }
 .white_text {
@@ -851,6 +851,7 @@ div.applet_display_option > div {
 h3.applet_header_name {
 	font-size: 3ch;
 	margin: 3px 0 6px;
+	word-break: break-word;
 }
 iframe.applet_content_iframe {
 	width: 100%;
