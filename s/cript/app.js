@@ -2535,7 +2535,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 													});
 													document.getElementById("position_select_button_social_secretary").addEventListener("click",function(){
 														selection_mode = "social_secretary";
-														user_selection_display("Select new SocialSecretary",true);
+														user_selection_display("Select new Social Secretary",true);
 													});
 													document.getElementById("save_appointed_positions").addEventListener("click",function(){
 														var confirmation_button = document.getElementById("save_appointed_positions");
