@@ -1133,7 +1133,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							});
 						});
 						var update_events = () => new Promise(function(resolve, reject){
-							var url = "https://sheets.googleapis.com/v4/spreadsheets/1n8XteyNorvi8FFpsaUGdya2Tiqpxa1Rx6yisywyMTCc/values/Events?key=AIzaSyBCvNB0vOm2GDbF_IrId2w-lvkbSh0PX4Y";
+							var url = "https://script.google.com/macros/s/AKfycbwesLr4BAyFI67I6By-wfkjSSfiqynFUAYU7ldvklBQ_yRjTaMv/exec";
 							try {
 								function add_pub(events){
 									event = events || [];
@@ -1168,71 +1168,56 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										resolve();
 										return false;
 									} else if (this.readyState === 4) {
-										var rows = JSON.parse(this.responseText)["values"];
-										rows.shift(0);
-										var display_rows = {}
-										for (var i = 0; i < rows.length; i++) {
-											if (rows[i].length == 11){
-												if (rows[i][10] == "TRUE"){
-													rows[i].pop(10);
-													rows[i][9] = (rows[i][9] == "TRUE");
-													var date = rows[i][3].split("/") || rows[i][3].split("-") || rows[i][3].split(".");
-													var end_date = rows[i][6].split("/") || rows[i][6].split("-") || rows[i][6].split(".");
-													date = new Date(date[2],date[1]-1,date[0]) || 0;
-													if (end_date.length > 2){
-														try {
-															end_date = new Date(end_date[2],end_date[1]-1,end_date[0]);
-														} catch(e) {
-															end_date = 0;
-														}
-													} else {
-														end_date = 0;
+										var response = JSON.parse(this.responseText);
+										var display_rows = {};
+										if (response.status == "success"){
+											for (var i = 0; i < response.response.length; i++) {
+												response.response[i][9] = (response.response[i][9] != false);
+												var date = response.response[i][3].split("/") || response.response[i][3].split("-") || response.response[i][3].split(".");
+												var end_date = response.response[i][6].split("/") || response.response[i][6].split("-") || response.response[i][6].split(".");
+												date = new Date(date[2],date[1]-1,date[0]) || 0;
+												end_date = new Date(end_date[2],end_date[1]-1,end_date[0]);
+												try {
+													var end_time = response.response[i][5].split(':');
+													if (end_time.length > 0){
+														end_date.setHours(end_time[0]);
 													}
-													if (end_date == 0 && date != 0){
-														end_date = new Date(date.getTime());
+													if (end_time.length > 1){
+														end_date.setMinutes(end_time[1]);
 													}
-													try {
-														var end_time = rows[i][5].split(':');
-														if (end_time.length > 0){
-															end_date.setHours(end_time[0]);
-														}
-														if (end_time.length > 1){
-															end_date.setMinutes(end_time[1]);
-														}
-														if (end_time.length > 2){
-															end_date.setSeconds(end_time[2]);
-														}
-													} catch (e) {
-														end_date = new Date(date.getTime());
-														end_date.setDate(end_date.getDate()+1);
-														end_date.setHours(0,0,0,0);
+													if (end_time.length > 2){
+														end_date.setSeconds(end_time[2]);
 													}
-													rows[i][6] = end_date;
-													var current_date = new Date();
-													current_date.setHours(0,0,0,0);
-													var start_date = date;
-													date.setHours(0,0,0,0);
-													if (start_date <= current_date){
-														date = current_date;
-														current_date = new Date();
-														if (end_date < current_date){
-															continue;
-														}
-													}
-													rows[i][3] = start_date;
-													var time = rows[i][4].split(":")
-													while (time.length < 3){
-														time.push("0");
-													}
-													time = (+time[0]) * 60 * 60 + (+time[1]) * 60 + (+time[2]) || 0;
-													if (typeof display_rows[date] === "undefined"){
-														display_rows[date] = {};
-													}
-													if (typeof display_rows[date][time] === "undefined"){
-														display_rows[date][time] = [];
-													}
-													display_rows[date][time].push(rows[i]);
+												} catch (e) {
+													end_date = new Date(date.getTime());
+													end_date.setDate(end_date.getDate()+1);
+													end_date.setHours(0,0,0,0);
 												}
+												response.response[i][6] = end_date;
+												var current_date = new Date();
+												current_date.setHours(0,0,0,0);
+												var start_date = date;
+												date.setHours(0,0,0,0);
+												if (start_date <= current_date){
+													date = current_date;
+													current_date = new Date();
+													if (end_date < current_date){
+														continue;
+													}
+												}
+												response.response[i][3] = start_date;
+												var time = response.response[i][4].split(":")
+												while (time.length < 3){
+													time.push("0");
+												}
+												time = (+time[0]) * 60 * 60 + (+time[1]) * 60 + (+time[2]) || 0;
+												if (typeof display_rows[date] === "undefined"){
+													display_rows[date] = {};
+												}
+												if (typeof display_rows[date][time] === "undefined"){
+													display_rows[date][time] = [];
+												}
+												display_rows[date][time].push(response.response[i]);
 											}
 										}
 										display_rows = add_pub(display_rows);
@@ -1584,7 +1569,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																out.html += "Unknown";
 															}
 															out.html += "</span><br>"
-															shown_end = false;
+															var shown_end = false;
 															out.html += "<span>" + {true:"Ending",false:"Until"}[start_date <= new Date() && time < now] + ": ";
 															if (end_date != ""){
 																if (end_date.getTime() > new Date(day).getTime() && end_time.getHours() != 12 && end_time.getMinutes() != 0){
@@ -2396,6 +2381,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											add.call_back.push(async function(){
 												await update_users().then(function(){
 													var set_selections = JSON.parse(JSON.stringify(contents.users[1]));
+													if (document.getElementById("positions_content_container_edit") == null){
+														return;
+													}
 													var selections = "<div class=\"side_margin center_text\" id=\"appoint_category_selection_buttons\"><div class=\"position_selection_button small_bottom\" id=\"position_select_button_president\" title=\"Click to select\"><h4 class=\"no_bottom\">President:</h4><div id=\"president_selection_text_container\">" + {true:(function(){
 														for (let i = 0; i < contents.users[0].length; i++) {
 															if (contents.users[0][i].id == contents.users[1].president){
