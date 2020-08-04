@@ -91,7 +91,7 @@ div.content {
 div.footer {
 	height: 5vh;
 }
-.no_interact, div#banner_main > p, a#close_popup_dialog, div#banner_container *, div.base_nav *, .post_img_s, .members_list_img_s, #new_post_content, #new_post_actions_post_submit, .members_list_name, #version_number {
+.no_interact, div#banner_main > p, a#close_popup_dialog, div#banner_container *, div.base_nav *, .post_img_s, .members_list_img_s, #new_post_content, #new_post_actions_post_submit, .members_list_name, #version_number, div.applet_header_controls > span {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -848,10 +848,20 @@ div.applet_display_option:not(.open) {
 div.applet_display_option > div {
 	padding: 1em;
 }
+div.applet_header_controls {
+	display: grid;
+	grid-template-columns: 90% 10%;
+}
 h3.applet_header_name {
 	font-size: 3ch;
 	margin: 3px 0 6px;
 	word-break: break-word;
+}
+div.applet_header_controls > span {
+	font-size: 5ch;
+	margin: -0.5ch 5% 0 0;
+	text-align: center;
+	cursor: pointer;
 }
 iframe.applet_content_iframe {
 	width: 100%;

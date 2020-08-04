@@ -2,6 +2,7 @@
 console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society members:\n\nThis website was made by the society members, for the society members. It is expected that some of you view this portion of the website, given the fact that you're all students studying a computing based subject; and to that extent, I congratulate you in using your technical initiative to learn more and to view the inner workings of this website. Have fun, engage with others and really do try to make the most of your time with all the members of this society, we're all your friends and are all looking out for one another.\n\nHave fun ;)\n\n\t- Bradley Marshall (@bradley499)\n\t  17/04/2020\n ");
 
 (function(){
+	const version = "0.5";
 	if (typeof page_ref === "undefined"){
 		location.assign("/error/page_ref");
 		return;
@@ -52,6 +53,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			document.getElementById("popup_dialog").classList.remove("active");
 		});
 	});
+	const alert_sound = "data:audio/mpeg;base64,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";
 	var alert_vibrate = true;
 	function alert(title,content){
 		title = title || "";
@@ -68,6 +70,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			document.getElementById("popup_dialog").classList.add("active");
 			if (alert_vibrate){
 				try {
+					new Audio(alert_sound).play();
 					window.navigator.vibrate(500);
 				} catch (e) {}
 			}
@@ -862,6 +865,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							}
 						});
 					});
+					document.getElementById("version_number").innerText = "Version: " + version;
 					document.getElementById("s_banner").addEventListener("click",function(){
 						if (document.body.getBoundingClientRect().top < -3){
 							var last_scroll_pos = document.body.scrollTop || document.documentElement.scrollTop;
@@ -1937,8 +1941,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										});
 									} else {
 										for (let i = 0; i < contents.applets.length; i++) {
-											out.html += "<div class=\"applet_display_option\" id=\"applet_ref_" + contents.applets[i].id + "\" appid=\"" + contents.applets[i].id + "\" style=\"background: linear-gradient(0deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0." + {true:"4",false:"2"}[contents.applets[i].background.startsWith("url")] + ")), " + contents.applets[i].background + ";\"><div><h3 class=\"applet_header_name\">" + contents.applets[i].name + "</h3><p class=\"no_top\">" + contents.applets[i].description.split("\n").join("</p><p class=\"no_top\">") + "</p><div id=\"applet_content_container_" + contents.applets[i].id + "\"></div></div></div>";
+											out.html += "<div class=\"applet_display_option\" id=\"applet_ref_" + contents.applets[i].id + "\" appid=\"" + contents.applets[i].id + "\" style=\"background: linear-gradient(0deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0." + {true:"4",false:"2"}[contents.applets[i].background.startsWith("url")] + ")), " + contents.applets[i].background + ";\"><div><div class=\"applet_header_controls\"><h3 class=\"applet_header_name\">" + contents.applets[i].name + "</h3><span class=\"hide\" id=\"applet_header_controls_minimize_" + contents.applets[i].id + "\" title=\"Minimize this applet\">&times;</span></div><p class=\"no_top\">" + contents.applets[i].description.split("\n").join("</p><p class=\"no_top\">") + "</p><div id=\"applet_content_container_" + contents.applets[i].id + "\"></div></div></div>";
 											add.click.push(["applet_ref_" + contents.applets[i].id ,function(e){
+												const initial_click = e.target.id;
 												var parent_check = 5;
 												var reference_check = e.target;
 												var applet_id = false;
@@ -1952,13 +1957,18 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 													}
 												}
 												if (applet_id !== false){
+													if (initial_click == "applet_header_controls_minimize_" + applet_id){
+														return;
+													}
 													try {
-														if (!reference_check.classList.contains("open")){
+														console.log(reference_check);
+														if (!reference_check.classList.contains("active")){
 															reference_check.classList.add("open");
+															reference_check.classList.add("active");
 															var applet_container = document.getElementById("applet_content_container_" + contents.applets[i].id);
 															var applet_container_host = document.createElement("iframe");
 															applet_container_host.setAttribute("id","applet_content_iframe-" + contents.applets[i].host_name);
-															applet_container_host.setAttribute("class","applet_content_iframe");
+															applet_container_host.classList.add("applet_content_iframe");
 															applet_container_host.style.height = "0px";
 															applet_container.appendChild(applet_container_host);
 															var applet_container_content = applet_container_host.contentWindow.document;
@@ -2261,14 +2271,51 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																});
 															}
 															var resizable = true;
+															var closing = false;
 															var resize = function(){
+																var ignore = false;
 																var resize_container = document.getElementById("applet_content_iframe-" + contents.applets[i].host_name);
 																if (typeof(resize_container) != "undefined" && resize_container != null){
-																	resize_container.style.height = resize_container.contentWindow.document.body.scrollHeight + "px";
+																	try {
+																		if (!reference_check.classList.contains("open")){
+																			ignore = true;
+																			if (reference_check.classList.contains("closed")){
+																				resize_container.style.display = "none";
+																			}
+																			if (!closing){
+																				resize_container.style.height = "0";
+																				setTimeout(function(){
+																					reference_check.classList.add("closed");
+																				},300);
+																				closing = true;
+																			}
+																		} else {
+																			ignore = false;
+																			closing = false;
+																			resize_container.style.display = "block";
+																		}
+																	} catch (e){
+																		console.error(e);
+																		return;
+																	}
+																	if (!ignore){
+																		resize_container.style.height = resize_container.contentWindow.document.body.scrollHeight + "px";
+																	}
 																	setTimeout(resize,50);
 																}
 															}
+															console.warn("applet_header_controls_minimize_" + applet_id);
 															setTimeout(resize,300); // to account for a quick load of applet
+															document.getElementById("applet_header_controls_minimize_" + applet_id).classList.remove("hide");
+															var a = e.target;
+															document.getElementById("applet_header_controls_minimize_" + applet_id).addEventListener("click",function(e){
+																reference_check.classList.remove("open");
+																e.target.classList.add("hide");
+															});
+														} else {
+															document.getElementById("applet_header_controls_minimize_" + applet_id).classList.remove("hide");
+															reference_check.classList.remove("closed");
+															reference_check.classList.add("open");
 														}
 													} catch(e) {}
 												}
