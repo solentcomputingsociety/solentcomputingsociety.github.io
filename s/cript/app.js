@@ -2003,7 +2003,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																}
 																if (apis_required.indexOf("services/token") >= 0){
 																	if (api[0] == null){
-																		alert("Failed to start","Currently unable to load applet, as it requires elevated access to your account; but your access token has not get be approved or generated! Please try again later.");
+																		alert("Failed to start","Currently unable to load applet, as it requires elevated access to your account; but your access token has not yet be approved or generated! Please try again later.");
 																		reject("Access token not generated");
 																		return;
 																	}
