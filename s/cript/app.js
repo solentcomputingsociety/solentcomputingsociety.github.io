@@ -1961,7 +1961,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														return;
 													}
 													try {
-														console.log(reference_check);
 														if (!reference_check.classList.contains("active")){
 															reference_check.classList.add("open");
 															reference_check.classList.add("active");
@@ -2295,7 +2294,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																			resize_container.style.display = "block";
 																		}
 																	} catch (e){
-																		console.error(e);
 																		return;
 																	}
 																	if (!ignore){
@@ -2304,7 +2302,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	setTimeout(resize,50);
 																}
 															}
-															console.warn("applet_header_controls_minimize_" + applet_id);
 															setTimeout(resize,300); // to account for a quick load of applet
 															document.getElementById("applet_header_controls_minimize_" + applet_id).classList.remove("hide");
 															var a = e.target;
@@ -3758,21 +3755,21 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																enable_fields();
 																return;
 															}
-														} else if (about_me_element_id == "Dev Community"){
+														} else if (about_me_element_id == "Dev_Community"){
 															if(value.match(/^(\w){1,15}$/.test(value) == false && /^[a-zA-Z][\w-_.]{1,13}[\w]$/g) != value){
 																alert("Error","Invalid Dev Community profile username!");
 																document.getElementById(element).removeAttribute("disabled");
 																enable_fields();
 																return;
 															}
-														} else if (about_me_element_id == "Phone number") {
+														} else if (about_me_element_id == "Phone_number") {
 															if(value.match(/^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \/]?)?((?:\(?\d{1,}\)?[\-\.\ \/]?){0,})$/g) != value){
 																alert("Error","Invalid phone number format!");
 																document.getElementById(element).removeAttribute("disabled");
 																enable_fields();
 																return;
 															}
-														} else if (about_me_element_id == "Email address") {
+														} else if (about_me_element_id == "Email_address") {
 															if(value.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g) != value){
 																alert("Error","Invalid email address format!");
 																document.getElementById(element).removeAttribute("disabled");
