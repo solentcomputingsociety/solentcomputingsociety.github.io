@@ -1157,7 +1157,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										if (typeof(events[date][time_of_pub]) === "undefined"){
 											events[date][time_of_pub] = [];
 										}
-										events[date][time_of_pub].push(["Society drink up at " + contents.pub.name,"",contents.pub.name,date,"19:00","","","🍺\nCome along to our weekly pub meetup; this week we will be going to " + contents.pub.name + ", why don't you come along for: a drink, and a catch up!","pub",false]);
+										events[date][time_of_pub].push(["Society drink up at " + contents.pub.name,"",contents.pub.name,date,"19:00","","","🍺\nCome along to our weekly pub meetup; this week we will be going to " + contents.pub.name + ", why don't you come along for: a drink, and a catch up!","pub_insert",false]);
 									}
 									return events;
 								}
@@ -1544,7 +1544,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														var i = priority_order[time_order][1];
 														var priority = priority_order[time_order][2];
 														var event = contents.events[day][time][i][8].toLowerCase();
-														var pub = (event == "pub");
+														var pub = (event == "pub_insert");
+														if (pub){
+															event = "pub";
+														}
 														var start_date = contents.events[day][time][i][3];
 														var end_date;
 														var end_time;
