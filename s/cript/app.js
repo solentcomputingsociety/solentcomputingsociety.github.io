@@ -875,7 +875,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									if (position) {
 										window.scrollBy(0, -Math.max(1, Math.floor(position / 8)));
 										last_scroll_pos = document.body.scrollTop || document.documentElement.scrollTop;
-										scrollAnimation = setTimeout(top, 30);
+										setTimeout(top, 30);
 									} else {
 										clearTimeout(top);
 									}
