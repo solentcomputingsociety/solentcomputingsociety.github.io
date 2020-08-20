@@ -799,18 +799,39 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					var load_spinner = document.getElementById("load_spinner");
 					var footer_content = document.getElementById("footer_content");
 					var overide_redirect = false;
-					var refresh_state_check = function (){
-						firebase.auth().onAuthStateChanged(function(user) {
+					var is_verified = false;
+					firebase.auth().onAuthStateChanged(async function(user) {
+						var refresh_state_check = async function (){
 							if (user){
 								if (user.emailVerified){
+									document.getElementById("cancel_verification").remove();
 									if (!overide_redirect){
 										if (!user.emailVerified){
 											location.assign("/error/auth_verification");
 										} else if(!overide_redirect) {
 											location.assign("/app/start.html");
 										}
+										return;
 									}
 								} else {
+									await firebase.auth().currentUser.reload();
+									if (!is_verified) {
+										if (user.emailVerified){
+											is_verified = true;
+											overide_redirect = true;
+											document.getElementById("login_panel_error").innerHTML = "Congratulations!<br><br><span style=\"font-size:xxx-large\">🥳</span><br><br> Your account is now verified, please click the button below to setup your account.";
+											document.getElementById("login_panel_error").style.backgroundColor = "#07ff97";
+											document.getElementById("login_submit").outerHTML = "<input type=\"submit\" value=\"Setup your account\" id=\"login_submit\">";
+											document.getElementById("login_submit").addEventListener("click",async function(e){
+												e.preventDefault();
+												e.target.classList.add("hide");
+												load_spinner.classList.remove("hide");
+												location.reload();
+											});
+											document.getElementById("cancel_verification").remove();
+											return;
+										}
+									}
 									document.getElementById("email_address").innerHTML = user.email;
 									login_panel.classList.remove("hide");
 									load_spinner.classList.add("hide");
@@ -819,7 +840,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										e.target.classList.add("hide");
 										load_spinner.classList.remove("hide");
 										await firebase.auth().currentUser.sendEmailVerification().then(function() {
-											document.getElementById("login_panel_error_content").innerHTML = "Please check your email for the verification email...";
+											document.getElementById("login_panel_error_content").innerHTML = "<br>Please check your email for the verification email...<br><br><u>Make sure that it isn't in your junk mail!</u>";
+											e.target.setAttribute("disabled","disabled");
+											e.target.style.cursor = "not-allowed";
+											e.target.setAttribute("value","Resend verification code");
+											setTimeout(function(){
+												e.target.removeAttribute("disabled");
+												e.target.style.cursor = "pointer";
+											},30000);
 										}).catch(function(error){
 											document.getElementById("login_panel_error_content").innerHTML = "<br><b>[" + error.code + "]:</b> " + error.message;
 										});
@@ -828,7 +856,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									});
 									setTimeout(function () {
 										refresh_state_check();										
-									}, 10000);
+									}, 5000);
 								}
 							} else {
 								location.assign("/login");
@@ -837,9 +865,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								overide_redirect = true;
 								firebase.auth().signOut();
 							});
-						});
-					};
-					refresh_state_check();
+						};
+						refresh_state_check();
+					});
 				}
 				break;
 			case "d2a57dc1d883fd21fb9951699df71cc7":
