@@ -25,6 +25,9 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 		script.src = scripts[i];
 		script.id = "dls" + i;
 		script.async = false;
+		script.onerror = function(){
+			window.location.href = 'error/load_app';
+		};
 		document.getElementsByTagName("head")[0].appendChild(script);
 		document.getElementById(script.id).addEventListener("load",function(){base_load(true)});
 	}

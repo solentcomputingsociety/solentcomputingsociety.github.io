@@ -16,7 +16,8 @@
 	<link rel="manifest" href="/app/manifest.webmanifest">
 	<script async src="https://unpkg.com/pwacompat" crossorigin="anonymous"></script>
 	<script>const page_ref = "d2a57dc1d883fd21fb9951699df71cc7";</script>
-	<script type="text/javascript" src="/s/cript/app.js"></script>
+	<script type="text/javascript" src="/s/cript/app.js" onerror="window.location.href = 'error/load_app'"></script>
+	<noscript><meta http-equiv="refresh" content="0; URL='/error/javascript'" /></noscript>
 	<script type="text/javascript">if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').then(function(sw){sw.update()})}</script>
 </head>
 <body>
