@@ -705,7 +705,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										});
 										if (overide_redirect){
 											footer_content.classList.add("hide");
-											window.location.href = "/error/auth_verification";
+											window.location.href = "/app/intro";
 										} else {
 											footer_content.classList.remove("hide");
 										}
