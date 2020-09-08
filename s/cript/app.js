@@ -1444,6 +1444,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							ignore_hash_change = true;
 							switch (page_id){
 								case "nav_loc_messages":
+									if (document.getElementById("page_app").classList.contains("hide")) {
+										ignore_hash_change = false;
+										return;
+									}
 									hash_ref = "messages";
 									try {
 										if (sub_ref == "posts_host_container"){
