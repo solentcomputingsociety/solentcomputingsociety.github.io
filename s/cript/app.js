@@ -1839,7 +1839,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	}
 																	about_panel_out += "<div class=\"side_margin\">" + build_socials;
 																	if (about_me["Intro"].length > 0){
-																		about_panel_out += "<p class=\"center_text small_bottom\">" + about_me["Intro"].replace('<','&lt;').replace('>','&gt;') + "</p>";
+																		about_panel_out += "<p class=\"center_text small_bottom\">" + about_me["Intro"].replace("<","&lt;").replace(">","&gt;").replace("\n\n","\n").replace("\n","<br>") + "</p>";
 																	}
 																	if (about_me["Subject"] > 0){
 																		about_panel_out += "<div><h3 class=\"center_text small_bottom\">Studying:</h3><p class=\"center_text\">" + about_sections["Subject"][about_me["Subject"] - 1];
@@ -1935,12 +1935,14 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															cached_about.push(uid_ref+"/favourite_things");
 															cached_about.push(uid_ref+"/social");
 														}).catch(function(error){
-															if (document.getElementById("about_me_prof_container").getAttribute("uid") == uid_ref){
-																document.getElementById("about_me_loading").classList.add("error");
-																document.getElementById("about_me_prof_container").classList.remove("loading")
-																document.getElementById("about_me_coabout_me_prof_containerntainer").classList.add("error");
-																document.getElementById("about_me_side_ref").outerHTML = "";
-															}
+															try {
+																if (document.getElementById("about_me_prof_container").getAttribute("uid") == uid_ref){
+																	document.getElementById("about_me_loading").classList.add("error");
+																	document.getElementById("about_me_prof_container").classList.remove("loading")
+																	document.getElementById("about_me_coabout_me_prof_containerntainer").classList.add("error");
+																	document.getElementById("about_me_side_ref").outerHTML = "";
+																}
+															} catch {}
 														});
 													}
 												}
