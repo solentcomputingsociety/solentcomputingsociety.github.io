@@ -90,11 +90,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			if (return_blob) {
 				return image_cache[url];
 			}
-			if (document.getElementById(rep_id).tagName.toLowerCase() == "span"){
-				document.getElementById(rep_id).outerHTML = "<img" + (document.getElementById(rep_id).outerHTML.substring(5)).substring(0,document.getElementById(rep_id).outerHTML.length-7);
-			}
-			document.getElementById(rep_id).setAttribute("src",image_cache[url]);
-			document.getElementById(rep_id).classList.remove("loading");
+			try {
+				if (document.getElementById(rep_id).tagName.toLowerCase() == "span"){
+					document.getElementById(rep_id).outerHTML = "<img" + (document.getElementById(rep_id).outerHTML.substring(5)).substring(0,document.getElementById(rep_id).outerHTML.length-7);
+				}
+				document.getElementById(rep_id).setAttribute("src",image_cache[url]);
+				document.getElementById(rep_id).classList.remove("loading");
+			} catch (e) {}
 		} else {
 			var xhr = new XMLHttpRequest();
 			xhr.open( "GET", url );
@@ -897,6 +899,10 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						});
 					});
 					document.getElementById("version_number").innerText = "Version: " + version;
+					document.getElementById("version_number").addEventListener("click",function(){
+						alert_vibrate = false;
+						alert("Version " + version,"The Solent Computing Society web app, was developed, in part by:\n" + atob("QnJhZGxleSBNYXJzaGFsbA==") + " & " + atob("TWF0dCBEZWFy") + "\n\nMade by the society, for the society!");
+					});
 					document.getElementById("s_banner").addEventListener("click",function(){
 						if (document.body.getBoundingClientRect().top < -3){
 							var last_scroll_pos = document.body.scrollTop || document.documentElement.scrollTop;
