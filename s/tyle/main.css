@@ -141,6 +141,7 @@ div#version_number {
 	text-align: center;
 	font-size: 11px;
 	color: #787878;
+	cursor: help;
 }
 div#b_banner, div#s_banner {
 	width: 480px;
