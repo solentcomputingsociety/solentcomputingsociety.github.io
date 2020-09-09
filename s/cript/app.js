@@ -2,7 +2,7 @@
 console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society members:\n\nThis website was made by the society members, for the society members. It is expected that some of you view this portion of the website, given the fact that you're all students studying a computing based subject; and to that extent, I congratulate you in using your technical initiative to learn more and to view the inner workings of this website. Have fun, engage with others and really do try to make the most of your time with all the members of this society, we're all your friends and are all looking out for one another.\n\nHave fun ;)\n\n\t- Bradley Marshall (@bradley499)\n\t  17/04/2020\n ");
 
 (function(){
-	const version = "0.5";
+	const version = "0.6";
 	if (typeof page_ref === "undefined"){
 		location.assign("/error/page_ref");
 		return;
@@ -937,9 +937,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							case "nav_loc_applets":
 								window.location.hash = "applets";
 								break;
-							case "nav_loc_pub":
-								window.location.hash = "pub";
-								break;
 							case "nav_loc_member_about":
 								window.location.hash = "profile/" + current_page[1];
 						}
@@ -968,8 +965,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							return {lp:"nav_loc_messages",main:true};
 						case "applets":
 							return {lp:"nav_loc_applets",main:true};
-						case "pub":
-							return {lp:"nav_loc_pub",main:true};
 						case "controls":
 							if (hash.length == 2){
 								user_view_about = hash[1];
@@ -1042,7 +1037,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 					if (user) {
 						var sub_pages = ["nav_loc_messages","nav_loc_events","nav_loc_members","nav_loc_applets"];
 						var sub_page = sub_pages[0];
-						var contents = {posts:{},users:[],events:true,pub:"tbc",applets:-1};
+						var contents = {posts:{},users:[],events:true,applets:-1};
 						var sub_page_link_generation = 0;
 						var posts_base_load = false;
 						sub_pages.forEach(function(nav_id){
@@ -1128,75 +1123,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								reject(error);
 							});
 						});
-						var update_pub = () => new Promise(function(resolve, reject){
-							firebase.firestore().collection("places").doc("pubs").get().then(function(pub){
-								if (pub.exists){
-									pub = pub.data();
-									pub.date_time = pub.date.toDate();
-									pub.date = pub.date_time;
-									pub.date = pub.date.setHours(23,0,0,0);
-									var pub_id = pub.this_week;
-									if (pub.date > new Date()){
-										firebase.firestore().collection("places/pubs/listed").doc(pub.this_week).get().then(function(pub_data){
-											if (pub_data.exists){
-												pub.this_week = pub_data.data();
-												pub.this_week.id = pub_id;
-												pub.this_week.geo = [pub.this_week.geo.latitude,pub.this_week.geo.longitude];
-												pub.this_week.error = false;
-												pub.this_week.date_time = pub.date_time;
-												contents.pub = pub.this_week;
-												resolve(pub);
-											} else {
-												throw false;
-											}
-										}).catch(function(e){
-											contents.pub = {name:"Unable to get name of pub (" + e.message +  ")",error:true};
-											resolve(pub);
-										});
-									} else {
-										pub = [];
-									}
-								} else {
-									pub = [];
-								}
-								if (pub.length == 0){
-									contents.pub = "tbc";
-									resolve(pub);
-								}
-							}).catch(function(error){
-								reject(error);
-							});
-						});
 						var update_events = () => new Promise(function(resolve, reject){
 							var url = "https://script.google.com/macros/s/AKfycbwesLr4BAyFI67I6By-wfkjSSfiqynFUAYU7ldvklBQ_yRjTaMv/exec";
 							try {
-								function add_pub(events){
-									event = events || [];
-									if (contents.pub != "tbc"){
-										var date = new Date();
-										date.setDate(date.getDate() + ((7-date.getDay())%7+3) % 7);
-										date.setHours(0,0,0,0);
-										if (date == new Date().setHours(0,0,0,0)){
-											if (new Date().getHours() > 23 && new Date().getMinutes() > 30){
-												return events;
-											}
-										}
-										if (typeof(events[date]) === "undefined"){
-											events[date] = {};
-										}
-										var time_of_pub = ((contents.pub.date_time.getHours() * 60) * 60) + (contents.pub.date_time.getMinutes() * 60) + contents.pub.date_time.getSeconds();
-										if (typeof(events[date][time_of_pub]) === "undefined"){
-											events[date][time_of_pub] = [];
-										}
-										events[date][time_of_pub].push(["Society drink up at " + contents.pub.name,"",contents.pub.name,date,"19:00","","","🍺\nCome along to our weekly pub meetup; this week we will be going to " + contents.pub.name + ", why don't you come along for: a drink, and a catch up!","pub_insert",false]);
-									}
-									return events;
-								}
 								var request = new XMLHttpRequest();
 								request.open('GET', url, true);
 								request.onreadystatechange = function() {
 									if (this.status >= 400) {
-										contents.events = add_pub();
 										if (contents.events == {}){
 											reject("Failed to load events");
 										}
@@ -1255,7 +1188,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												display_rows[date][time].push(response.response[i]);
 											}
 										}
-										display_rows = add_pub(display_rows);
 										var sorted_display_rows = {};
 										var display_rows_keys = Object.keys(display_rows);
 										display_rows_keys.sort(function(a,b){
@@ -1408,7 +1340,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								}, 500);
 							}
 						}
-						var pubs_data = [];
 						var user_view_about = -1;
 						var cached_about = [];
 						var valid_setup = false;
@@ -1422,7 +1353,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							sub_ref = sub_ref || false;
 							sub_page = page_id;
 							var sub_pages_rel = sub_pages;
-							sub_pages_rel.push("nav_loc_pub");
 							var is_president = contents.users[1].president == firebase.auth().currentUser.uid;
 							sub_pages_rel.push("nav_loc_member_about");
 							if (!is_president && page_id == "nav_loc_controls"){
@@ -1579,10 +1509,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														var i = priority_order[time_order][1];
 														var priority = priority_order[time_order][2];
 														var event = contents.events[day][time][i][8].toLowerCase();
-														var pub = (event == "pub_insert");
-														if (pub){
-															event = "pub";
-														}
 														var start_date = contents.events[day][time][i][3];
 														var end_date;
 														var end_time;
@@ -1597,7 +1523,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														} catch (e) {
 															end_date = "";
 														}
-														out.html += "<div id=\"" + {true:"pub_link_event_ref",false:"event_ref_id-e" + (new Date(day).getTime() + time)}[pub] + "\" class=\"event_content_container" + {true:" dynamic_tables",false:""}[navigator.appVersion.indexOf("Chrome") != -1] + " event_type_" + event.split(" ").join("_") + {true:" priority_event",false:""}[priority] + "\"><div><h3 class=\"event_name\">" + contents.events[day][time][i][0] + "</h3><div><div class=\"center_text small\"><span>" + {true:"Started",false:"From"}[start_date.getTime() < date_check.getTime() || (start_date.getTime() == date_check.getTime() && parseInt(time) < now)] + ": ";
+														out.html += "<div id=\"vent_ref_id-e" + (new Date(day).getTime() + time) + "\" class=\"event_content_container" + {true:" dynamic_tables",false:""}[navigator.appVersion.indexOf("Chrome") != -1] + " event_type_" + event.split(" ").join("_") + {true:" priority_event",false:""}[priority] + "\"><div><h3 class=\"event_name\">" + contents.events[day][time][i][0] + "</h3><div><div class=\"center_text small\"><span>" + {true:"Started",false:"From"}[start_date.getTime() < date_check.getTime() || (start_date.getTime() == date_check.getTime() && parseInt(time) < now)] + ": ";
 														try {
 															if (start_date < new Date(day)){
 																out.html += ("0" + contents.events[day][time][i][3].getDate()).slice(-2) + "/" + ("0" + (contents.events[day][time][i][3].getMonth() + 1)).slice(-2) + "/" + contents.events[day][time][i][3].getFullYear();
@@ -1622,10 +1548,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 																	shown_end = true;
 																}
 															}
-															if ((pub)){
-																out.html += " late";
-																shown_end = true;
-															} else if (end_time != ""){
+															if (end_time != ""){
 																if (contents.events[day][time][i][5].length > 0){
 																	if (end_time.getHours() == 0 && end_time.getMinutes() == 0){
 																		out.html += "Midnight";
@@ -1660,11 +1583,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															out.html += "<p class=\"no_top small_bottom small side_margin center_text\">Location: " + contents.events[day][time][i][2] + "</p>";
 														}
 														out.html += "</div></div></div>";
-														if (pub){
-															add.click.push(["pub_link_event_ref",function(){
-																load_page("nav_loc_pub");
-															}]);
-														}
 													}
 													out.html += "<div class=\"event_content_container spacer_padder small desktop_only\"></div></div></div></div>";
 												}
@@ -2380,72 +2298,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									token_refresh();
 									out.html += "</div>";
 									break;
-								case "nav_loc_pub":
-									hash_ref = "pub";
-									document.title = "Weekly pub | Solent Computing Society";
-									out.html = "<div class=\"side_margin\"><p class=\"center_text\">";
-									if (is_president) {
-										if (pubs_data.length == 0){
-											document.getElementById({true:"page_render",false:sub_ref}[sub_ref == false]).innerHTML = "<div class=\"side_margin center_text\"><p class=\"center_text no_interact\">Loading...</p></div>";
-											await firebase.firestore().collection("places/pubs/listed").get().then(async function(snapshot){
-												pubs_data = snapshot.docs.map( doc => {
-													var doc_data = doc.data();
-													doc_data.id = doc.id;
-													return doc_data;
-												});	
-											}).catch(function(error){
-												alert("Error:", "Failed to load pub data!\n" + error.message);
-											});
-										}
-										out.html += "<div id=\"select_pub_container\"><p class=\"center_text\">Select pub:</p><div class=\"center_text\"><select id=\"pub_selection\">";
-										for (var i = 0; i < pubs_data.length; i++) {
-											out.html += "<option value=\"" + pubs_data[i].id + "\" id=\"" + pubs_data[i].id + "\"" + {true:" selected=\"selected\"",false:""}[contents.pub.id == pubs_data[i].id] + ">" + pubs_data[i].name + "</option>"
-										}
-										out.html += "</select> or <a title=\"Randomly select a pub\" id=\"pub_selection_randomiser\">Randomise</a>.</div></div>";
-										var pub_selection_update_func = async function(){
-											var selected_pub = pubs_data[document.getElementById("pub_selection").selectedIndex].id;
-											var publish_date = new Date();
-											if (!(new Date().getDay() == 3 && new Date().getHours() <= 19)){
-												publish_date = publish_date.setDate(publish_date.getDate() + (7 + 3 - publish_date.getDay()) % 7);
-											}
-											document.getElementById("page_render").innerHTML = "<div id=\"loading_progress\"><div id=\"load_spinner\"></div><p class=\"center_text margin_top no_interact\">Updating weekly pub...</p></div>";
-											firebase.firestore().collection("places").doc("pubs").set({
-												date: firebase.firestore.Timestamp.fromDate(new Date(publish_date)),
-												this_week: selected_pub,
-											}).then(async function(){
-												await update_pub();
-												await update_events();
-												load_page("nav_loc_pub");
-											}).catch(function(error){
-												alert("Error:","Failed to update weekly pub!\n" + error.message);
-												error_show("failed_weekly_pub");
-											});
-										};
-										add.click.push(["pub_selection_randomiser",function(){
-											var random_pub = -1;
-											while (random_pub == -1) {
-												random_pub = pubs_data[Math.floor(Math.random()*pubs_data.length)].id;
-												if (pubs_data[document.getElementById("pub_selection").selectedIndex].id == random_pub){
-													random_pub = -1;
-												}
-											}
-											document.getElementById(random_pub).selected = true;
-											pub_selection_update_func();
-										}]);
-										add.change.push(["pub_selection",pub_selection_update_func]);
-									}
-									if (contents.pub == "tbc"){
-										if (is_president) {
-											out.html += "</div>";
-											break;
-										}
-										out.html += "<p class=\"center_text no_interact\">This week's pub hasn't been published yet...</p></div>";
-									} else if (contents.pub.error == true){
-										out.html += "<p class=\"center_text no_interact\">Unable to load this week's pub!</p></div>";
-									} else {
-										out.html += "<p class=\"center_text no_interact\">This week we will be going to:</p><h2 class=\"center_text\">" + contents.pub.name + "</h2><p class=\"center_text\">" + contents.pub.address + "</p><p class=\"center_text\">" + contents.pub.postcode + "</p></div><iframe src=\"https://maps.google.com/maps?q=" + contents.pub.geo[0] + "," + contents.pub.geo[1] + "&z=18&output=embed\" id=\"pub_map\" frameborder=\"0\" style=\"border:0;background-image:url(\'" + img_blob("/app/img/map_loading.gif",false,true) + "\')\" allowfullscreen=\"\" aria-hidden=\"false\" tabindex=\"0\"></iframe>";
-									}
-									break;
 								case "nav_loc_controls":
 									hash_ref = "controls";
 									if (!is_president){
@@ -2765,10 +2617,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 										sub_ref = false;
 									} else {
 										document.title = "Presidential controls | Solent Computing Society";
-										out.html = "<div class=\"side_margin no_interact\"><h2 class=\"center_text no_interact\">Presidential controls:</h2><p class=\"center_text no_interact\">Make changes and updates for the society by following the hotlinks below:</p><br><p class=\"center_text no_bottom\"><a href=\"https://docs.google.com/spreadsheets/d/1n8XteyNorvi8FFpsaUGdya2Tiqpxa1Rx6yisywyMTCc/edit\" target=\"_blank\" title=\"Open events spreadsheet\">Update events</a></p><br><p class=\"center_text no_bottom\"><a href=\"https://console.firebase.google.com/project/solent-computing-society/authentication/users\" target=\"_blank\" title=\"Manage member list\">Manage members</a></p><br><p class=\"center_text no_bottom\"><a id=\"nav_loc_pub\">Set weekly pub</a></p><br><p class=\"center_text no_bottom\"><a id=\"nav_loc_appoint_position\">Appoint positions</a></p><br><p class=\"center_text no_bottom\"><a id=\"nav_loc_banner\">Banner controls</a></p></div>";
-										add.click.push(["nav_loc_pub",function(){
-											load_page("nav_loc_pub");
-										}]);
+										out.html = "<div class=\"side_margin no_interact\"><h2 class=\"center_text no_interact\">Presidential controls:</h2><p class=\"center_text no_interact\">Make changes and updates for the society by following the hotlinks below:</p><br><p class=\"center_text no_bottom\"><a href=\"https://docs.google.com/spreadsheets/d/1n8XteyNorvi8FFpsaUGdya2Tiqpxa1Rx6yisywyMTCc/edit\" target=\"_blank\" title=\"Open events spreadsheet\">Update events</a></p><br><p class=\"center_text no_bottom\"><a href=\"https://console.firebase.google.com/project/solent-computing-society/authentication/users\" target=\"_blank\" title=\"Manage member list\">Manage members</a></p><br><p class=\"center_text no_bottom\"><a id=\"nav_loc_appoint_position\">Appoint positions</a></p><br><p class=\"center_text no_bottom\"><a id=\"nav_loc_banner\">Banner controls</a></p></div>";
 										add.click.push(["nav_loc_appoint_position",function(){
 											load_page("nav_loc_controls","appoint");
 										}]);
@@ -2877,102 +2726,90 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									window.location.hash = "setup";
 								}
 								setup_check = true;
-								await update_pub().then(async function(e){
-									await update_events();
-									setInterval(function(){update_events(),update_pub()},600000);
-									await firebase.firestore().collection("blog").doc("banner").get().then(async function(banner){
-										banner = banner.data();
-										if (banner.show){
-											var banner_contents = document.getElementById("banner_contents");
-											banner_contents.innerText = banner.contents;
-											banner_contents.setAttribute("title","Click to dismiss");
-											document.getElementById("banner_main").addEventListener("click",function(){
-												document.getElementById("banner_container").classList.add("hide");
-												document.getElementById("page_render").classList.remove("banner_top");
-												try {
-													document.getElementById("redundant_padding").remove();															
-												} catch (e) {}
-											});
-											document.getElementById("banner_container").classList.remove("hide");
-											document.getElementById("page_render").classList.add("banner_top");
+								await update_events();
+								setInterval(function(){update_events()},600000);
+								await firebase.firestore().collection("blog").doc("banner").get().then(async function(banner){
+									banner = banner.data();
+									if (banner.show){
+										var banner_contents = document.getElementById("banner_contents");
+										banner_contents.innerText = banner.contents;
+										banner_contents.setAttribute("title","Click to dismiss");
+										document.getElementById("banner_main").addEventListener("click",function(){
+											document.getElementById("banner_container").classList.add("hide");
+											document.getElementById("page_render").classList.remove("banner_top");
 											try {
 												document.getElementById("redundant_padding").remove();															
 											} catch (e) {}
-											function resize(){
-												try {
-													document.getElementById("redundant_padding").style.minHeight = (document.getElementById("banner_contents").offsetHeight + 20 - (16 * 4)) + "px";
-												} catch(e){};
-											}
-											new ResizeObserver(resize).observe(banner_contents)
-										}
-										valid_setup = true;
-									}).catch(function(error){
-										if (!navigator.onLine){
-											location.href = "offline.html";
-										} else {
-											alert("Error","Unable to load content [ref: banner]");
-											error_show();
-											valid_setup = false;
-										}
-									});
-									if (valid_setup){
-										sub_pages.forEach(function(nav_id){
-											if (nav_id != "nav_loc_member_about")
-											{
-												document.getElementById(nav_id).classList.remove("disabled");
-											}
 										});
-										document.getElementById("page_render").classList.remove("loading");
-										document.getElementById("nav_loc_messages").classList.remove("fadeout","disabled");
-										document.getElementById("nav_loc_messages").setAttribute("title","View the society message board");
-										list_applets();
-										var hash_state_redirect = hash_state_check();
-										switch (hash_state_redirect.lp){
-											case "nav_loc_events":
-												load_page("nav_loc_events");
-												break;
-											case "nav_loc_members":
-												load_page("nav_loc_members");
-												break;
-											case "nav_loc_messages":
-												load_page("nav_loc_messages");
-												break;
-											case "nav_loc_applets":
-												load_page("nav_loc_applets");
-												break;
-											case "nav_loc_pub":
-												load_page("nav_loc_pub");
-												break;
-											case "nav_loc_member_about":
-												user_view_about = hash_state_redirect.add;
-												load_page("nav_loc_member_about",hash_state_redirect.add);
-												break;
-											case "nav_loc_controls":
-												load_page("nav_loc_controls",hash_state_redirect.add);
-												break;
-											case "menu":
-												settings();
-												break;
-											case "settings":
-												settings(hash_state_redirect.add);
-												break;
-											default:
-												if (document.getElementById("page_menu").classList.contains("hide") && !document.getElementById("page_app").classList.contains("hide")){
-													load_page("nav_loc_events");
-												}
+										document.getElementById("banner_container").classList.remove("hide");
+										document.getElementById("page_render").classList.add("banner_top");
+										try {
+											document.getElementById("redundant_padding").remove();															
+										} catch (e) {}
+										function resize(){
+											try {
+												document.getElementById("redundant_padding").style.minHeight = (document.getElementById("banner_contents").offsetHeight + 20 - (16 * 4)) + "px";
+											} catch(e){};
 										}
-										setInterval(function(){ 
-											refresh(true);
-										},3000);
+										new ResizeObserver(resize).observe(banner_contents)
 									}
+									valid_setup = true;
 								}).catch(function(error){
 									if (!navigator.onLine){
 										location.href = "offline.html";
 									} else {
-										alert("Error","Unable to load content [ref:&nbsp;pub/" + error.code + "]");
+										alert("Error","Unable to load content [ref: banner]");
 										error_show();
+										valid_setup = false;
 									}
 								});
+								if (valid_setup){
+									sub_pages.forEach(function(nav_id){
+										if (nav_id != "nav_loc_member_about")
+										{
+											document.getElementById(nav_id).classList.remove("disabled");
+										}
+									});
+									document.getElementById("page_render").classList.remove("loading");
+									document.getElementById("nav_loc_messages").classList.remove("fadeout","disabled");
+									document.getElementById("nav_loc_messages").setAttribute("title","View the society message board");
+									list_applets();
+									var hash_state_redirect = hash_state_check();
+									switch (hash_state_redirect.lp){
+										case "nav_loc_events":
+											load_page("nav_loc_events");
+											break;
+										case "nav_loc_members":
+											load_page("nav_loc_members");
+											break;
+										case "nav_loc_messages":
+											load_page("nav_loc_messages");
+											break;
+										case "nav_loc_applets":
+											load_page("nav_loc_applets");
+											break;
+										case "nav_loc_member_about":
+											user_view_about = hash_state_redirect.add;
+											load_page("nav_loc_member_about",hash_state_redirect.add);
+											break;
+										case "nav_loc_controls":
+											load_page("nav_loc_controls",hash_state_redirect.add);
+											break;
+										case "menu":
+											settings();
+											break;
+										case "settings":
+											settings(hash_state_redirect.add);
+											break;
+										default:
+											if (document.getElementById("page_menu").classList.contains("hide") && !document.getElementById("page_app").classList.contains("hide")){
+												load_page("nav_loc_events");
+											}
+									}
+									setInterval(function(){ 
+										refresh(true);
+									},3000);
+								}
 							}).catch(function(error){
 								if (!navigator.onLine){
 									location.href = "offline.html";
@@ -3022,9 +2859,6 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									break;
 								case "nav_loc_applets":
 									load_page("nav_loc_applets");
-									break;
-								case "nav_loc_pub":
-									load_page("nav_loc_pub");
 									break;
 								case "nav_loc_member_about":
 									user_view_about = hash_state_redirect.add;
