@@ -245,7 +245,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 			"Yacht Design And Production",
 			"Yacht And Powercraft Design",
 			"Football Science",
-			"Mental Health And Psychological Wellbeing"
+			"Mental Health And Psychological Wellbeing",
+			"Data Analytics Engineering"
 			/*
 				WARNING!
 
@@ -3384,7 +3385,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								}
 							});
 							var about_me = {"Subject":about["subject"]||"","Year of study":about["year_of_study"]||"","Intro":about["intro"]||"","Relationship status":about["relationship_status"]||"","Birthday":about["birthday"]||"","Favourite lecturer": about["favourite_lecturer"]||"","Favourite food": about["favourite_food"]||"","Favourite drink": about["favourite_drink"]||"","Favourite film": about["favourite_film"]||"","Favourite TV show": about["favourite_tv_show"]||"","Favourite game": about["favourite_game"]||"","Facebook":about["facebook"]||"","Phone number":about["phone_number"]||"","Email address":about["email_address"]||"","Website":about["website"]||"","Twitter":about["twitter"]||"","Instagram":about["instagram"]||"","Snapchat":about["snapchat"]||"","Youtube":about["youtube"]||"","Discord":about["discord"]||"","Dev Community":about["dev_community"]||"","GitHub":about["github"]||"","LinkedIn":about["linkedin"]||""};
-							var computing_subjects = [20,23,88,24,16,17,18,19];
+							var computing_subjects = [20,23,88,24,16,17,18,19,102];
 							try {
 								document.getElementById("settings_loading_statement").remove();
 							} catch (e) {}
