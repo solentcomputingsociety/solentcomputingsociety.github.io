@@ -3103,7 +3103,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 								var file = profile_picture_input.files;
 								if (file.length == 1) {
 									file = file[0];
-									profile_picture_inputvalue = "";
+									profile_picture_input.value = "";
 									if (file && ["image/x-png","image/png","image/jpeg","image/jpg"].includes(file['type'])){
 										if (file.size > 0 && file.size <= 5242880){
 											var prof_image_preview_src = prof_image_preview.getAttribute("src") || ""; 
