@@ -3336,11 +3336,18 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						document.getElementById("page_ref_settings_content").classList.remove("hide");
 						document.getElementById("page_ref_settings_setup").classList.add("hide");
 						document.getElementById("page_ref_settings_forbidden").classList.add("hide");
-						document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><div id=\"setting_ref_content\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Back to settings\" id=\"settings_ref_back\">Go back to main settings</a></p><br>";
+						try {
+							document.getElementById("page_ref_settings_content").innerHTML = "<p class=\"side_margin margin_top center_text\" id=\"settings_loading_statement\"></p><p class=\"side_margin margin_top center_text\"><a title=\"Back to settings\" id=\"settings_ref_back\" class=\"hide\">Go back to main settings</a></p><br><div id=\"setting_ref_content\"></div><p class=\"side_margin margin_top center_text\"><a title=\"Back to settings\" id=\"settings_ref_back_bottom\">Go back to main settings</a></p><br>";
+						} catch (e) {
+							main_menu();
+							alert("Error","An unexpected error resulted in the failure to load the \"About me\" page.");
+							return;
+						}
 						document.getElementById("page_ref_title").innerHTML = "About me";
-						document.getElementById("settings_ref_back").addEventListener("click",base_settings_page);
+						document.getElementById("settings_ref_back_bottom").addEventListener("click",base_settings_page);
 						ignore_hash_change = false;
 						await firebase.firestore().collection("users/members/id/" + firebase.auth().currentUser.uid + "/about/").get().then(async function(about){
+							document.getElementById("settings_ref_back").addEventListener("click",base_settings_page);
 							var about_docs = about.docs.map( doc => {
 								var doc_data = doc.data();
 								doc_data.id = doc.id;
@@ -3389,7 +3396,13 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							try {
 								document.getElementById("settings_loading_statement").remove();
 							} catch (e) {}
-							document.getElementById("setting_ref_content").innerHTML = "<p class=\"side_margin margin_top center_text\">This information will be publicly viewable to all members of the Solect Computing Society!</p><div class=\"side_margin about_me_edit margin_top\" id=\"about_me_container\"><br></div>";
+							try {
+								document.getElementById("setting_ref_content").innerHTML = "<p class=\"side_margin margin_top center_text\">This information will be publicly viewable to all members of the Solect Computing Society!</p><div class=\"side_margin about_me_edit margin_top\" id=\"about_me_container\"><br></div>";
+							} catch (e) {
+								main_menu();
+								alert("Error","An unexpected error resulted in the failure to load the \"About me\" page.");
+								return;
+							}
 							var render_content = function(about_topic,dateMin,dateMax) {
 								dateMin = dateMin || null;
 								dateMax = dateMax || null;
@@ -3472,6 +3485,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									if (e.target.classList.contains("disabled")){
 										return false;
 									}
+									//document.getElementById("settings_ref_back").classList.remove("hide");
 									var about_me_element_id = e.target.getAttribute("id").replace("about_me_category_update_","");
 									var invalid = true;
 									var iteration = 0;
@@ -3556,11 +3570,17 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 												}
 												if (about_me_element_id == "Birthday"){
 													var time = document.getElementById(element).valueAsDate;
-													time.setHours(0,0,0,0);
-													var today = new Date();
-													today.setHours(0,0,0,0);
-													if (time > today){
-														alert("Unable to update your " + about_me_element_id.split("_").join(" "),"Your birthday cannot be in the future!");
+													try {
+														time.setHours(0,0,0,0);
+														var today = new Date();
+														today.setHours(0,0,0,0);
+														if (time > today){
+															alert("Unable to update your " + about_me_element_id.split("_").join(" "),"Your birthday cannot be in the future!");
+															enable_fields();
+															return;
+														}
+													} catch (e) {
+														alert("Unable to update your " + about_me_element_id.split("_").join(" "),"Your birthday needs a full date with a valid DD/MM/YYYY date!");
 														enable_fields();
 														return;
 													}
