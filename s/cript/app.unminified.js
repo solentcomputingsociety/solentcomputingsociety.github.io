@@ -1522,7 +1522,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 														var i = priority_order[time_order][1];
 														var priority = priority_order[time_order][2];
 														var event = contents.events[day][time][i][8].toLowerCase();
-														var start_date = contents.events[day][time][i][3];
+														var start_date = new Date(contents.events[day][time][i][3].getTime());
 														var end_date;
 														var end_time;
 														if (contents.events[day][time][i][6] !== "") {
@@ -1552,8 +1552,8 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 															out.html += "</span><br>"
 															var shown_end = false;
 															out.html += "<span>" + {true:"Ending",false:"Until"}[start_date <= new Date() && time < now] + ": ";
-															if (end_date != ""){
-																if (end_date.getTime() > new Date(day).getTime() && end_time.getHours() != 12 && end_time.getMinutes() != 0){
+															if ({true:true,false:end_date.getTime() !== start_date.getTime()}[end_date != ""]){
+																if (end_date.getTime() > new Date(day).getTime()){
 																	out.html += ("0" + end_date.getDate()).slice(-2) + "/" + ("0" + (end_date.getMonth() + 1)).slice(-2) + "/" + end_date.getFullYear();
 																	if (contents.events[day][time][i][5].length > 0){
 																		out.html += " at ";
