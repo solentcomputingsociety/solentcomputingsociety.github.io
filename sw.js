@@ -1,4 +1,4 @@
-const version = "0.0.2";
+const version = "0.0.1";
 const cacheName = "offline";
 var updateCache = async function() {
 	await caches.open('offline').then(async function(cache) {
