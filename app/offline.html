@@ -79,7 +79,7 @@
 		<script type="text/javascript">document.getElementById("retry").addEventListener("click",function(e){
 			e.target.parentElement.outerHTML = "";
 			document.getElementById("load_spinner").classList.remove("hide");
-			setTimeout(function(){if (window.location.pathname != "/app/offline.html"){location.reload()}else{location.assign("/app/start.html")}},500);
+			setTimeout(function(){if (window.location.pathname != "/app/offline.html"){location.reload()}else{location.assign("/")}},500);
 		});</script>
 	</div>
 </body>

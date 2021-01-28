@@ -77,9 +77,8 @@
 	<div class="content">
 		<div id="b_banner"></div>
 		<h1>Error</h1>
-		<noscript><p id="message">An error occured. Please enable JavaScript to display the error message.</p><style type="text/css">.display{display:none}</style></noscript>
-		<p id="message" class="display"><script type="text/javascript">var errors={"/error/page_ref":"An invalid request caused a page reference error","/error/page_ref_undefined":"The page you requested did not have any valid reference identifier","/error/unexpected":"An unexpected error occured","/error/user_id_not_found":"You attempted to complete an action where you are required to be signed into a valid user account","/error/load_app":"Failed to load a portion of the app.",false:"Sorry, but the page `" + window.location.pathname.substring(1) + "` was not found"};document.getElementById("message").innerHTML={true:errors[window.location.pathname],false:errors[false]}[Object.keys(errors).indexOf(window.location.pathname)>=0]+"."</script></p>
-		<p><a href="/events" title="Go back to app">Why not view some upcoming <u>event</u>?</a></p>
+		<p id="message">An invalid page reference was provided.</p>
+		<p><a href="/" title="Go back to app">Go to home?</a></p>
 	</div>
 </body>
 </html>
