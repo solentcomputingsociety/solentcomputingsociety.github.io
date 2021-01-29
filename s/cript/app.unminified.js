@@ -289,7 +289,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									if (Object.keys(events[day]).length > 0){
 										show_date = [show_date.getDate(),show_date.getMonth(),show_date.getFullYear(),]
 										show_date[3] = show_date[0] % 100;
-										events_render += "<div><h4 class=\"event_date\">" + {true:"Today",false:show_date[0] + (ordinal[(show_date[3] - 20) % 10] || ordinal[show_date[1]] || ordinal[0]) + " of " + months[show_date[1]] + ", " + show_date[2]}[event_date.valueOf() <= date_check.valueOf()] + ":</h4><div><div class=\"event_daily_container\"><div class=\"event_content_container spacer_padder desktop_only\"></div>";
+										events_render += "<div><h4 class=\"event_date\">" + {true:"Today",false:show_date[0] + (ordinal[(show_date[3] - 20) % 10] || ordinal[show_date[1]] || ordinal[0]) + " of " + months[show_date[1]] + ", " + show_date[2]}[event_date.valueOf() <= date_check.valueOf()] + ":</h4><div><div class=\"event_daily_container\"><div class=\"event_content_container spacer_padder\"></div>";
 										for (let priority = 0; priority < 2; priority++) {
 											for (var time in events[day]){
 												for (var i = 0; i < events[day][time].length; i++){
@@ -322,7 +322,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 											} catch (e) {
 												end_date = "";
 											}
-											events_render += "<div id=\"vent_ref_id-e" + (new Date(day).getTime() + time) + "\" class=\"event_content_container" + {true:" dynamic_tables",false:""}[navigator.appVersion.indexOf("Chrome") != -1] + " event_type_" + event.split(" ").join("_") + {true:" priority_event",false:""}[priority] + "\"><div><h3 class=\"event_name\">" + events[day][time][i][0] + "</h3><div><div class=\"center_text small\"><span>" + {true:"Started",false:"From"}[start_date.getTime() < date_check.getTime() || (start_date.getTime() == date_check.getTime() && parseInt(time) < now)] + ": ";
+											events_render += "<div class=\"event_content_container" + {true:" dynamic_tables",false:""}[navigator.appVersion.indexOf("Chrome") != -1] + " event_type_" + event.split(" ").join("_") + {true:" priority_event",false:""}[priority] + "\"><div><h3 class=\"event_name\">" + events[day][time][i][0] + "</h3><div><div class=\"center_text small\"><span>" + {true:"Started",false:"From"}[start_date.getTime() < date_check.getTime() || (start_date.getTime() == date_check.getTime() && parseInt(time) < now)] + ": ";
 											try {
 												if (start_date < new Date(day)){
 													events_render += ("0" + events[day][time][i][3].getDate()).slice(-2) + "/" + ("0" + (events[day][time][i][3].getMonth() + 1)).slice(-2) + "/" + events[day][time][i][3].getFullYear();
