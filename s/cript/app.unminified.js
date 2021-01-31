@@ -277,7 +277,15 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 							now = now.getSeconds() + (60 * (now.getMinutes() + (60 * now.getHours())));
 							events_render = "<div id=\"events_page_container\"><div id=\"events_page_side\">";
 							const months = ["January", "February", "March","April", "May", "June", "July", "August", "September", "October", "November", "December"];
-							const ordinal = ["th", "st", "nd", "rd"];
+							const ordinal = function(d) {
+								if (d > 3 && d < 21) return 'th';
+								switch (d % 10) {
+								  case 1:  return "st";
+								  case 2:  return "nd";
+								  case 3:  return "rd";
+								  default: return "th";
+								}
+							  }
 							var events_added = false;
 							for (var day in events) {
 								var priority_order = [];
@@ -289,7 +297,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 									if (Object.keys(events[day]).length > 0){
 										show_date = [show_date.getDate(),show_date.getMonth(),show_date.getFullYear(),]
 										show_date[3] = show_date[0] % 100;
-										events_render += "<div><h4 class=\"event_date\">" + {true:"Today",false:show_date[0] + (ordinal[(show_date[3] - 20) % 10] || ordinal[show_date[1]] || ordinal[0]) + " of " + months[show_date[1]] + ", " + show_date[2]}[event_date.valueOf() <= date_check.valueOf()] + ":</h4><div><div class=\"event_daily_container\"><div class=\"event_content_container spacer_padder\"></div>";
+										events_render += "<div><h4 class=\"event_date\">" + {true:"Today",false:show_date[0] + ordinal(show_date[0]) + " of " + months[show_date[1]] + ", " + show_date[2]}[event_date.valueOf() <= date_check.valueOf()] + ":</h4><div><div class=\"event_daily_container\"><div class=\"event_content_container spacer_padder\"></div>";
 										for (let priority = 0; priority < 2; priority++) {
 											for (var time in events[day]){
 												for (var i = 0; i < events[day][time].length; i++){
