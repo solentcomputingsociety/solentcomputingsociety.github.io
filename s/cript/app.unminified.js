@@ -192,7 +192,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						request.onreadystatechange = function() {
 							if (this.status >= 400) {
 								if (events == {}){
-									reject("Failed to load events");
+									reject();
 								}
 								resolve();
 								return false;
@@ -263,6 +263,7 @@ console.info("\nSolent\nComputing\nSociety_\n\n\nA message to the society member
 						};
 						request.onerror = function () {
 							events = false;
+							reject();
 						}
 						request.send();
 					} catch(err) {}
